@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <title></title>
+    <script type="text/javascript">
+    function Check() {
+
+        var account = document.getElementsByName('account')[0].value;
+        var name = document.getElementsByName('name')[0].value;
+        var password = document.getElementsByName('password')[0].value;
+        if (account && name && password) {
+            return true;
+        }
+        alert('please input the info.');
+        return false;
+
+    }
+    </script>
+</head>
+
+<body>
+    <form name="editform" action="storeEdit" method="post" accept-charset="utf-8" onSubmit="return Check();">
+        <h1>店舖 - 修改</h1>
+        <input type="hidden" name="id" value="<%=data[0].id  %>" />
+        <div class="row">
+            <label>名稱：</label>
+            <input type="text" name="name" placeholder="name" value="<%=data[0].name %>" readonly  />
+        </div>
+        <div class="row">
+            <label>所有者：</label>
+            <select name="ownerid">
+                    <% for ( var i = 0 ; i < user.length ; i++){ %>
+                    <option value="<%= user[i].id  %>" <%= data[0].ownerid == user[i].id ? "selected='true'":""%>><%= user[i].name  %></option>
+                    <% } %>
+            </select>
+        </div>
+        <div class="row">
+            <label>區域：</label>
+            <input type="text" name="area" placeholder="area" value="<%=data[0].area %>"/>
+        </div> 
+        <div class="row">
+            <label>地址：</label>
+            <input type="text" name="address" placeholder="address" value="<%=data[0].address %>"/>
+        </div>  
+        <div class="row">
+            <label>經度：</label>
+            <input type="text" name="lat" placeholder="lat" value="<%=data[0].lat %>"/>
+        </div>  
+        <div class="row">
+            <label>緯度：</label>
+            <input type="text" name="lng" placeholder="lng" value="<%=data[0].lng %>"/>
+        </div>   
+        <div class="row">
+            <label>狀態：</label>
+            <input type="radio" name="status" value="1" <%=data[0].status ? "checked" : "" %>> 正常 </input>
+            <input type="radio" name="status" value="0" <%=data[0].status ? "" : "checked" %>> 異常 </input>
+        </div>       
+        <div class="row">
+            <input class="btn" type='submit' value='提交'>
+            <input class="btn" type='reset' value='重置'>
+            <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
+        </div>
+    </form>   
+</body>
+
+</html>

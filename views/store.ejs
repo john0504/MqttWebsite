@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script>
+    function Edit(id) {
+        window.location.href = "/store/storeEdit?id=" + id;
+    }
+
+    function Delete(id) {
+        var rs = confirm('確定要刪除?');
+        if (rs) {
+            window.location.href = "/store/storeDelete?id=" + id;
+        }
+    }
+
+    function Next(index, length) {
+        if (index+1 > length-1) {
+            window.location.href = "/store?index=0";
+        } else {
+            window.location.href = "/store?index=" + (++index);
+        } 
+                
+    }
+
+    function Past(index, length) {
+        if (index-1 < 0) {
+            window.location.href = "/store?index="+ (--length);
+        } else {
+            window.location.href = "/store?index=" + (--index);
+        }
+    }
+    </script>
+</head>
+
+<body>
+    <% if (locals.account) { %>
+        <table border="0" align="right">
+            <tr>
+                <th><h3>您好, <%= account %></h1>  </th>
+                <th><a href="/logout">登出</a></th>
+            </tr>
+        </table>
+    <% } %>
+    <table border="0" align="center">
+        <tr>
+            <% if (locals.superuser == 1) { %>
+                <th><a href="/user">用戶</a></th>
+            <% } %>
+            <th><a href="/store">店舖</a></th>
+            <th><a href="/machine">機台</a></th>
+        </tr>
+    </table>
+    <h3>
+        <%= data[index].name %>
+        <input type="button" name="past" value="上一個" class="btn" onclick="Past('<%= index %>','<%= data.length %>');" />
+        <input type="button" name="next" value="下一個" class="btn" onclick="Next('<%= index %>','<%= data.length %>');" />
+    </h3>
+    <iframe width="850" height="300" frameborder="0" 
+        scrolling="no" marginheight="0" marginwidth="0" 
+        src=http://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=<%=data[index].lng %>,<%=data[index].lat %>&z=16&output=embed&t=>
+    </iframe>
+    <br/><br/>
+    <h1>店舖 - 列表</h1>
+    <div class="control">
+        <% if (locals.superuser == 1) { %>
+            <input class="btn" type='submit' value='新增' onclick="javascript: location.href='/store/add'">
+        <% } %>        
+    </div>
+    <table class="table">
+        <tr>
+            <th>編號</th>
+            <th>名稱</th>
+            <th>所有者</th>
+            <th>區域</th>
+            <th>狀態</th>
+            <th>地址</th>
+            <th>建立時間</th>
+        </tr>
+        <% for ( var i = 0 ; i < data.length ; i++){ %>
+            <tr>
+                <td>
+                    <%= i+1 %>
+                </td>
+                <td>
+                    <%= data[i].name  %>
+                </td>
+                <td>
+                    <%= data[i].owner  %>
+                </td>
+                <td>
+                    <%= data[i].area  %>
+                </td>
+                <td>
+                    <% if(data[i].status > 0) { %>
+                        正常
+                    <% } else { %>
+                        異常
+                    <% } %>    
+                </td>
+                <td>
+                    <%= data[i].address  %>
+                </td>
+                <td>
+                    <% var date = new Date(data[i].createdate/1); %>
+                    <%= date.getFullYear() + "-" 
+                    + (date.getMonth() + 1) + "-" 
+                    + date.getDate() + " " 
+                    + date.getHours() + ":" 
+                    + date.getMinutes() + ":" 
+                    + date.getSeconds()  %>
+                </td>
+                <td>
+                    <% if (locals.superuser == 1) { %>
+                        <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].id  %>');" />
+                        <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].id  %>');" />
+                    <% } %> 
+                </td>
+            </tr>
+            <% } %>
+    </table>
+</body>
+
+</html>

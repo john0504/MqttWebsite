@@ -20,8 +20,8 @@
 
     function Search() {
 
-        var userid = document.getElementsByName('suserid')[0].value;
-        window.location.href = "/?user=" + userid;;
+        var serial = document.getElementsByName('suserid')[0].value;
+        window.location.href = "/?serial=" + serial;
     }
     </script>
 </head>
@@ -29,8 +29,8 @@
 <body>
     <h1>Account - List</h1>
     <div class="search">
-        <label>UserId：</label>
-        <input type="text" name="suserid" value="<%=user  %>" placeholder="input the userid">
+        <label>序號：</label>
+        <input type="text" name="suserid" value="<%=serial  %>" placeholder="請輸入完整序號">
         <input type="button" name="sSearch" value="Search" class="btn" onclick="Search();">
     </div>
     <div class="control">
@@ -38,25 +38,46 @@
     </div>
     <table class="table">
         <tr>
-            <th>id</th>
-            <th>userid</th>
-            <th>password</th>
-            <th>email</th>
-            <th></th>
+            <th>編號</th>
+            <th>機台名稱</th>
+            <th>店舖名稱</th>
+            <th>序號</th>
+            <th>機型</th>
+            <th>安裝日期</th>
+            <th>狀態</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
             <tr>
                 <td>
-                    <%= data[i].id  %>
+                    <%= i+1 %>
                 </td>
                 <td>
-                    <%= data[i].userid  %>
+                    <%= data[i].name  %>
                 </td>
                 <td>
-                    <%= data[i].password  %>
+                    <%= data[i].marketname  %>
                 </td>
                 <td>
-                    <%= data[i].email  %>
+                    <%= data[i].serial  %>
+                </td>
+                <td>
+                    <%= data[i].type  %>
+                </td>
+                <td>
+                    <% var date = new Date(data[i].createdate/1); %>
+                    <%= date.getFullYear() + "-" 
+                    + (date.getMonth() + 1) + "-" 
+                    + date.getDate() + " " 
+                    + date.getHours() + ":" 
+                    + date.getMinutes() + ":" 
+                    + date.getSeconds()  %>
+                </td>
+                <td>
+                    <% if(data[i].status > 0) { %>
+                        連線
+                    <% } else { %>
+                        離線
+                    <% } %>    
                 </td>
                 <td>
                     <input type="button" name="edit" value="Edit" class="btn" onclick="Edit('<%= data[i].id  %>');" />

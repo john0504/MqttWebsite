@@ -1,5 +1,5 @@
 body {
-    padding: 50px;
+    padding: 30px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -11,8 +11,8 @@ body {
     margin: 10px;
 }
 
-.search input[type='text'] {
-    height: 25px;
+.search select {
+    height: 35px;
     padding: 0 5px;
 }
 
@@ -31,7 +31,7 @@ a:hover {
 
 .table {
     border-collapse: collapse;
-    font-size: 16px;
+    font-size: 12px;
     text-align: center;
 }
 
@@ -54,7 +54,7 @@ a:hover {
 
 .row {
     width: 280px;
-    height: 30px;
+    height: 60px;
     margin: 5px;
 }
 
@@ -64,15 +64,23 @@ a:hover {
     font-size: 16px;
 }
 
+.row select {
+    float: right;
+    height: 35px;
+    width: 250px;
+    padding: 0 5px;
+}
+
 .row input[type='text'],
-.row input[type='password'] {
+.row input[type='password']
+{
     float: right;
     height: 20px;
     padding: 0 5px;
 }
 
 .btn {
-    width: 80px;
+    width: 60px;
     height: 30px;
     border: none;
     color: #FFFFFF;

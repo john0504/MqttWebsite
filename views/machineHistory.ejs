@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+    <% if (locals.account) { %>
+        <table border="0" align="right">
+            <tr>
+                <th><h3>您好, <%= account %></h1>  </th>
+                <th><a href="/logout">登出</a></th>
+            </tr>
+        </table>
+    <% } %>
+    <table border="0" align="center">
+        <tr>
+            <th><a href="/user">用戶</a></th>
+            <th><a href="/store">店舖</a></th>
+            <th><a href="/machine">機台</a></th>
+        </tr>
+    </table>
+    <h1>機台 - 歷史紀錄</h1>    
+    <table class="table">
+        <tr>
+            <th>交易日期</th>
+            <th>錢箱數目</th>
+            <th>扭蛋數目</th>
+        </tr>
+        <% for ( var i = 0 ; i < data.length ; i++){ %>
+            <tr>
+                <td>
+                    <% var date = new Date(data[i].date/1); %>
+                    <%= date.getFullYear() + "-" 
+                    + (date.getMonth() + 1) + "-" 
+                    + date.getDate() + " " 
+                    + date.getHours() + ":" 
+                    + date.getMinutes() + ":" 
+                    + date.getSeconds()  %>
+                </td>
+                <td>
+                    <%= data[i].money  %>
+                </td>
+                <td>
+                    <%= data[i].gift  %>
+                </td>
+            </tr>
+            <% } %>
+    </table>       
+    <div class="row">
+        <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
+    </div>
+</body>
+
+</html>

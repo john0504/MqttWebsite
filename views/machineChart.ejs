@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+</head>
+<body>
+    <h1>機台 - 圖表</h1>
+    <canvas id="myChart" width="900" height="400"></canvas>
+
+    <script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: <%- JSON.stringify(labels);  %>,
+            datasets: [{
+                label: 'Money',
+                data: <%- JSON.stringify(moneyDataSet.data);  %>,
+                backgroundColor: <%- JSON.stringify(moneyDataSet.backgroundColor);  %>,
+                borderColor: <%- JSON.stringify(moneyDataSet.borderColor);  %>,
+                borderWidth: 1
+            },
+            {
+                label: 'Gift',
+                data: <%- JSON.stringify(giftDataSet.data);  %>,
+                backgroundColor: <%- JSON.stringify(giftDataSet.backgroundColor);  %>,
+                borderColor: <%- JSON.stringify(giftDataSet.borderColor);  %>,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    </script>        
+    <div class="row">
+        <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
+    </div>
+</body>
+</html>

@@ -9,10 +9,10 @@
     <script type="text/javascript">
     function Check() {
 
-        var id = document.getElementsByName('userid')[0].value;
-        var pwd = document.getElementsByName('password')[0].value;
-        var mail = document.getElementsByName('email')[0].value;
-        if (id && pwd && mail) {
+        var account = document.getElementsByName('account')[0].value;
+        var name = document.getElementsByName('name')[0].value;
+        var password = document.getElementsByName('password')[0].value;
+        if (account && name && password) {
             return true;
         }
         alert('please input the info.');
@@ -24,24 +24,29 @@
 
 <body>
     <form name="editform" action="userEdit" method="post" accept-charset="utf-8" onSubmit="return Check();">
-        <h1>Account - Edit</h1>
+        <h1>用戶 - 修改</h1>
         <input type="hidden" name="id" value="<%=data[0].id  %>" />
         <div class="row">
-            <label>userid：</label>
-            <input type="text" name="userid" placeholder="userid" value="<%=data[0].userid %>" readonly  />
+            <label>帳號：</label>
+            <input type="text" name="account" placeholder="account" value="<%=data[0].account %>" readonly  />
         </div>
         <div class="row">
-            <label>password：</label>
-            <input type="text" name="password" placeholder="password" value="<%=data[0].password  %>" />
+            <label>名稱：</label>
+            <input type="text" name="name" placeholder="name" value="<%=data[0].name %>" />
         </div>
         <div class="row">
-            <label>email：</label>
-            <input type="text" name="email" placeholder="email" value="<%=data[0].email  %>">
-        </div>
+            <label>密碼：</label>
+            <input type="text" name="password" placeholder="password" value="<%=data[0].password %>"/>
+        </div>  
         <div class="row">
-            <input class="btn" type='submit' value='Submit'>
-            <input class="btn" type='reset' value='Reset'>
-            <input class="btn" type='button' value='Back' onclick="javascript: window.history.back();">
+            <label>權限：</label>
+            <input type="radio" name="enable" value="1" <%=data[0].enable ? "checked" : "" %>> 啟用 </input>
+            <input type="radio" name="enable" value="0" <%=data[0].enable ? "" : "checked" %>> 禁用 </input>
+        </div>       
+        <div class="row">
+            <input class="btn" type='submit' value='提交'>
+            <input class="btn" type='reset' value='重置'>
+            <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
         </div>
     </form>
 </body>
