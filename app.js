@@ -41,11 +41,11 @@ var opt = {
 	clientId: 'nodejs'
 };
 
-var client = mqtt.connect('mqtt://127.0.0.1', opt);
+var client = mqtt.connect('mqtt://localhost', opt);
  
 client.on('connect', function () {
 	console.log('MQTT server connected.');
-	client.subscribe("cectco/client/msg");
+	client.subscribe("TENX/+/+/status_up");
 });
 
 client.on('message', function (topic, msg) { 
