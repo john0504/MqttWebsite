@@ -218,12 +218,31 @@ router.get('/machineDelete', function(req, res, next) {
 
     var db = req.con;
 
-    db.query('DELETE FROM mqtt_machine WHERE id = ?', id, function(err, rows) {
+    db.query('SELECT serial as serial FROM mqtt_machine WHERE id = ?', id, function(err, rows) {
         if (err) {
             console.log(err);
         }
-        res.redirect('/');
+
+        var data = rows;
+        if (data == '') {
+            return;
+        }
+        console.log(JSON.stringify(data[0].serial));        
+        db.query('DELETE FROM mqtt_client WHERE serial = ?', data[0].serial, function(err, rows) {
+            if (err) {
+                console.log(err);
+            }
+        });
+
+        db.query('DELETE FROM mqtt_machine WHERE id = ?', id, function(err, rows) {
+            if (err) {
+                console.log(err);
+            }
+            
+            res.redirect('/');
+        });
     });
+
 });
 
 module.exports = router;
