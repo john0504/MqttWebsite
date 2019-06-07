@@ -41,6 +41,7 @@ function disconnect_handler() {
         }
     });
 }
+disconnect_handler();
 /*
 con.connect(function(err) {
     if (err) {
