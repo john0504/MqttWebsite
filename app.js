@@ -17,13 +17,28 @@ var reg = require('./routes/reg');
 // DataBase 
 var mysql = require("mysql");
 
-var con = mysql.createConnection({
+function disconnect_handler() {
+   var con = mysql.createConnection({
     host: "localhost",
     user: "tywu",
     password: "12345678",
     database: "mqtt_DB"
 });
+    con.connect(err => {
+        (err) && setTimeout('disconnect_handler()', 2000);
+    });
 
+    conn.on('error', err => {
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+            // db error 重新連線
+            disconnect_handler();
+        } else {
+            throw err;
+        }
+    });
+    exports.conn = conn;
+}
+/*
 con.connect(function(err) {
     if (err) {
         console.log('connecting error');
@@ -31,6 +46,7 @@ con.connect(function(err) {
     }
     console.log('connecting success');
 });
+*/
 
 
 //===========================================
