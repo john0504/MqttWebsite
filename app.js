@@ -25,10 +25,12 @@ var con = mysql.createConnection({
 });
 
 function disconnect_handler() {
-    con.connect(err => {
-        (err) && setTimeout('disconnect_handler()', 2000);
-    });
-	
+    con.connect(function(err) {
+        if (err) {
+            console.log('connecting error');
+            return;
+        }
+    });	
     console.log('connecting success');
 
     con.on('error', err => {
