@@ -1,10 +1,18 @@
+<head>
+    <title>
+        <%= title %>
+    </title>
+</head>
 <form class="form-signin" role="form" method="post">
     <h2 class="form-signin-heading">註冊</h2>
 
-    <input id="txtUserName" name="txtUserName" type="text" class="form-control" placeholder="帳號" required />
+    <input id="txtUserAccount" name="txtUserAccount" type="text" class="form-control" placeholder="帳號" required />
+    <br/>
     <input id="txtUserPwd" name="txtUserPwd" type="password" class="form-control" placeholder="密碼" required/>
-    <input id="txtUserRePwd"  name="txtUserRePwd" type="password" class="form-control" placeholder="再輸入密碼" required/>  
+    <br/>
+    <input id="txtUserName"  name="txtUserName" type="text" class="form-control" placeholder="名稱" required/>  
 
     <button id="btnSub" class="btn btn-lg btn-primary" type="submit">註冊</button>
    <a class="btn btn-link" href="/login" role="button">登入</a>
+   <br/><%= msg  %>
 </form>  

@@ -41,6 +41,7 @@ router.post('/', function(req, res, next) {
             res.locals.account = account;
             //設定session
             req.session.name = result[0].name; 
+            req.session.account = account; 
             req.session.sign = true;
             req.session.superuser = result[0].superuser;
             req.session.userid = result[0].id;

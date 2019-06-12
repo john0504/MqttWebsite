@@ -13,6 +13,7 @@ var machine = require('./routes/machine');
 var user = require('./routes/user');
 var store = require('./routes/store');
 var reg = require('./routes/reg');
+var api = require('./routes/api');
 
 // DataBase 
 var mysql = require("mysql");
@@ -171,6 +172,7 @@ app.use('/logout', logout);
 app.use('/machine', machine);
 app.use('/store', store);
 app.use('/user', user);
+app.use('/api:1', api);
 
 
 // catch 404 and forward to error handler

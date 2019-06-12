@@ -1,23 +1,50 @@
 var express = require('express'),
     router = express.Router(),
     crypto = require('crypto'),
-    TITLE_REG = '註冊';
+    TITLE_REG = '註冊'
+    msg = '';
 
 router.get('/', function(req, res) {
   res.render('reg',{title:TITLE_REG});
 });
 
 router.post('/', function(req, res) {
-  var userName = req.body['txtUserName'],
+  var userAccount = req.body['txtUserAccount'],
       userPwd = req.body['txtUserPwd'],
-      userRePwd = req.body['txtUserRePwd'],     
-      md5 = crypto.createHash('md5');
- 
-      userPwd = md5.update(userPwd).digest('hex');
+      userName = req.body['txtUserName'];
 
-  var newUser = new User({
-      account: userName,
-      password: userPwd
+  var db = req.con;
+
+  // check account exist
+  var account = userAccount;
+  db.query('SELECT account FROM mqtt_user WHERE account = ?', account, function(err, rows) {
+      if (err) {
+          console.log(err);
+      }
+
+      var count = rows.length;
+      if (count > 0) {
+
+          var msg = '帳號名稱重複！';
+          res.render('reg',{title:TITLE_REG, msg: msg});
+
+      } else {
+        var sql = {
+            account: userAccount,
+            password: userPwd,
+            name: userName,
+            createdate: Date.now()
+        };
+
+        //console.log(sql);
+        db.query('INSERT INTO mqtt_user SET ?', sql, function(err, rows) {
+            if (err) {
+                console.log(err);
+            }
+            res.setHeader('Content-Type', 'application/json');
+            res.redirect('/');
+        });
+      }
   });
 });
 module.exports = router;

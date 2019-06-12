@@ -3,7 +3,7 @@ var router = express.Router();
 
 // home page
 function checkSession(req, res) {
-    if (!req.session.sign || req.session.superuser == 0) {
+    if (!req.session.sign) {
         res.redirect('/');
         return false;
     } else {
@@ -19,17 +19,29 @@ router.get('/', function(req, res, next) {
     }
     var db = req.con;
  
-
-    db.query('SELECT * FROM mqtt_user ', function(err, rows) {
-        if (err) {
-            console.log(err);
-        }
-        var data = rows;
-
-        // use user.ejs
-        res.render('user', { title: 'User Information', data: data });
-    });
-
+    if (req.session.superuser == 1) {
+        db.query('SELECT * FROM mqtt_user ', function(err, rows) {
+            if (err) {
+                console.log(err);
+            }
+            var data = rows;
+    
+            // use user.ejs
+            res.render('user', { title: 'User Information', data: data });
+        });
+    } else {
+        var account = req.session.account;
+        console.log(account);
+        db.query('SELECT * FROM mqtt_user WHERE account = ?',account ,function(err, rows) {
+            if (err) {
+                console.log(err);
+            }
+            var data = rows;
+    
+            // use user.ejs
+            res.render('user', { title: 'User Information', data: data });
+        });
+    }
 });
 
 // add page
@@ -80,8 +92,6 @@ router.post('/userAdd', function(req, res, next) {
             });
         }
     });
-
-
 });
 
 // edit page
@@ -116,16 +126,20 @@ router.post('/userEdit', function(req, res, next) {
     var sql = {
       account: req.body.account,
       password: req.body.password,
-      name: req.body.name,
-      enable: req.body.enable
+      name: req.body.name
     };
 
+    if (req.body.enable){
+        sql.enable = req.body.enable;
+    }
+        
    db.query('UPDATE mqtt_user SET ? WHERE id = ?', [sql, id], function(err, rows) {
         if (err) {
             console.log(err);
         }
 
-        res.setHeader('Content-Type', 'application/json');
+        req.session.name = req.body.name;
+        res.setHeader('Content-Type', 'application/json');        
         res.redirect('/user');
     });
 

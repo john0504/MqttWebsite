@@ -38,11 +38,13 @@
             <label>密碼：</label>
             <input type="text" name="password" placeholder="password" value="<%=data[0].password %>"/>
         </div>  
-        <div class="row">
-            <label>權限：</label>
-            <input type="radio" name="enable" value="1" <%=data[0].enable ? "checked" : "" %>> 啟用 </input>
-            <input type="radio" name="enable" value="0" <%=data[0].enable ? "" : "checked" %>> 禁用 </input>
-        </div>       
+        <% if (locals.superuser == 1) { %>            
+            <div class="row">
+                <label>權限：</label>
+                <input type="radio" name="enable" value="1" <%=data[0].enable ? "checked" : "" %>> 啟用 </input>
+                <input type="radio" name="enable" value="0" <%=data[0].enable ? "" : "checked" %>> 禁用 </input>
+            </div>   
+        <% } %>    
         <div class="row">
             <input class="btn" type='submit' value='提交'>
             <input class="btn" type='reset' value='重置'>

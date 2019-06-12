@@ -48,22 +48,22 @@
     <% } %>
     <table border="0" align="center">
         <tr>
-            <% if (locals.superuser == 1) { %>
-                <th><a href="/user">用戶</a></th>
-            <% } %>
+            <th><a href="/user">用戶</a></th>
             <th><a href="/store">店舖</a></th>
             <th><a href="/machine">機台</a></th>
         </tr>
     </table>
-    <h3>
-        <%= data[index].name %>
-        <input type="button" name="past" value="上一個" class="btn" onclick="Past('<%= index %>','<%= data.length %>');" />
-        <input type="button" name="next" value="下一個" class="btn" onclick="Next('<%= index %>','<%= data.length %>');" />
-    </h3>
-    <iframe width="850" height="300" frameborder="0" 
-        scrolling="no" marginheight="0" marginwidth="0" 
-        src=http://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=<%=data[index].lng %>,<%=data[index].lat %>&z=16&output=embed&t=>
-    </iframe>
+    <% if (data[index]) { %>
+        <h3>
+            <%= data[index].name %>
+            <input type="button" name="past" value="上一個" class="btn" onclick="Past('<%= index %>','<%= data.length %>');" />
+            <input type="button" name="next" value="下一個" class="btn" onclick="Next('<%= index %>','<%= data.length %>');" />
+        </h3>
+        <iframe width="850" height="300" frameborder="0" 
+            scrolling="no" marginheight="0" marginwidth="0" 
+            src=http://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=<%=data[index].lng %>,<%=data[index].lat %>&z=16&output=embed&t=>
+        </iframe>
+    <% } %>
     <br/><br/>
     <h1>店舖 - 列表</h1>
     <div class="control">
