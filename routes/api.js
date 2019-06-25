@@ -148,4 +148,36 @@ router.post('/sendmail', function(req, res, next) {
     });                
 });
 
+router.post('/reset', function(req, res, next) {
+    var db = req.con;
+    var account = req.body['email'];
+    db.query('SELECT * FROM mqtt_user WHERE account = ?', account, function(err, rows) {
+        if (err) {
+            console.log(err);
+        }
+        
+        var count = rows.length;
+        if (count == 0) {    
+            res.status(400).send('Auth fail.');
+            return;        
+        } else {
+            var mail = req.mailTransport;
+            var password = rows[0].password;
+            mail.sendMail({
+                from: 'no-reply <cect@cectco.com>',
+                to: account + ' <' + account + '>',
+                subject: 'Forget your CECT password?',
+                html: '<h1>' + password + 
+                '</h1><p>This is your password. </p>'+
+                '<p>If you have not applied to get password, please ignore this mail.</p>'
+            }, function(err){
+                if (err) {
+                    console.log('Unable to send email: ' + err);
+                }
+            });
+            res.status(200).send("OK");
+        }
+    });                
+});
+
 module.exports = router;
