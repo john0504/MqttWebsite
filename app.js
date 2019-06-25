@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var nodemailer = require('nodemailer');
 
 var routes = require('./routes/index');
 var login = require('./routes/login');
@@ -14,6 +15,32 @@ var user = require('./routes/user');
 var store = require('./routes/store');
 var reg = require('./routes/reg');
 var api = require('./routes/api');
+
+var mailTransport = nodemailer.createTransport(
+    {
+    host: 'mail.cectco.com',
+    port: 587,
+    tls: {
+        rejectUnauthorized:false
+    },
+    auth: {
+        user: 'cect@cectco.com',
+        pass: 'p0yL.jws06)~'
+    }
+});
+
+// test mail
+
+// mailTransport.sendMail({
+//     from: 'no-reply <cect@cectco.com>',
+//     to: 'tywu <tywu@cectco.com>',
+//     subject: 'Hello',
+//     html: '<h1>Hello</h1><p>This is a test mail.</p>'
+// }, function(err){
+//     if (err) {
+//         console.log('Unable to send email: ' + err);
+//     }
+// });
 
 // DataBase 
 var mysql = require("mysql");
@@ -162,6 +189,7 @@ app.use(session({
 // db state
 app.use(function(req, res, next) {
     req.con = con;
+    req.mailTransport = mailTransport;
     next();
 });
 

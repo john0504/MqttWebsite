@@ -1,5 +1,6 @@
 var express = require('express'),
      router = express.Router();
+var crypto = require('crypto');
 
 router.put('/session', function(req, res) {  
     var db = req.con;
@@ -57,8 +58,17 @@ router.post('/session', function(req, res, next) {
 
 router.put('/user', function(req, res) {
     var account = req.body['account'],
-    password = req.body['password'];
-  
+    password = req.body['password'],
+    token = req.body['token'];
+    
+    var mailtoken = 'cectmail' + account;
+    
+    var md5 = crypto.createHash('md5');
+    mailtoken = md5.update(mailtoken).digest('hex').substring(0,8);
+    if (token != mailtoken) {
+        res.status(400).send('Auth fail.');
+        return;
+    }
     var db = req.con;
   
     // check account exist 
@@ -101,6 +111,41 @@ router.get('/fw/list', function(req, res) {
 router.get('/info-model', function(req, res) {
     res.status(200).send({});
     return;
+});
+
+router.post('/sendmail', function(req, res, next) {
+    var db = req.con;
+    var account = req.body['email'];
+    db.query('SELECT account FROM mqtt_user WHERE account = ?', account, function(err, rows) {
+        if (err) {
+            console.log(err);
+        }
+  
+        var count = rows.length;
+        if (count > 0) {  
+            res.status(400).send('The email has already been taken.');
+            return;
+  
+        } else {
+            var mail = req.mailTransport;
+            var mailtoken = 'cectmail' + account;
+            var md5 = crypto.createHash('md5');
+            mailtoken = md5.update(mailtoken).digest('hex').substring(0,8);
+            mail.sendMail({
+                from: 'no-reply <cect@cectco.com>',
+                to: account + ' <' + account + '>',
+                subject: 'Welcome to register CECT',
+                html: '<h1>' + mailtoken + 
+                '</h1><p>This is your registration key. </p>'+
+                '<p>If you have not applied to register, please ignore this mail.</p>'
+            }, function(err){
+                if (err) {
+                    console.log('Unable to send email: ' + err);
+                }
+            });
+            res.status(200).send({});
+        }
+    });                
 });
 
 module.exports = router;
