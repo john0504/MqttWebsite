@@ -175,7 +175,7 @@ router.post('/reset', function(req, res, next) {
                     console.log('Unable to send email: ' + err);
                 }
             });
-            res.status(200).send("OK");
+            res.status(200).send({});
         }
     });                
 });
