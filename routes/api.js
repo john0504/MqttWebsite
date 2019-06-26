@@ -23,7 +23,7 @@ router.put('/session', function(req, res) {
             res.status(400).send('使用者被拒絕存取');
             return;
         } else { 
-            res.status(200).send("OK");
+            res.status(200).send({});
             return;
         }                    
     });
