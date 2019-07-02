@@ -95,8 +95,8 @@ client.on('message', function (topic, msg) {
             date: Date.now(),
         };
 
-        var addmoney = 0;
-        var addgift = 0;
+        var addmoney = sql.money;
+        var addgift = sql.gift;
         var addbank = 0;
         
         mysqlQuery("SELECT * FROM mqtt_client WHERE serial = ? ORDER BY id DESC LIMIT 1", sql.serial, function (err, result) {
@@ -104,28 +104,29 @@ client.on('message', function (topic, msg) {
                 console.log('[SELECT ERROR] - ', err.message);
                 return;
             }
-            if (result != '') {
-                if (result[0].totalmoney == sql.totalmoney &&
-                    result[0].totalgift == sql.totalgift &&
-                    result[0].money == sql.money &&
-                    result[0].gift == sql.gift) {
-                    console.log('--------------------Superfluous Data----------------------');
-                } else {
+            if (result != '' && 
+                result[0].totalmoney == sql.totalmoney &&
+                result[0].totalgift == sql.totalgift &&
+                result[0].money == sql.money &&
+                result[0].gift == sql.gift) {                
+                console.log('--------------------Superfluous Data----------------------');                       
+            } else {
+                if (result != '') {
                     addmoney = sql.money - result[0].money;
                     addgift = sql.gift - result[0].gift;
                     addbank = addgift > 0 ? 0 : addmoney; 
+                }                
 
-                    mysqlQuery("INSERT INTO mqtt_client SET ?", sql, function (err, result) {
-                        if (err) {
-                            console.log('[SELECT ERROR] - ', err.message);
-                            return;
-                        }
-                        console.log('--------------------------INSERT----------------------------');
-                        console.log('INSERT ID:', result);
-                        console.log('-----------------------------------------------------------------\n\n');
-                    });
-                }            
-            } 
+                mysqlQuery("INSERT INTO mqtt_client SET ?", sql, function (err, result) {
+                    if (err) {
+                        console.log('[SELECT ERROR] - ', err.message);
+                        return;
+                    }
+                    console.log('--------------------------INSERT----------------------------');
+                    console.log('INSERT ID:', result);
+                    console.log('-----------------------------------------------------------------\n\n');
+                });
+            }
             var sqlstring = "INSERT INTO mqtt_machine SET ? ON DUPLICATE KEY UPDATE ? ";
             var insertsql = {
                 totalmoney: obj.totalmoney,

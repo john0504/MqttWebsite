@@ -213,7 +213,7 @@ router.post('/alldevice', function (req, res, next) {
                             name: result[i].name,
                             serial: result[i].serial,
                             type: result[i].type,
-                            // bank: result[i].bank,
+                            bank: result[i].bank,
                             money: result[i].money,
                             gift: result[i].gift,
                             // expiredate: result[i].expiredate,
