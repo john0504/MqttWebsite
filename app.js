@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
+// var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -15,156 +15,156 @@ var user = require('./routes/user');
 var store = require('./routes/store');
 var reg = require('./routes/reg');
 var api = require('./routes/api');
+var payment = require('./routes/payment');
 
 var mailTransport = nodemailer.createTransport(
     {
-    host: 'mail.cectco.com',
-    port: 587,
-    tls: {
-        rejectUnauthorized:false
-    },
-    auth: {
-        user: 'cect@cectco.com',
-        pass: 'p0yL.jws06)~'
-    }
-});
-
-// test mail
-
-// mailTransport.sendMail({
-//     from: 'no-reply <cect@cectco.com>',
-//     to: 'tywu <tywu@cectco.com>',
-//     subject: 'Hello',
-//     html: '<h1>Hello</h1><p>This is a test mail.</p>'
-// }, function(err){
-//     if (err) {
-//         console.log('Unable to send email: ' + err);
-//     }
-// });
+        host: 'mail.cectco.com',
+        port: 587,
+        tls: {
+            rejectUnauthorized: false
+        },
+        auth: {
+            user: 'cect@cectco.com',
+            pass: 'p0yL.jws06)~'
+        }
+    });
 
 // DataBase 
 var mysql = require("mysql");
 
-var con = mysql.createConnection({
+var pool = mysql.createPool({
     host: "localhost",
     user: "tywu",
     password: "12345678",
-    database: "mqtt_DB"
+    database: "mqtt_DB",
+    connectionLimit: 1000
 });
 
-function disconnect_handler() {
-    con.connect(function(err) {
+var mysqlQuery = function(sql, options, callback) {
+    if (typeof options === "function") {
+        callback = options;
+        options = undefined;
+    }
+    pool.getConnection(function(err, conn){
         if (err) {
-            console.log('connecting error');
-            return;
-        }
-    });	
-    console.log('connecting success');
-
-    con.on('error', err => {
-        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            // db error reconnect
-    	    console.log('reconnecting...');
-            disconnect_handler();
+            callback(err, null, null);
         } else {
-            throw err;
+            conn.query(sql, options, function(err, results, fields){
+                // callback
+                callback(err, results, fields);
+            });
+            // release connection。
+            // 要注意的是，connection 的釋放需要在此 release，而不能在 callback 中 release
+            conn.release();
         }
     });
 }
-disconnect_handler();
-/*
-con.connect(function(err) {
-    if (err) {
-        console.log('connecting error');
-        return;
-    }
-    console.log('connecting success');
-});
-*/
-
 
 //===========================================
 
 var mqtt = require('mqtt');
 var opt = {
-	port:1883,
-	clientId: 'nodejs'
+    port: 1883,
+    clientId: 'nodejs'
 };
 
 var client = mqtt.connect('mqtt://localhost', opt);
- 
+
 client.on('connect', function () {
-	console.log('MQTT server connected.');
-	client.subscribe("TENX/+/+/status_up");
+    console.log('MQTT server connected.');
+    client.subscribe("TENX/+/+/status_up");
+    client.subscribe("CECT/+/+/device_create");
 });
 
-client.on('message', function (topic, msg) { 
+client.on('message', function (topic, msg) {
     console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
+    var index = topic.indexOf("device_create");
+
     
-	const obj = JSON.parse(msg.toString());	
+    if (index != -1 || topic.indexOf("status_up") != -1) {
+        const obj = JSON.parse(msg.toString());
 
-    var sql = {
-        totalmoney: obj.totalmoney,
-        totalgift: obj.totalgift,
-        money: obj.money,
-        gift: obj.gift,
-        serial: obj.serial,
-        date: Date.now(),
-    };
+        var sql = {
+            totalmoney: obj.totalmoney,
+            totalgift: obj.totalgift,
+            // bank: obj.bank,
+            money: obj.money,
+            gift: obj.gift,
+            serial: obj.serial,
+            date: Date.now(),
+        };
 
-    con.query("SELECT * FROM mqtt_client WHERE serial = ? ORDER BY id DESC LIMIT 1", sql.serial, function (err, result) {
-        if(err){
-            console.log('[SELECT ERROR] - ',err.message);
-            return;
-          }
-          if(result != '') {
-              if (result[0].totalmoney == sql.totalmoney &&
-                result[0].totalgift == sql.totalgift &&
-                result[0].money == sql.money &&
-                result[0].gift == sql.gift) {
-                    console.log('--------------------Superfluous Data----------------------');
-                    return;                    
-              }
-        }
-          con.query("INSERT INTO mqtt_client SET ?", sql, function (err, result) {
-            if(err){
-                console.log('[SELECT ERROR] - ',err.message);
+        var addmoney = 0;
+        var addgift = 0;
+        var addbank = 0;
+        
+        mysqlQuery("SELECT * FROM mqtt_client WHERE serial = ? ORDER BY id DESC LIMIT 1", sql.serial, function (err, result) {
+            if (err) {
+                console.log('[SELECT ERROR] - ', err.message);
                 return;
-              }
-              console.log('--------------------------INSERT----------------------------');      
-              console.log('INSERT ID:',result);        
-              console.log('-----------------------------------------------------------------\n\n');  
-        });
-    });		
+            }
+            if (result != '') {
+                if (result[0].totalmoney == sql.totalmoney &&
+                    result[0].totalgift == sql.totalgift &&
+                    result[0].money == sql.money &&
+                    result[0].gift == sql.gift) {
+                    console.log('--------------------Superfluous Data----------------------');
+                } else {
+                    addmoney = sql.money - result[0].money;
+                    addgift = sql.gift - result[0].gift;
+                    addbank = addgift > 0 ? 0 : addmoney; 
 
-    var insertsql = {
-        totalmoney: obj.totalmoney, 
-        totalgift: obj.totalgift,
-        money: obj.money,
-        gift: obj.gift,
-        name: obj.name,
-        serial: obj.serial,
-        type: obj.typename,
-        lat: obj.lat,
-        lng: obj.lng,
-        createdate: Date.now()    
-    };
-    var updatesql = {
-        totalmoney: obj.totalmoney, 
-        totalgift: obj.totalgift,
-        money: obj.money,
-        gift: obj.gift,
-        updatedate: Date.now()
-    };
-    con.query("INSERT INTO mqtt_machine SET ? ON DUPLICATE KEY UPDATE ?",[insertsql,updatesql],function (err, result) {
-        if(err){
-            console.log('[SELECT ERROR] - ',err.message);
-            return;
-        }
-        console.log('--------------------------UPDATE----------------------------');      
-        console.log('UPDATE ID:',result);        
-        console.log('-----------------------------------------------------------------\n\n');  
-    });     
+                    mysqlQuery("INSERT INTO mqtt_client SET ?", sql, function (err, result) {
+                        if (err) {
+                            console.log('[SELECT ERROR] - ', err.message);
+                            return;
+                        }
+                        console.log('--------------------------INSERT----------------------------');
+                        console.log('INSERT ID:', result);
+                        console.log('-----------------------------------------------------------------\n\n');
+                    });
+                }            
+            } 
+            var sqlstring = "INSERT INTO mqtt_machine SET ? ON DUPLICATE KEY UPDATE ? ";
+            var insertsql = {
+                totalmoney: obj.totalmoney,
+                totalgift: obj.totalgift,
+                // bank: obj.bank,
+                money: obj.money,
+                gift: obj.gift,
+                name: obj.name,
+                serial: obj.serial,
+                type: obj.typename,
+                lat: obj.lat,
+                lng: obj.lng,
+                // expiredate: ???,
+                createdate: Date.now()
+            };
+            var updatesql = {
+                totalmoney: obj.totalmoney,
+                totalgift: obj.totalgift,
+                updatedate: Date.now()
+            };
+            if (addgift > 0) {
+                updatesql.bank = 0;
+            } else {
+                sqlstring = sqlstring + ", bank = bank + " + addbank;
+            }
+            sqlstring = sqlstring + ", money = money + " + addmoney;
+            sqlstring = sqlstring + ", gift = gift + " + addgift;
+            mysqlQuery(sqlstring, [insertsql, updatesql], function (err, result) {
+                if (err) {
+                    console.log('[SELECT ERROR] - ', err.message);
+                    return;
+                }
+                console.log('--------------------------UPDATE----------------------------');
+                console.log('UPDATE ID:', result);
+                console.log('-----------------------------------------------------------------\n\n');
+            });
+        });
+    }
+    
 });
 
 //===========================================
@@ -175,7 +175,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -183,13 +183,14 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: 'cectco mqtt', //secret的值建议使用随机字符串
-    cookie: {maxAge: 60 * 1000 * 30} // 过期时间（毫秒）
+    cookie: { maxAge: 60 * 1000 * 30 } // 过期时间（毫秒）
 }));
 
 // db state
-app.use(function(req, res, next) {
-    req.con = con;
+app.use(function (req, res, next) {
+    req.mysqlQuery = mysqlQuery;
     req.mailTransport = mailTransport;
+    req.mqttClient = client;
     next();
 });
 
@@ -201,10 +202,11 @@ app.use('/machine', machine);
 app.use('/store', store);
 app.use('/user', user);
 app.use('/api:1', api);
+app.use('/payment', payment);
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
@@ -215,7 +217,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
+    app.use(function (err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
@@ -226,13 +228,12 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
         error: {}
     });
 });
-
 
 module.exports = app;

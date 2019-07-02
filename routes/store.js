@@ -6,37 +6,38 @@ function checkSession(req, res) {
     if (!req.session.sign) {
         res.redirect('/');
         return false;
-    } else {
-        res.locals.account = req.session.name;
+    } else {        
+        res.locals.account = req.session.account;
+        res.locals.name = req.session.name;
         res.locals.superuser = req.session.superuser;
     }
     return true;
 }
 
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
     var index = req.query.index ? req.query.index : 0;
-    var db = req.con;
+    var mysqlQuery = req.mysqlQuery;
     var sql = 'SELECT * FROM mqtt_store ';
     if (req.session.superuser != 1) {
-        sql += ('WHERE ownerid = ' + req.session.userid);
+        sql += ("WHERE account = '" + req.session.account + "'");
     }
-    db.query(sql, function(err, rows) {
+    mysqlQuery(sql, function (err, rows) {
         if (err) {
             console.log(err);
         }
         var data = rows;
-        
-        db.query('SELECT id, name FROM mqtt_user', function(err, rows) {
+
+        mysqlQuery('SELECT account, name FROM mqtt_user', function (err, rows) {
             if (err) {
                 console.log(err);
-            }            
+            }
             var user = rows;
-            for(var i = 0; i < data.length; i++) {
-                for(var j = 0; j < user.length; j++) {
-                    if(data[i].ownerid == user[j].id) {
+            for (var i = 0; i < data.length; i++) {
+                for (var j = 0; j < user.length; j++) {
+                    if (data[i].account == user[j].account) {
                         data[i].owner = user[j].name;
                         break;
                     }
@@ -50,33 +51,33 @@ router.get('/', function(req, res, next) {
 });
 
 // add page
-router.get('/add', function(req, res, next) {
+router.get('/add', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var db = req.con;
-    db.query('SELECT id, name FROM mqtt_user', function(err, rows){
+    var mysqlQuery = req.mysqlQuery;
+    mysqlQuery('SELECT id, name FROM mqtt_user', function (err, rows) {
         if (err) {
             console.log(err);
         }
 
         user = rows;
         // use storeAdd.ejs
-        res.render('storeAdd', { title: 'Add Store', msg: '', user: user }); 
+        res.render('storeAdd', { title: 'Add Store', msg: '', user: user });
     });
-    
+
 });
 
 // add post
-router.post('/storeAdd', function(req, res, next) {
+router.post('/storeAdd', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var db = req.con;   
+    var mysqlQuery = req.mysqlQuery;
 
     var sql = {
         name: req.body.name,
-        ownerid: req.body.ownerid,
+        account: req.body.account,
         area: req.body.area,
         address: req.body.address,
         lat: req.body.lat,
@@ -85,7 +86,7 @@ router.post('/storeAdd', function(req, res, next) {
     };
 
     //console.log(sql);
-    var qur = db.query('INSERT INTO mqtt_store SET ?', sql, function(err, rows) {
+    var qur = mysqlQuery('INSERT INTO mqtt_store SET ?', sql, function (err, rows) {
         if (err) {
             console.log(err);
         }
@@ -95,43 +96,43 @@ router.post('/storeAdd', function(req, res, next) {
 });
 
 // edit page
-router.get('/storeEdit', function(req, res, next) {
+router.get('/storeEdit', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
     var id = req.query.id;
 
-    var db = req.con;
+    var mysqlQuery = req.mysqlQuery;
 
-    db.query('SELECT * FROM mqtt_store WHERE id = ?', id, function(err, rows) {
+    mysqlQuery('SELECT * FROM mqtt_store WHERE id = ?', id, function (err, rows) {
         if (err) {
             console.log(err);
         }
 
         var data = rows;
-        db.query('SELECT id, name FROM mqtt_user', function(err, rows){
+        mysqlQuery('SELECT account, name FROM mqtt_user', function (err, rows) {
             if (err) {
                 console.log(err);
             }
-    
-            user = rows;           
-            res.render('storeEdit', { title: 'Edit store', data: data, user: user});
-             
+
+            user = rows;
+            res.render('storeEdit', { title: 'Edit store', data: data, user: user });
+
         });
     });
 });
 
 
-router.post('/storeEdit', function(req, res, next) {
+router.post('/storeEdit', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var db = req.con;
+    var mysqlQuery = req.mysqlQuery;
 
     var id = req.body.id;
 
-    var sql = {      
-        ownerid: req.body.ownerid,
+    var sql = {
+        account: req.body.account,
         area: req.body.area,
         address: req.body.address,
         lat: req.body.lat,
@@ -139,7 +140,7 @@ router.post('/storeEdit', function(req, res, next) {
         status: req.body.status
     };
 
-   db.query('UPDATE mqtt_store SET ? WHERE id = ?', [sql, id], function(err, rows) {
+    mysqlQuery('UPDATE mqtt_store SET ? WHERE id = ?', [sql, id], function (err, rows) {
         if (err) {
             console.log(err);
         }
@@ -151,15 +152,15 @@ router.post('/storeEdit', function(req, res, next) {
 });
 
 
-router.get('/storeDelete', function(req, res, next) {
+router.get('/storeDelete', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
     var id = req.query.id;
 
-    var db = req.con;
+    var mysqlQuery = req.mysqlQuery;
 
-    db.query('DELETE FROM mqtt_store WHERE id = ?', id, function(err, rows) {
+    mysqlQuery('DELETE FROM mqtt_store WHERE id = ?', id, function (err, rows) {
         if (err) {
             console.log(err);
         }

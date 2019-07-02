@@ -7,18 +7,18 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <title></title>
     <script type="text/javascript">
-    function Check() {
+        function Check() {
 
-        var account = document.getElementsByName('account')[0].value;
-        var name = document.getElementsByName('name')[0].value;
-        var password = document.getElementsByName('password')[0].value;
-        if (account && name && password) {
-            return true;
+            var account = document.getElementsByName('account')[0].value;
+            var name = document.getElementsByName('name')[0].value;
+            var password = document.getElementsByName('password')[0].value;
+            if (account && name && password) {
+                return true;
+            }
+            alert('please input the info.');
+            return false;
+
         }
-        alert('please input the info.');
-        return false;
-
-    }
     </script>
 </head>
 
@@ -28,7 +28,7 @@
         <input type="hidden" name="id" value="<%=data[0].id  %>" />
         <div class="row">
             <label>帳號：</label>
-            <input type="text" name="account" placeholder="account" value="<%=data[0].account %>" readonly  />
+            <input type="text" name="account" placeholder="account" value="<%=data[0].account %>" readonly />
         </div>
         <div class="row">
             <label>名稱：</label>
@@ -36,15 +36,15 @@
         </div>
         <div class="row">
             <label>密碼：</label>
-            <input type="text" name="password" placeholder="password" value="<%=data[0].password %>"/>
-        </div>  
-        <% if (locals.superuser == 1) { %>            
-            <div class="row">
-                <label>權限：</label>
-                <input type="radio" name="enable" value="1" <%=data[0].enable ? "checked" : "" %>> 啟用 </input>
-                <input type="radio" name="enable" value="0" <%=data[0].enable ? "" : "checked" %>> 禁用 </input>
-            </div>   
-        <% } %>    
+            <input type="text" name="password" placeholder="password" value="<%=data[0].password %>" />
+        </div>
+        <% if (locals.superuser == 1) { %>
+        <div class="row">
+            <label>權限：</label>
+            <input type="radio" name="enable" value="1" <%=data[0].enable ? "checked" : "" %>> 啟用 </input>
+            <input type="radio" name="enable" value="0" <%=data[0].enable ? "" : "checked" %>> 禁用 </input>
+        </div>
+        <% } %>
         <div class="row">
             <input class="btn" type='submit' value='提交'>
             <input class="btn" type='reset' value='重置'>

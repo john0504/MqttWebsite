@@ -7,19 +7,19 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <title></title>
     <script type="text/javascript">
-    function Check() {
+        function Check() {
 
-        var name = document.getElementsByName('name')[0].value;
-        var ownerid = document.getElementsByName('ownerid')[0].value;
-        var area = document.getElementsByName('area')[0].value;
-        var address = document.getElementsByName('address')[0].value;
-        if (name && ownerid && area && address) {
-            return true;
+            var name = document.getElementsByName('name')[0].value;
+            var account = document.getElementsByName('account')[0].value;
+            var area = document.getElementsByName('area')[0].value;
+            var address = document.getElementsByName('address')[0].value;
+            if (name && account && area && address) {
+                return true;
+            }
+            alert('please input the info.');
+            return false;
+
         }
-        alert('please input the info.');
-        return false;
-
-    }
     </script>
 </head>
 
@@ -32,7 +32,7 @@
         </div>
         <div class="row">
             <label>所有者：</label>
-            <select name="ownerid">
+            <select name="account">
                 <option value="0"></option>
                 <% for ( var i = 0 ; i < user.length ; i++){ %>
                 <option value="<%= user[i].id  %>"><%= user[i].name  %></option>
@@ -58,7 +58,7 @@
         <div class="row">
             <input class="btn" type='submit' value='提交'>
             <input class="btn" type='reset' value='重置'>
-            <input class="btn" type='button' value='上一頁' onclick="javascript: location.href='/'">
+            <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
             <label class="msgerr">
                 <%=msg %>
             </label>

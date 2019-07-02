@@ -7,22 +7,22 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script>
-    function Edit(id) {
-        window.location.href = "/userEdit?id=" + id;
-    }
-
-    function Delete(id) {
-        var rs = confirm('Confirm to delete?');
-        if (rs) {
-            window.location.href = "/userDelete?id=" + id;
+        function Edit(id) {
+            window.location.href = "/userEdit?id=" + id;
         }
-    }
 
-    function Search() {
+        function Delete(id) {
+            var rs = confirm('Confirm to delete?');
+            if (rs) {
+                window.location.href = "/userDelete?id=" + id;
+            }
+        }
 
-        var serial = document.getElementsByName('suserid')[0].value;
-        window.location.href = "/?serial=" + serial;
-    }
+        function Search() {
+
+            var serial = document.getElementsByName('suserid')[0].value;
+            window.location.href = "/?serial=" + serial;
+        }
     </script>
 </head>
 
@@ -47,44 +47,44 @@
             <th>狀態</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
-            <tr>
-                <td>
-                    <%= i+1 %>
-                </td>
-                <td>
-                    <%= data[i].name  %>
-                </td>
-                <td>
-                    <%= data[i].marketname  %>
-                </td>
-                <td>
-                    <%= data[i].serial  %>
-                </td>
-                <td>
-                    <%= data[i].type  %>
-                </td>
-                <td>
-                    <% var date = new Date(data[i].createdate/1); %>
-                    <%= date.getFullYear() + "-" 
+        <tr>
+            <td>
+                <%= i+1 %>
+            </td>
+            <td>
+                <%= data[i].name  %>
+            </td>
+            <td>
+                <%= data[i].marketname  %>
+            </td>
+            <td>
+                <%= data[i].serial  %>
+            </td>
+            <td>
+                <%= data[i].type  %>
+            </td>
+            <td>
+                <% var date = new Date(data[i].createdate/1); %>
+                <%= date.getFullYear() + "-" 
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() + " " 
                     + date.getHours() + ":" 
                     + date.getMinutes() + ":" 
                     + date.getSeconds()  %>
-                </td>
-                <td>
-                    <% if(data[i].status > 0) { %>
-                        連線
-                    <% } else { %>
-                        離線
-                    <% } %>    
-                </td>
-                <td>
-                    <input type="button" name="edit" value="Edit" class="btn" onclick="Edit('<%= data[i].id  %>');" />
-                    <input type="button" name="delete" value="Delete" class="btn" onclick="Delete('<%= data[i].id  %>');" />
-                </td>
-            </tr>
-            <% } %>
+            </td>
+            <td>
+                <% if(data[i].status > 0) { %>
+                連線
+                <% } else { %>
+                離線
+                <% } %>
+            </td>
+            <td>
+                <input type="button" name="edit" value="Edit" class="btn" onclick="Edit('<%= data[i].id  %>');" />
+                <input type="button" name="delete" value="Delete" class="btn" onclick="Delete('<%= data[i].id  %>');" />
+            </td>
+        </tr>
+        <% } %>
     </table>
 </body>
 

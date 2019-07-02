@@ -1,7 +1,7 @@
 var express = require('express'),
-     router = express.Router();
+  router = express.Router();
 
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
   req.session.destroy();
   res.redirect('/login');
 });

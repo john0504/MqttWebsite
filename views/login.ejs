@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         <%= title %>
     </title>
@@ -13,21 +13,21 @@
 
 <body>
     <div class="container">
-    <% if (locals.account) { %>
-        <h1>您好, <%= account %></h1>  
+        <% if (locals.name) { %>
+        <h1>您好, <%= name %></h1>
         <a href="/logout">登出</a>
-    <% } else { %>
+        <% } else { %>
         <form class="form-signin" role="form" method="post">
-        <h2 class="form-signin-heading">登入</h2>
-    
-        <input id="txtUserName" name="txtUserName" type="text" class="form-control" placeholder="帳號" required />
-        </br>
-        <input id="txtUserPwd" name="txtUserPwd" type="password" class="form-control" placeholder="密碼" required/>
-        <button id="btnSub" class="btn btn-lg btn-primary" type="submit">登入</button>
-        </br></br>
-        <!-- <a class="btn btn-link" href="/login" role="button">註冊</a> -->
-        </form>  
-    <% } %>
+            <h2 class="form-signin-heading">登入</h2>
+
+            <input id="txtUserName" name="txtUserName" type="text" class="form-control" placeholder="帳號" required />
+            </br>
+            <input id="txtUserPwd" name="txtUserPwd" type="password" class="form-control" placeholder="密碼" required />
+            <button id="btnSub" class="btn btn-lg btn-primary" type="submit">登入</button>
+            </br></br>
+            <!-- <a class="btn btn-link" href="/login" role="button">註冊</a> -->
+        </form>
+        <% } %>
     </div>
 </body>
 

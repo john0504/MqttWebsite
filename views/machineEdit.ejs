@@ -7,18 +7,18 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <title></title>
     <script type="text/javascript">
-    function Check() {
+        function Check() {
 
-        var name = document.getElementsByName('name')[0].value;
-        var storeid = document.getElementsByName('storeid')[0].value;
-        
-        if (name && storeid) {
-            return true;
+            var name = document.getElementsByName('name')[0].value;
+            var storeid = document.getElementsByName('storeid')[0].value;
+
+            if (name && storeid) {
+                return true;
+            }
+            alert('please input the info.');
+            return false;
+
         }
-        alert('please input the info.');
-        return false;
-
-    }
     </script>
 </head>
 
@@ -28,16 +28,17 @@
         <input type="hidden" name="id" value="<%=data[0].id  %>" />
         <div class="row">
             <label>名稱:</label>
-            <input type="text" name="name" placeholder="name" value="<%=data[0].name %>"  />
+            <input type="text" name="name" placeholder="name" value="<%=data[0].name %>" />
         </div>
         <div class="row">
-            <label>店舖:</label>            
+            <label>店舖:</label>
             <select name="storeid">
                 <% for ( var i = 0 ; i < store.length ; i++){ %>
-                <option value="<%= store[i].id  %>" <%= data[0].storeid == store[i].id ? "selected='true'":""%>><%= store[i].name  %></option>                
+                <option value="<%= store[i].id  %>" <%= data[0].storeid == store[i].id ? "selected='true'":""%>>
+                    <%= store[i].name  %></option>
                 <% } %>
             </select>
-        </div>   
+        </div>
         <div class="row">
             <input class="btn" type='submit' value='提交'>
             <input class="btn" type='reset' value='重置'>

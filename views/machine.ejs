@@ -7,83 +7,86 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script>
-    function History(serial) {
-        window.location.href = "/machine/machineHistory?serial=" + serial;
-    }
-
-    function Chart(serial) {
-        window.location.href = "/machine/machineChart?serial=" + serial;
-    }
-    
-    function Edit(id) {
-        window.location.href = "/machine/machineEdit?id=" + id;
-    }
-
-    function Delete(id) {
-        var rs = confirm('確定要刪除?');
-        if (rs) {
-            window.location.href = "/machine/machineDelete?id=" + id;
+        function History(serial) {
+            window.location.href = "/machine/machineHistory?serial=" + serial;
         }
-    }
 
-    function Search() {
-        var storeid = document.getElementsByName('storeid')[0].value;
-        window.location.href = "/machine/?storeid=" + storeid;
-    }
-
-    function Next(index, length) {
-        if (index >= length-1) {
-            window.location.href = "/machine?index=0";
-        } else {
-            window.location.href = "/machine?index=" + (++index);
-        } 
-                
-    }
-
-    function Past(index, length) {
-        if (index-1 < 0) {
-            window.location.href = "/machine?index=" + (length-1);
-        } else {
-            window.location.href = "/machine?index=" + (index-1);
+        function Chart(serial) {
+            window.location.href = "/machine/machineChart?serial=" + serial;
         }
-    }
+
+        function Edit(id) {
+            window.location.href = "/machine/machineEdit?id=" + id;
+        }
+
+        function Delete(id) {
+            var rs = confirm('確定要刪除?');
+            if (rs) {
+                window.location.href = "/machine/machineDelete?id=" + id;
+            }
+        }
+
+        function Search() {
+            var storeid = document.getElementsByName('storeid')[0].value;
+            window.location.href = "/machine/?storeid=" + storeid;
+        }
+
+        function Next(index, length) {
+            if (index >= length - 1) {
+                window.location.href = "/machine?index=0";
+            } else {
+                window.location.href = "/machine?index=" + (++index);
+            }
+
+        }
+
+        function Past(index, length) {
+            if (index - 1 < 0) {
+                window.location.href = "/machine?index=" + (length - 1);
+            } else {
+                window.location.href = "/machine?index=" + (index - 1);
+            }
+        }
     </script>
 </head>
 
 <body>
-    <% if (locals.account) { %>
-        <table border="0" align="right">
-            <tr>
-                <th><h3>您好, <%= account %></h1>  </th>
-                <th><a href="/logout">登出</a></th>
-            </tr>
-        </table>
+    <% if (locals.name) { %>
+    <table border="0" align="right">
+        <tr>
+            <th>
+                <h3>您好, <%= name %></h1>
+            </th>
+            <th><a href="/logout">登出</a></th>
+        </tr>
+    </table>
     <% } %>
     <table border="0" align="center">
         <tr>
+            <% if (locals.superuser == 1) { %>
+                <th><a href="/payment">加值卡</a></th>
+            <% } %>
             <th><a href="/user">用戶</a></th>
             <th><a href="/store">店舖</a></th>
             <th><a href="/machine">機台</a></th>
         </tr>
     </table>
     <% if (data[index]) { %>
-        <h3>
-            <%= data[index].name %>
-            <input type="button" name="past" value="上一個" class="btn" onclick="Past('<%= index %>','<%= data.length %>');" />
-            <input type="button" name="next" value="下一個" class="btn" onclick="Next('<%= index %>','<%= data.length %>');" />
-        </h3>
-        <iframe width="850" height="300" frameborder="0" 
-            scrolling="no" marginheight="0" marginwidth="0" 
-            src=http://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=<%=data[index].lng %>,<%=data[index].lat %>&z=16&output=embed&t=>
-        </iframe>
-    <% } %>
-    <br/><br/>
+    <h3>
+        <%= data[index].name %>
+        <input type="button" name="past" value="上一個" class="btn" onclick="Past('<%= index %>','<%= data.length %>');" />
+        <input type="button" name="next" value="下一個" class="btn" onclick="Next('<%= index %>','<%= data.length %>');" />
+    </h3>
+    <iframe width="850" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+        src=http://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=<%=data[index].lng %>,<%=data[index].lat %>&z=16&output=embed&t=>
+        </iframe> <% } %> <br /><br />
     <h1>機台 - 列表</h1>
-    <div class="search">           
-        <label>店舖:</label>            
+    <div class="search">
+        <label>店舖:</label>
         <select name="storeid">
             <% for ( var i = 0 ; i < store.length ; i++){ %>
-            <option value="<%= store[i].id  %>" <%= storeid == store[i].id ? "selected='true'":""%>><%= store[i].name  %></option>
+            <option value="<%= store[i].id  %>" <%= storeid == store[i].id ? "selected='true'":""%>>
+                <%= store[i].name  %></option>
             <% } %>
         </select>
         <input type="button" name="sSearch" value="查詢" class="btn" onclick="Search();">
@@ -94,53 +97,52 @@
             <th>機台名稱</th>
             <th>店舖名稱</th>
             <th>序號</th>
-            <th>機型</th>
-            <th>安裝時間</th>
+            <th>保夾</th>
+            <th>投幣</th>
+            <th>出獎</th>
             <th>狀態</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
-            <tr>
-                <td>
-                    <%= i+1 %>
-                </td>
-                <td>
-                    <%= data[i].name  %>
-                </td>
-                <td>
-                    <%= data[i].storename  %>
-                </td>
-                <td>
-                    <%= data[i].serial  %>
-                </td>
-                <td>
-                    <%= data[i].type  %>
-                </td>
-                <td>
-                    <% var date = new Date(data[i].createdate/1); %>
-                    <%= date.getFullYear() + "-" 
-                    + (date.getMonth() + 1) + "-" 
-                    + date.getDate() + " " 
-                    + date.getHours() + ":" 
-                    + date.getMinutes() + ":" 
-                    + date.getSeconds()  %>
-                </td>
-                <td>
-                    <% if(data[i].status > 0) { %>
-                        連線
-                    <% } else { %>
-                        離線
-                    <% } %>    
-                </td>
-                <td>
-                    <input type="button" name="history" value="紀錄" class="btn" onclick="History('<%= data[i].serial  %>');" />
-                    <input type="button" name="chart" value="圖表" class="btn" onclick="Chart('<%= data[i].serial  %>');" />
-                    <% if (locals.superuser == 1) { %>
-                        <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].id  %>');" />
-                        <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].id  %>');" />                    
-                    <% } %>                    
-                </td>
-            </tr>
-            <% } %>
+        <tr>
+            <td>
+                <%= i+1 %>
+            </td>
+            <td>
+                <%= data[i].name  %>
+            </td>
+            <td>
+                <%= data[i].storename  %>
+            </td>
+            <td>
+                <%= data[i].serial  %>
+            </td>
+            <td>
+                <%= data[i].bank  %>
+            </td>
+            <td>
+                <%= data[i].money  %>
+            </td>
+            <td>
+                <%= data[i].gift  %>
+            </td>
+            <td>
+                <% if(data[i].status > 0) { %>
+                連線
+                <% } else { %>
+                離線
+                <% } %>
+            </td>
+            <td>
+                <input type="button" name="history" value="紀錄" class="btn"
+                    onclick="History('<%= data[i].serial  %>');" />
+                <input type="button" name="chart" value="圖表" class="btn" onclick="Chart('<%= data[i].serial  %>');" />
+                <% if (locals.superuser == 1) { %>
+                <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].id  %>');" />
+                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].id  %>');" />
+                <% } %>
+            </td>
+        </tr>
+        <% } %>
     </table>
 </body>
 
