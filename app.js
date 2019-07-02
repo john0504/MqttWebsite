@@ -95,8 +95,8 @@ client.on('message', function (topic, msg) {
             date: Date.now(),
         };
 
-        var addmoney = sql.money;
-        var addgift = sql.gift;
+        var addmoney = 0;
+        var addgift = 0;
         var addbank = 0;
         
         mysqlQuery("SELECT * FROM mqtt_client WHERE serial = ? ORDER BY id DESC LIMIT 1", sql.serial, function (err, result) {
@@ -115,7 +115,7 @@ client.on('message', function (topic, msg) {
                     addmoney = sql.money - result[0].money;
                     addgift = sql.gift - result[0].gift;
                     addbank = addgift > 0 ? 0 : addmoney; 
-                }                
+                }
 
                 mysqlQuery("INSERT INTO mqtt_client SET ?", sql, function (err, result) {
                     if (err) {
