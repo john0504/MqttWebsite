@@ -123,8 +123,6 @@ client.on('message', function (topic, msg) {
                         return;
                     }
                     console.log('--------------------------INSERT----------------------------');
-                    console.log('INSERT ID:', result);
-                    console.log('-----------------------------------------------------------------\n\n');
                 });
             }
             var sqlstring = "INSERT INTO mqtt_machine SET ? ON DUPLICATE KEY UPDATE ? ";
@@ -160,8 +158,6 @@ client.on('message', function (topic, msg) {
                     return;
                 }
                 console.log('--------------------------UPDATE----------------------------');
-                console.log('UPDATE ID:', result);
-                console.log('-----------------------------------------------------------------\n\n');
             });
         });
     }
