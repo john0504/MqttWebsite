@@ -75,6 +75,8 @@ client.on('connect', function () {
     console.log('MQTT server connected.');
     client.subscribe("TENX/+/+/status_up");
     client.subscribe("CECT/+/+/device_create");
+    client.subscribe("CECT/alldevice");
+    client.subscribe("CECT/updatedevice");
 });
 
 client.on('message', function (topic, msg) {
@@ -161,7 +163,100 @@ client.on('message', function (topic, msg) {
             });
         });
     }
+
+    index = topic.indexOf("alldevice");
+
+    if (index != -1) {
+        const obj = JSON.parse(msg.toString());
+        var account = obj.account;
+        //var token = obj.token;
+        mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+            if (err) {
+                console.log(err);
+                return;
+            }
     
+            var count = rows.length;
+            if (count == 0) {
+                console.log('Auth fail.');
+                return;
+            } else {
+                if (rows[0].enable == 0) {
+                    console.log('使用者被拒絕存取');
+                    return;
+                } else {
+                    mysqlQuery('SELECT * FROM mqtt_machine WHERE account = ?', account, function (err, result) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        var count = result.length;
+                        var message = { data: [] };
+    
+                        for (var i = 0; i < count; i++) {
+                            var device = {
+                                name: result[i].name,
+                                serial: result[i].serial,
+                                type: result[i].type,
+                                bank: result[i].bank,
+                                money: result[i].money,
+                                gift: result[i].gift,
+                                // expiredate: result[i].expiredate,
+                                status: Date.now() - result[i].updatedate < 5 * 60 * 1000 ? 1 : 0
+                            };
+                            message.data.push(device);
+                        }
+                        var topic = `CECT/${account}/alldevice`
+                        console.log(`${topic}:${JSON.stringify(message)}`);
+                        client.publish(topic, JSON.stringify(message), { qos:1, retain: true});
+                        return;
+    
+                    });
+                }
+            }
+        });
+    }
+
+    index = topic.indexOf("updatedevice");
+    if (index != -1) {
+        const obj = JSON.parse(msg.toString());
+        var account = obj.account;
+        var serial = obj.serial;
+        var data = obj.data;
+        mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+    
+            var count = rows.length;
+            if (count == 0) {
+                console.log('Auth fail.');
+                return;
+            } else {
+                if (rows[0].enable == 0) {
+                    console.log('使用者被拒絕存取');
+                    return;
+                } else {
+                    mysqlQuery('SELECT * FROM mqtt_machine WHERE account = ? AND serial = ?'
+                        , [account, serial], function (err, result) {
+                            if (err) {
+                                console.log(err);
+                                return;
+                            }
+                            mysqlQuery('UPDATE mqtt_machine SET ? WHERE id = ?'
+                                , [data, result[0].id], function (err, result2) {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                    console.log(err);
+                                    return;
+                                });
+                        });
+                }
+            }
+        });
+    }    
 });
 
 //===========================================
