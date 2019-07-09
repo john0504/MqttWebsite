@@ -26,7 +26,7 @@ var mailTransport = nodemailer.createTransport(
         },
         auth: {
             user: 'cect@cectco.com',
-            pass: 'p0yL.jws06)~'
+            pass: ''
         }
     });
 
@@ -38,7 +38,7 @@ var pool = mysql.createPool({
     user: "tywu",
     password: "12345678",
     database: "mqtt_DB",
-    connectionLimit: 1000
+    connectionLimit: 1
 });
 
 var mysqlQuery = function(sql, options, callback) {
@@ -74,17 +74,15 @@ var client = mqtt.connect('mqtt://localhost', opt);
 client.on('connect', function () {
     console.log('MQTT server connected.');
     client.subscribe("TENX/+/+/status_up");
-    client.subscribe("CECT/+/+/device_create");
     client.subscribe("CECT/alldevice");
     client.subscribe("CECT/updatedevice");
 });
 
 client.on('message', function (topic, msg) {
     console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
-    var index = topic.indexOf("device_create");
-
+    var index = topic.indexOf("status_up");
     
-    if (index != -1 || topic.indexOf("status_up") != -1) {
+    if (index != -1) {
         const obj = JSON.parse(msg.toString());
 
         var sql = {
