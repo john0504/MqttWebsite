@@ -186,18 +186,19 @@ router.post('/machineEdit', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
 
     var id = req.body.id;
-    var storeid = req.body.storeid;
+    var storeid = req.body.storeid;    
+    /*
     var account;
     for (var i = 0; i < store.length; i++) {
         if (store[i].id == storeid) {
             account = store[i].account;
             break;
         }
-    }
+    }*/
     var sql = {
         name: req.body.name,
         storeid: storeid,
-        account: account
+        //account: account
     };
     console.log(JSON.stringify(sql));
     mysqlQuery('UPDATE mqtt_machine SET ? WHERE id = ?', [sql, id], function (err, rows) {
