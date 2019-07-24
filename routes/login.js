@@ -5,9 +5,9 @@ var express = require('express'),
 
 
 router.get('/', function (req, res, next) {
-    if (req.session.sign) {
-        res.locals.account = req.session.account;
-        res.locals.name = req.session.name;
+    if (req.session.Sign) {
+        res.locals.Account = req.session.Account;
+        res.locals.Name = req.session.Name;
     }
     res.render('login', { title: title });
 });
@@ -15,11 +15,11 @@ router.get('/', function (req, res, next) {
 
 router.post('/', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
-    var account = req.body['txtUserName'],
-        password = req.body['txtUserPwd'];
+    var Account = req.body['txtUserName'],
+        Password = req.body['txtUserPwd'];
     //md5 = crypto.createHash('md5');
-    var cmd = "select * from mqtt_user where account = ?";
-    mysqlQuery(cmd, [account], function (err, result) {
+    var cmd = "select * from AccountTbl where Account = ?";
+    mysqlQuery(cmd, [Account], function (err, result) {
         if (err) {
             return;
         }
@@ -30,22 +30,22 @@ router.post('/', function (req, res, next) {
         }
 
         //password = md5.update(password).digest('hex');
-        if (result[0].account != account || result[0].password != password) {
+        if (result[0].Account != Account || result[0].Password != Password) {
             res.locals.error = '使用者帳號或密碼錯誤';
             res.render('login', { title: res.locals.error });
             return;
-        } else if (result[0].enable == 0) {
+        } else if (result[0].Enable == 0) {
             res.locals.error = '使用者被拒絕存取';
             res.render('login', { title: res.locals.error });
             return;
         } else {
             //設定session
-            req.session.name = result[0].name;
-            req.session.account = account;
-            req.session.sign = true;
-            req.session.superuser = result[0].superuser;
-            req.session.userid = result[0].id;
-            console.log(req.session.name + " login!");
+            req.session.Name = result[0].Name;
+            req.session.Account = Account;
+            req.session.Sign = true;
+            req.session.SuperUser = result[0].SuperUser;
+            req.session.AccountNo = result[0].AccountNo;
+            console.log(req.session.Name + " login!");
             // res.render('login',{title:"登入成功"});
             res.redirect('/machine');
             return;

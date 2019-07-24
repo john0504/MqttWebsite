@@ -3,13 +3,13 @@ var router = express.Router();
 
 // home page
 function checkSession(req, res) {
-    if (!req.session.sign) {
+    if (!req.session.Sign) {
         res.redirect('/');
         return false;
     } else {
-        res.locals.account = req.session.account;
-        res.locals.name = req.session.name;
-        res.locals.superuser = req.session.superuser;
+        res.locals.Account = req.session.Account;
+        res.locals.Name = req.session.Name;
+        res.locals.SuperUser = req.session.SuperUser;
     }
     return true;
 }
@@ -21,56 +21,50 @@ router.get('/', function (req, res, next) {
     var index = req.query.index ? req.query.index : 0;
     var mysqlQuery = req.mysqlQuery;
 
-    var storeid = 0;
-    storeid = req.query.storeid;
+    var sql = 'SELECT * FROM DeviceTbl ';
 
-    var sql = 'SELECT * FROM mqtt_machine ';
-
-    if (storeid && storeid != 0) {      
-        if (req.session.superuser != 1) {
-            sql += ("WHERE account = '" + req.session.account + "' AND storeid = " + storeid);
-        } else {
-            sql += ('WHERE storeid = ' + storeid);
-        }
-    } else {
-        if (req.session.superuser != 1) {
-            sql += ("WHERE account = '" + req.session.account + "'");
-        }
-        storeid = 0;
+    if (req.session.SuperUser != 1) {
+        sql += (`WHERE AccountNo = ${req.session.AccountNo}`);
     }
-
-
-    mysqlQuery(sql, function (err, rows) {
+    var data;
+    mysqlQuery(sql, function (err, devices) {
         if (err) {
             console.log(err);
         }
-        var data = rows;
-        var storesql = 'SELECT id, name FROM mqtt_store ';
-        if (req.session.superuser != 1) {
-            storesql += ('WHERE account = "' + req.session.account + '"');
-        }
-        mysqlQuery(storesql, function (err, rows) {
-            if (err) {
-                console.log(err);
-            }
-            var store = rows;
-            store.splice(0, 0, { id: 0, name: "全部" });
-            for (var i = 0; i < data.length; i++) {
-                if (Date.now() - data[i].updatedate < 5 * 60 * 1000) {
-                    data[i].status = 1;
+        data = devices;
+        
+        for (var i = 0; i < data.length; i++) {
+            var forIndex = i;
+            if (req.session.SuperUser == 1) {
+                if (data[forIndex].AccountNo) {
+                    mysqlQuery("SELECT * FROM AccountTbl where AccountNo = ?",data[forIndex].AccountNo, function (err, accounts) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        data[forIndex].Account = accounts != "" ? accounts[0].Account : "--";
+                    });
                 } else {
-                    data[i].status = 0;
+                    data[forIndex].Account = "--";
                 }
-                for (var j = 0; j < store.length; j++) {
-                    if (data[i].storeid == store[j].id) {
-                        data[i].storename = store[j].name;
-                        break;
-                    }
-                }
+            }  else {
+                data[forIndex].Account = req.session.Account;               
+            } 
+            if (Date.now()/1000 - data[forIndex].UpdateDate < 5 * 60) {
+                data[forIndex].Status = 1;
+            } else {
+                data[forIndex].Status = 0;
             }
-            // use machine.ejs
-            res.render('machine', { title: 'Machine Information', data: data, store: store, storeid: storeid, index: index });
-        });
+            mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1', data[forIndex].DevNo, function (err, msgs) {
+                if (err) {
+                    console.log(err);
+                }
+                Object.assign(data[forIndex], msgs[0]);
+                if (forIndex == data.length -1) {
+                    // use machine.ejs
+                    res.render('machine', { title: 'Machine Information', data: data, index: index });
+                }                
+            });
+        }          
     });
 
 });
@@ -80,16 +74,16 @@ router.get('/machineHistory', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var serial = req.query.serial;
+    var DevNo = req.query.DevNo;
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('SELECT * FROM mqtt_client WHERE serial = ? order by id desc', serial, function (err, rows) {
+    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc', DevNo, function (err, msgs) {
         if (err) {
             console.log(err);
         }
 
-        var data = rows;
+        var data = msgs;
         res.render('machineHistory', { title: 'Machine History', data: data });
     });
 
@@ -100,16 +94,16 @@ router.get('/machineChart', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var serial = req.query.serial;
+    var DevNo = req.query.DevNo;
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('SELECT * FROM mqtt_client WHERE serial = ? order by id asc', serial, function (err, rows) {
+    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id asc', DevNo, function (err, msgs) {
         if (err) {
             console.log(err);
         }
-        console.log(JSON.stringify(rows));
-        var data = rows;
+        console.log(JSON.stringify(msgs));
+        var data = msgs;
         var labels = [];
         var moneyDataSet = { data: [], backgroundColor: [], borderColor: [] };
         var giftDataSet = { data: [], backgroundColor: [], borderColor: [] };
@@ -117,31 +111,31 @@ router.get('/machineChart', function (req, res, next) {
         var gift = 0;
         var day = new Date(1);
         for (var i = 0; i < data.length; i++) {
-            var date = new Date(data[i].date / 1);
+            var date = new Date(data[i].DateCode * 1000);
             if (date.getDate() != day.getDate() || date.getMonth() != day.getMonth() || date.getFullYear() != day.getFullYear()) {
                 day = date;
                 labels.push((date.getMonth() + 1) + "-" + date.getDate());
 
-                moneyDataSet.data.push(data[i].money - money);
+                moneyDataSet.data.push(data[i].H60 - money);
                 moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
                 moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
-                money = data[i].money;
+                money = data[i].H60;
 
-                giftDataSet.data.push(data[i].gift - gift);
+                giftDataSet.data.push(data[i].H61 - gift);
                 giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
                 giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
-                gift = data[i].gift;
+                gift = data[i].H61;
             } else {
-                if (money != data[i].money) {
+                if (money != data[i].H60) {
                     var tempmoney = moneyDataSet.data.pop();
-                    moneyDataSet.data.push(tempmoney + data[i].money - money);
-                    money = data[i].money;
+                    moneyDataSet.data.push(tempmoney + data[i].H60 - money);
+                    money = data[i].H60;
                 }
 
-                if (gift != data[i].gift) {
+                if (gift != data[i].H61) {
                     var tempgift = giftDataSet.data.pop();
-                    giftDataSet.data.push(tempgift + data[i].gift - gift);
-                    gift = data[i].gift;
+                    giftDataSet.data.push(tempgift + data[i].H61 - gift);
+                    gift = data[i].H61;
                 }
             }
         }
@@ -150,30 +144,22 @@ router.get('/machineChart', function (req, res, next) {
 
 });
 
-var store
 // edit page
 router.get('/machineEdit', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var id = req.query.id;
+    var DevNo = req.query.DevNo;
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('SELECT * FROM mqtt_machine WHERE id = ?', id, function (err, rows) {
+    mysqlQuery('SELECT * FROM DeviceTbl WHERE DevNo = ?', DevNo, function (err, rows) {
         if (err) {
             console.log(err);
         }
 
         var data = rows;
-        mysqlQuery('SELECT * FROM mqtt_store', function (err, rows) {
-            if (err) {
-                console.log(err);
-            }
-
-            store = rows;
-            res.render('machineEdit', { title: 'Edit Machine', data: data, store: store });
-        });
+        res.render('machineEdit', { title: 'Edit Machine', data: data });
     });
 
 });
@@ -185,29 +171,16 @@ router.post('/machineEdit', function (req, res, next) {
     }
     var mysqlQuery = req.mysqlQuery;
 
-    var id = req.body.id;
-    var storeid = req.body.storeid;    
-    /*
-    var account;
-    for (var i = 0; i < store.length; i++) {
-        if (store[i].id == storeid) {
-            account = store[i].account;
-            break;
-        }
-    }*/
+    var DevNo = req.body.DevNo;
+
     var sql = {
-        name: req.body.name,
-        storeid: storeid,
-        //account: account
+        DevName: req.body.Name
     };
-    console.log(JSON.stringify(sql));
-    mysqlQuery('UPDATE mqtt_machine SET ? WHERE id = ?', [sql, id], function (err, rows) {
+    mysqlQuery('UPDATE DeviceTbl SET ? WHERE DevNo = ?', [sql, DevNo], function (err, rows) {
         if (err) {
             console.log('UPDATE error:' + err);
         }
-
-        res.setHeader('Content-Type', 'application/json');
-        res.redirect('/');
+        res.redirect('/machine');
     });
 });
 
@@ -216,35 +189,22 @@ router.get('/machineDelete', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var id = req.query.id;
-
+    var DevNo = req.query.DevNo;
     var mysqlQuery = req.mysqlQuery;
+  
+    mysqlQuery('DELETE FROM mqtt_client WHERE DevNo = ?', DevNo, function (err, rows) {
+        if (err) {
+            console.log(err);
+        }
+    });
 
-    mysqlQuery('SELECT serial as serial FROM mqtt_machine WHERE id = ?', id, function (err, rows) {
+    mysqlQuery('DELETE FROM mqtt_machine WHERE DevNo = ?', DevNo, function (err, rows) {
         if (err) {
             console.log(err);
         }
 
-        var data = rows;
-        if (data == '') {
-            return;
-        }
-        console.log(JSON.stringify(data[0].serial));
-        mysqlQuery('DELETE FROM mqtt_client WHERE serial = ?', data[0].serial, function (err, rows) {
-            if (err) {
-                console.log(err);
-            }
-        });
-
-        mysqlQuery('DELETE FROM mqtt_machine WHERE id = ?', id, function (err, rows) {
-            if (err) {
-                console.log(err);
-            }
-
-            res.redirect('/');
-        });
+        res.redirect('/machine');
     });
-
 });
 
 module.exports = router;

@@ -9,10 +9,10 @@
     <script type="text/javascript">
         function Check() {
 
-            var account = document.getElementsByName('account')[0].value;
-            var pwd = document.getElementsByName('password')[0].value;
-            var name = document.getElementsByName('name')[0].value;
-            if (account && pwd && name) {
+            var Account = document.getElementsByName('Account')[0].value;
+            var pwd = document.getElementsByName('Password')[0].value;
+            var name = document.getElementsByName('Name')[0].value;
+            if (Account && pwd && name) {
                 return true;
             }
             alert('please input the info.');
@@ -27,15 +27,15 @@
         <h1>用戶 - 新增帳號</h1>
         <div class="row">
             <label>帳號：</label>
-            <input type="text" name="account" placeholder="account" />
+            <input type="text" name="Account" placeholder="Account" />
         </div>
         <div class="row">
             <label>密碼：</label>
-            <input type="password" name="password" placeholder="password" />
+            <input type="password" name="Password" placeholder="Password" />
         </div>
         <div class="row">
             <label>名稱：</label>
-            <input type="text" name="name" placeholder="name" />
+            <input type="text" name="Name" placeholder="Name" />
         </div>
         <div class="row">
             <input class="btn" type='submit' value='提交'>

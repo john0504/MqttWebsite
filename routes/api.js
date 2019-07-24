@@ -4,10 +4,11 @@ var crypto = require('crypto');
 
 router.put('/session', function (req, res) {
     var mysqlQuery = req.mysqlQuery;
-    var account = req.body['account'],
+    var Account = req.body['account'],
         token = req.body['token'];
-    var cmd = "select * from mqtt_user where account = ?";
-    mysqlQuery(cmd, [account], function (err, result) {
+    var AccountNo = parseInt(token, 16);
+    var cmd = "select * from AccountTbl where Account = ?";
+    mysqlQuery(cmd, [Account], function (err, result) {
         if (err) {
             return;
         }
@@ -16,10 +17,10 @@ router.put('/session', function (req, res) {
             return;
         }
 
-        if (result[0].account != account || account + ':' + result[0].password != token) {
+        if (result[0].Account != Account || result[0].AccountNo != AccountNo) {
             res.status(400).send('token錯誤');
             return;
-        } else if (result[0].enable == 0) {
+        } else if (result[0].Enable == 0) {
             res.status(400).send('使用者被拒絕存取');
             return;
         } else {
@@ -31,11 +32,13 @@ router.put('/session', function (req, res) {
 
 router.post('/session', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
-    var account = req.body['email'],
-        password = req.body['password'];
-    var cmd = "select * from mqtt_user where account = ?";
-    mysqlQuery(cmd, [account], function (err, result) {
+    var Account = req.body['email'],
+        Password = req.body['password'];
+    var cmd = "select * from AccountTbl where Account = ?";
+    console.log(`Account=${Account}&Password=${Password}`);
+    mysqlQuery(cmd, [Account], function (err, result) {
         if (err) {
+            console.log(`err=${JSON.stringify(err)}`);
             return;
         }
         if (result == '') {
@@ -43,25 +46,33 @@ router.post('/session', function (req, res, next) {
             return;
         }
 
-        if (result[0].account != account || result[0].password != password) {
+        if (result[0].Account != Account || result[0].Password != Password) {
             res.status(400).send('Auth fail.');
             return;
-        } else if (result[0].enable == 0) {
+        } else if (result[0].Enable == 0) {
             res.status(400).send('使用者被拒絕存取');
             return;
         } else {
-            res.status(200).send({ token: account + ":" + password });
+            var token = result[0].AccountNo.toString(16);
+            if (token.length == 1) {
+                token = "000" + token;
+            } else if (token.length == 2) {
+                token = "00" + token;
+            } else if (token.length == 3) {
+                token = "0" + token;
+            }
+            res.status(200).send({ token: token });
             return;
         }
     });
 });
 
 router.put('/user', function (req, res) {
-    var account = req.body['account'],
-        password = req.body['password'],
+    var Account = req.body['account'],
+        Password = req.body['password'],
         token = req.body['token'];
 
-    var mailtoken = 'cectmail' + account;
+    var mailtoken = 'cectmail' + Account;
 
     var md5 = crypto.createHash('md5');
     mailtoken = md5.update(mailtoken).digest('hex').substring(0, 8);
@@ -71,9 +82,9 @@ router.put('/user', function (req, res) {
     }
     var mysqlQuery = req.mysqlQuery;
 
-    // check account exist 
+    // check Account exist 
 
-    mysqlQuery('SELECT account FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+    mysqlQuery('SELECT Account FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
         if (err) {
             console.log(err);
         }
@@ -85,19 +96,22 @@ router.put('/user', function (req, res) {
 
         } else {
             var sql = {
-                account: account,
-                password: password,
-                name: account,
-                createdate: Date.now()
+                Account: Account,
+                Password: Password,
+                Name: Account,
+                CreateDate: Date.now() / 1000
             };
 
             //console.log(sql);
-            mysqlQuery('INSERT INTO mqtt_user SET ?', sql, function (err, rows) {
+            mysqlQuery('INSERT INTO AccountTbl SET ?', sql, function (err, rows) {
                 if (err) {
                     console.log(err);
                 }
-                res.status(200).send({ token: account + ":" + password });
-                return;
+                mysqlQuery('SELECT * FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
+                    var AccountNo = rows[0].AccountNo;
+                    res.status(200).send({ token: AccountNo });
+                    return;
+                });
             });
         }
     });
@@ -115,8 +129,8 @@ router.get('/info-model', function (req, res) {
 
 router.post('/sendmail', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
-    var account = req.body['email'];
-    mysqlQuery('SELECT account FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+    var Account = req.body['email'];
+    mysqlQuery('SELECT Account FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
         if (err) {
             console.log(err);
         }
@@ -128,12 +142,12 @@ router.post('/sendmail', function (req, res, next) {
 
         } else {
             var mail = req.mailTransport;
-            var mailtoken = 'cectmail' + account;
+            var mailtoken = 'cectmail' + Account;
             var md5 = crypto.createHash('md5');
             mailtoken = md5.update(mailtoken).digest('hex').substring(0, 8);
             mail.sendMail({
                 from: 'no-reply <cect@cectco.com>',
-                to: account + ' <' + account + '>',
+                to: Account + ' <' + Account + '>',
                 subject: 'Welcome to register CECT',
                 html: '<h1>' + mailtoken +
                     '</h1><p>This is your registration key. </p>' +
@@ -150,8 +164,8 @@ router.post('/sendmail', function (req, res, next) {
 
 router.post('/reset', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
-    var account = req.body['email'];
-    mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+    var Account = req.body['email'];
+    mysqlQuery('SELECT * FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
         if (err) {
             console.log(err);
         }
@@ -165,7 +179,7 @@ router.post('/reset', function (req, res, next) {
             var password = rows[0].password;
             mail.sendMail({
                 from: 'no-reply <cect@cectco.com>',
-                to: account + ' <' + account + '>',
+                to: Account + ' <' + Account + '>',
                 subject: 'Forget your CECT password?',
                 html: '<h1>' + password +
                     '</h1><p>This is your password. </p>' +
@@ -180,217 +194,84 @@ router.post('/reset', function (req, res, next) {
     });
 });
 
-router.post('/alldevice', function (req, res, next) {
+router.post('/payment', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
-    var account = req.body['account'];
+    var Account = req.body['account'];
     var token = req.body['token'];
-    mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+    var AccountNo = parseInt(token, 16);
+    var DevNo = req.body['serial'];
+    var CardNo = req.body['code'];
+    mysqlQuery('SELECT * FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
         if (err) {
             console.log(err);
         }
-
         var count = rows.length;
         if (count == 0) {
             res.status(400).send('Auth fail.');
             return;
         } else {
-            if (account + ':' + rows[0].password != token) {
+            if (rows[0].AccountNo != AccountNo) {
                 res.status(400).send('token錯誤');
                 return;
-            } else if (rows[0].enable == 0) {
+            } else if (rows[0].Enable == 0) {
                 res.status(400).send('使用者被拒絕存取');
                 return;
             } else {
-                mysqlQuery('SELECT * FROM mqtt_machine WHERE account = ?', account, function (err, result) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    var count = result.length;
-                    var message = { data: [] };
-
-                    for (var i = 0; i < count; i++) {
-                        var device = {
-                            name: result[i].name,
-                            serial: result[i].serial,
-                            type: result[i].type,
-                            bank: result[i].bank,
-                            money: result[i].money,
-                            gift: result[i].gift,
-                            // expiredate: result[i].expiredate,
-                            status: Date.now() - result[i].updatedate < 5 * 60 * 1000 ? 1 : 0
-                        };
-                        message.data.push(device);
-                    }
-                    res.status(200).send(message);
-                    return;
-
-                });
-                return;
-            }
-        }
-    });
-});
-
-router.post('/updatedevice', function (req, res, next) {
-    var mysqlQuery = req.mysqlQuery;
-    var account = req.body['account'];
-    var token = req.body['token'];
-    var serial = req.body['serial'];
-    var data = req.body['data'];
-    mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
-        if (err) {
-            console.log(err);
-        }
-
-        var count = rows.length;
-        if (count == 0) {
-            res.status(400).send('Auth fail.');
-            return;
-        } else {
-            if (account + ':' + rows[0].password != token) {
-                res.status(400).send('token錯誤');
-                return;
-            } else if (rows[0].enable == 0) {
-                res.status(400).send('使用者被拒絕存取');
-                return;
-            } else {
-                mysqlQuery('SELECT * FROM mqtt_machine WHERE account = ? AND serial = ?'
-                    , [account, serial], function (err, result) {
+                mysqlQuery('SELECT DevNo FROM DeviceTbl WHERE DevNo = ?'
+                    , DevNo, function (err, device) {
                         if (err) {
                             console.log(err);
                         }
-                        mysqlQuery('UPDATE mqtt_machine SET ? WHERE id = ?'
-                            , [data, result[0].id], function (err, result2) {
-                                if (err) {
-                                    console.log(err);
-                                }
-                                res.status(200).send({});
-                                return;
-                            });
-                    });
-            }
-        }
-    });
-});
-
-router.post('/deletedevice', function (req, res, next) {
-    var mysqlQuery = req.mysqlQuery;
-    var account = req.body['account'];
-    var token = req.body['token'];
-    var serial = req.body['serial'];
-    mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
-        if (err) {
-            console.log(err);
-        }
-
-        var count = rows.length;
-        if (count == 0) {
-            res.status(400).send('Auth fail.');
-            return;
-        } else {
-            if (account + ':' + rows[0].password != token) {
-                res.status(400).send('token錯誤');
-                return;
-            } else if (rows[0].enable == 0) {
-                res.status(400).send('使用者被拒絕存取');
-                return;
-            } else {
-                mysqlQuery('SELECT * FROM mqtt_machine WHERE account = ? AND serial = ?'
-                    , [account, serial], function (err, result) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        if (result.length == 0) {
-                            res.status(200).send({});
+                        var count = device.length;
+                        if (count == 0) {
+                            res.status(400).send('There is no this DevNo.');
+                            return;
                         } else {
-                            mysqlQuery('UPDATE mqtt_machine SET account = NULL WHERE id = ?'
-                                , result[0].id, function (err, result2) {
+                            mysqlQuery('SELECT * FROM PaymentTbl WHERE CardNo = ?'
+                                , CardNo, function (err, payment) {
                                     if (err) {
                                         console.log(err);
                                     }
-    
-                                    res.status(200).send({});
-                                    return;
+                                    var count = payment.length;
+                                    if (count == 0) {
+                                        res.status(400).send('There is no this payment CardNo.');
+                                        return;
+                                    } else {
+                                        if (payment[0].Used == 1) {
+                                            res.status(400).send('This payment CardNo has been used.');
+                                            return;
+                                        } else {
+                                            var ExpireDate = device[0].ExpireDate;
+                                            if (ExpireDate - Date.now() / 1000 > 0) {
+                                                ExpireDate += 31536000;
+                                            } else {
+                                                ExpireDate = Date.now() / 1000 + 31536000;
+                                            }
+                                            var sql = {
+                                                Used: 1,
+                                                AccountNo: AccountNo,
+                                                PayDate: Date.now() / 1000,
+                                                DevNo: DevNo
+                                            };
+                                            mysqlQuery('UPDATE PaymentTbl SET ? WHERE CardNo = ?'
+                                                , [sql, payment[0].CardNo], function (err, result) {
+                                                    if (err) {
+                                                        console.log(err);
+                                                    }
+                                                    mysqlQuery('UPDATE DeviceTbl SET ExpireDate = ? WHERE DevNo = ?'
+                                                        , [expiredate, device[0].DevNo], function (err, result2) {
+                                                            if (err) {
+                                                                console.log(err);
+                                                            }
+                                                            res.status(200).send({});
+                                                            return;
+                                                        });
+                                                });
+                                        }
+                                    }
                                 });
                         }
                     });
-            }
-        }
-    });
-});
-
-router.post('/payment', function (req, res, next) {
-    var mysqlQuery = req.mysqlQuery;
-    var account = req.body['account'];
-    var token = req.body['token'];
-    var serial = req.body['serial'];
-    var code = req.body['code'];
-    mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
-        if (err) {
-            console.log(err);
-        }
-        var count = rows.length;
-        if (count == 0) {
-            res.status(400).send('Auth fail.');
-            return;
-        } else {
-            if (account + ':' + rows[0].password != token) {
-                res.status(400).send('token錯誤');
-                return;
-            } else if (rows[0].enable == 0) {
-                res.status(400).send('使用者被拒絕存取');
-                return;
-            } else {
-                mysqlQuery('SELECT serial FROM mqtt_machine WHERE serial = ?'
-                    , serial, function (err, machine) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    var count = machine.length;
-                    if (count == 0) {
-                        res.status(400).send('There is no this serial.');
-                        return;
-                    } else {
-                        mysqlQuery('SELECT * FROM mqtt_payment WHERE code = ?'
-                            , code, function (err, payment) {
-                            if (err) {
-                                console.log(err);
-                            }
-                            var count = payment.length;
-                            if (count == 0) {
-                                res.status(400).send('There is no this payment code.');
-                                return;
-                            } else {
-                                if (payment[0].used == 1) {
-                                    res.status(400).send('This payment code has been used.');
-                                    return;
-                                } else {
-                                    var expiredate = machine[0].expiredate;
-                                    if (expiredate - Date.now() > 0) {
-                                        expiredate += 31536000000;
-                                    } else {
-                                        expiredate =  Date.now() + 31536000000;
-                                    }
-                                    var sql = {used: 1, account: account, paydate: Date.now()};
-                                    mysqlQuery('UPDATE mqtt_payment SET ? WHERE id = ?'
-                                        , [sql, payment[0].id], function (err, result) {
-                                        if (err) {
-                                            console.log(err);
-                                        }
-                                        mysqlQuery('UPDATE mqtt_machine SET expiredate = ? WHERE id = ?'
-                                            , [expiredate, machine[0].id], function (err, result2) {
-                                            if (err) {
-                                                console.log(err);
-                                            }                                
-                                            res.status(200).send({});
-                                            return;
-                                        });
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });
             }
         }
     });

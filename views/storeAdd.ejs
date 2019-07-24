@@ -10,10 +10,10 @@
         function Check() {
 
             var name = document.getElementsByName('name')[0].value;
-            var account = document.getElementsByName('account')[0].value;
+            var Account = document.getElementsByName('Account')[0].value;
             var area = document.getElementsByName('area')[0].value;
             var address = document.getElementsByName('address')[0].value;
-            if (name && account && area && address) {
+            if (name && Account && area && address) {
                 return true;
             }
             alert('please input the info.');
@@ -32,7 +32,7 @@
         </div>
         <div class="row">
             <label>所有者：</label>
-            <select name="account">
+            <select name="Account">
                 <option value="0"></option>
                 <% for ( var i = 0 ; i < user.length ; i++){ %>
                 <option value="<%= user[i].id  %>"><%= user[i].name  %></option>

@@ -7,25 +7,25 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script>
-        function Edit(id) {
-            window.location.href = "/user/userEdit?id=" + id;
+        function Edit(AccountNo) {
+            window.location.href = "/user/userEdit?AccountNo=" + AccountNo;
         }
 
-        function Delete(id) {
+        function Delete(AccountNo) {
             var rs = confirm('確定要刪除?');
             if (rs) {
-                window.location.href = "/user/userDelete?id=" + id;
+                window.location.href = "/user/userDelete?AccountNo=" + AccountNo;
             }
         }
     </script>
 </head>
 
 <body>
-    <% if (locals.name) { %>
+    <% if (locals.Name) { %>
     <table border="0" align="right">
         <tr>
             <th>
-                <h3>您好, <%= name %></h1>
+                <h3>您好, <%= Name %></h1>
             </th>
             <th><a href="/logout">登出</a></th>
         </tr>
@@ -33,16 +33,15 @@
     <% } %>
     <table border="0" align="center">
         <tr>
-            <% if (locals.superuser == 1) { %>
+            <% if (locals.SuperUser == 1) { %>
             <th><a href="/payment">加值卡</a></th>
             <% } %>
             <th><a href="/user">用戶</a></th>
-            <th><a href="/store">店舖</a></th>
             <th><a href="/machine">機台</a></th>
         </tr>
     </table>
     <h1>用戶 - 列表</h1>
-    <% if (locals.superuser == 1) { %>
+    <% if (locals.SuperUser == 1) { %>
     <div class="control">
         <input class="btn" type='submit' value='新增' onclick="javascript: location.href='/user/add'">
     </div>
@@ -61,13 +60,13 @@
                 <%= i+1 %>
             </td>
             <td>
-                <%= data[i].account  %>
+                <%= data[i].Account  %>
             </td>
             <td>
-                <%= data[i].name  %>
+                <%= data[i].Name  %>
             </td>
             <td>
-                <% var date = new Date(data[i].createdate/1); %>
+                <% var date = new Date(data[i].CreateDate * 1000); %>
                 <%= date.getFullYear() + "-" 
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() + " " 
@@ -76,16 +75,16 @@
                     + date.getSeconds()  %>
             </td>
             <td>
-                <% if(data[i].enable > 0) { %>
+                <% if(data[i].Enable > 0) { %>
                 啟用
                 <% } else { %>
                 禁用
                 <% } %>
             </td>
             <td>
-                <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].id  %>');" />
-                <% if (locals.superuser == 1) { %>
-                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].id  %>');" />
+                <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].AccountNo  %>');" />
+                <% if (locals.SuperUser == 1) { %>
+                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].AccountNo  %>');" />
                 <% } %>
             </td>
         </tr>

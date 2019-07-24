@@ -3,13 +3,13 @@ var router = express.Router();
 
 // home page
 function checkSession(req, res) {
-    if (!req.session.sign) {
+    if (!req.session.Sign) {
         res.redirect('/');
         return false;
     } else {
-        res.locals.account = req.session.account;
-        res.locals.name = req.session.name;
-        res.locals.superuser = req.session.superuser;
+        res.locals.Account = req.session.Account;
+        res.locals.Name = req.session.Name;
+        res.locals.SuperUser = req.session.SuperUser;
     }
     return true;
 }
@@ -20,24 +20,23 @@ router.get('/', function (req, res, next) {
     }
     var mysqlQuery = req.mysqlQuery;
 
-    if (req.session.superuser == 1) {
-        mysqlQuery('SELECT * FROM mqtt_user ', function (err, rows) {
+    if (req.session.SuperUser == 1) {
+        mysqlQuery('SELECT * FROM AccountTbl ', function (err, accounts) {
             if (err) {
                 console.log(err);
             }
-            var data = rows;
+            var data = accounts;
 
             // use user.ejs
             res.render('user', { title: 'User Information', data: data });
         });
     } else {
-        var account = req.session.account;
-        console.log(account);
-        mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+        var AccountNo = req.session.AccountNo;
+        mysqlQuery('SELECT * FROM AccountTbl WHERE AccountNo = ?', AccountNo, function (err, accounts) {
             if (err) {
                 console.log(err);
             }
-            var data = rows;
+            var data = accounts;
 
             // use user.ejs
             res.render('user', { title: 'User Information', data: data });
@@ -61,14 +60,14 @@ router.post('/userAdd', function (req, res, next) {
     }
     var mysqlQuery = req.mysqlQuery;
 
-    // check account exist
-    var account = req.body.account;
-    mysqlQuery('SELECT account FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+    // check Account exist
+    var Account = req.body.Account;
+    mysqlQuery('SELECT Account FROM AccountTbl WHERE Account = ?', Account, function (err, accounts) {
         if (err) {
             console.log(err);
         }
 
-        var count = rows.length;
+        var count = accounts.length;
         if (count > 0) {
 
             var msg = 'Account already exists.';
@@ -77,14 +76,14 @@ router.post('/userAdd', function (req, res, next) {
         } else {
 
             var sql = {
-                account: req.body.account,
-                password: req.body.password,
-                name: req.body.name,
-                createdate: Date.now()
+                Account: req.body.Account,
+                Password: req.body.Password,
+                Name: req.body.Name,
+                CreateDate: Date.now()/1000
             };
 
             //console.log(sql);
-            var qur = mysqlQuery('INSERT INTO mqtt_user SET ?', sql, function (err, rows) {
+            mysqlQuery('INSERT INTO AccountTbl SET ?', sql, function (err, accounts) {
                 if (err) {
                     console.log(err);
                 }
@@ -100,16 +99,16 @@ router.get('/userEdit', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var id = req.query.id;
+    var AccountNo = req.query.AccountNo;
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('SELECT * FROM mqtt_user WHERE id = ?', id, function (err, rows) {
+    mysqlQuery('SELECT * FROM AccountTbl WHERE AccountNo = ?', AccountNo, function (err, accounts) {
         if (err) {
             console.log(err);
         }
 
-        var data = rows;
+        var data = accounts;
         res.render('userEdit', { title: 'Edit user', data: data });
     });
 
@@ -121,26 +120,25 @@ router.post('/userEdit', function (req, res, next) {
         return;
     }
     var mysqlQuery = req.mysqlQuery;
-
-    var id = req.body.id;
+    var AccountNo = req.body.AccountNo;
 
     var sql = {
-        account: req.body.account,
-        password: req.body.password,
-        name: req.body.name
+        Account: req.body.Account,
+        Password: req.body.Password,
+        Name: req.body.Name
     };
 
-    if (req.body.enable) {
-        sql.enable = req.body.enable;
+    if (req.body.Enable) {
+        sql.Enable = req.body.Enable;
     }
 
-    mysqlQuery('UPDATE mqtt_user SET ? WHERE id = ?', [sql, id], function (err, rows) {
+    mysqlQuery('UPDATE AccountTbl SET ? WHERE AccountNo = ?', [sql, AccountNo], function (err, accounts) {
         if (err) {
             console.log(err);
         }
         
-        res.locals.account = req.session.account;
-        res.locals.name = req.session.name;
+        res.locals.Account = req.session.Account;
+        res.locals.Name = req.session.Name;
         res.setHeader('Content-Type', 'application/json');
         res.redirect('/user');
     });
@@ -152,11 +150,10 @@ router.get('/userDelete', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var id = req.query.id;
-
+    var AccountNo = req.query.AccountNo;
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('DELETE FROM mqtt_user WHERE id = ?', id, function (err, rows) {
+    mysqlQuery('DELETE FROM AccountTbl WHERE AccountNo = ?', AccountNo, function (err, accounts) {
         if (err) {
             console.log(err);
         }

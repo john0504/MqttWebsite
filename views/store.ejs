@@ -50,7 +50,7 @@
     <% } %>
     <table border="0" align="center">
         <tr>
-            <% if (locals.superuser == 1) { %>
+            <% if (locals.SuperUser == 1) { %>
                 <th><a href="/payment">加值卡</a></th>
             <% } %>
             <th><a href="/user">用戶</a></th>
@@ -69,7 +69,7 @@
         </iframe> <% } %> <br /><br />
     <h1>店舖 - 列表</h1>
     <div class="control">
-        <% if (locals.superuser == 1) { %>
+        <% if (locals.SuperUser == 1) { %>
         <input class="btn" type='submit' value='新增' onclick="javascript: location.href='/store/add'">
         <% } %>
     </div>
@@ -108,7 +108,7 @@
                 <%= data[i].address  %>
             </td>
             <td>
-                <% var date = new Date(data[i].createdate/1); %>
+                <% var date = new Date(data[i].CreateDate/1); %>
                 <%= date.getFullYear() + "-" 
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() + " " 
@@ -117,7 +117,7 @@
                     + date.getSeconds()  %>
             </td>
             <td>
-                <% if (locals.superuser == 1) { %>
+                <% if (locals.SuperUser == 1) { %>
                 <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].id  %>');" />
                 <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].id  %>');" />
                 <% } %>

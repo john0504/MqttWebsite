@@ -7,10 +7,10 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script>
-        function Delete(id) {
+        function Delete(CardNo) {
             var rs = confirm('確定要刪除?');
             if (rs) {
-                window.location.href = "/payment/paymentDelete?id=" + id;
+                window.location.href = "/payment/paymentDelete?CardNo=" + CardNo;
             }
         }
     </script>
@@ -31,7 +31,6 @@
         <tr>
             <th><a href="/payment">加值卡</a></th>
             <th><a href="/user">用戶</a></th>
-            <th><a href="/store">店舖</a></th>
             <th><a href="/machine">機台</a></th>
         </tr>
     </table>
@@ -43,7 +42,6 @@
         <tr>
             <th>編號</th>
             <th>序號</th>
-            <th>建立日期</th>
             <th>狀態</th>
             <th>使用人</th>
             <th>機台序號</th>
@@ -55,41 +53,32 @@
                 <%= i+1 %>
             </td>
             <td>
-                <%= data[i].code  %>
+                <%= data[i].CardNo  %>
             </td>
             <td>
-                <% var date = new Date(data[i].createdate/1); %>
-                <%= date.getFullYear() + "-" 
-                    + (date.getMonth() + 1) + "-" 
-                    + date.getDate() + " " 
-                    + date.getHours() + ":" 
-                    + date.getMinutes() + ":" 
-                    + date.getSeconds()  %>
-            </td>
-            <td>
-                <% if(data[i].used > 0) { %>
+                <% if(data[i].Used > 0) { %>
                 已使用
                 <% } else { %>
                 未使用
                 <% } %>
             </td>
             <td>
-                <% if(data[i].account) { %>
-                    <%= data[i].account  %>
+                <% if(data[i].Account) { %>
+                    <%= data[i].Account  %>
                 <% } else { %>
                     -- 
                 <% } %> 
             </td>
             <td>
-                <% if(data[i].serial) { %>
-                    <%= data[i].serial  %>
+                <% if(data[i].DevNo) { %>
+                    <%= data[i].DevNo  %>
                 <% } else { %>
                     -- 
                 <% } %> 
             </td>
             <td>
-                <% if(data[i].paydate) { %>
-                <% var date = new Date(data[i].paydate/1); %>
+                <% if(data[i].PayDate) { %>
+                <% var date = new Date(data[i].paydate*1000); %>
                 <%= date.getFullYear() + "-" 
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() + " " 
@@ -101,7 +90,7 @@
                 <% } %>    
             </td>
             <td>                               
-                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].id  %>');" />                
+                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].CardNo  %>');" />                
             </td>
         </tr>
         <% } %>

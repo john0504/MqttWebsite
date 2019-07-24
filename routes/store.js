@@ -3,13 +3,13 @@ var router = express.Router();
 
 // home page
 function checkSession(req, res) {
-    if (!req.session.sign) {
+    if (!req.session.Sign) {
         res.redirect('/');
         return false;
     } else {        
-        res.locals.account = req.session.account;
-        res.locals.name = req.session.name;
-        res.locals.superuser = req.session.superuser;
+        res.locals.Account = req.session.Account;
+        res.locals.Name = req.session.Name;
+        res.locals.SuperUser = req.session.SuperUser;
     }
     return true;
 }
@@ -21,8 +21,8 @@ router.get('/', function (req, res, next) {
     var index = req.query.index ? req.query.index : 0;
     var mysqlQuery = req.mysqlQuery;
     var sql = 'SELECT * FROM mqtt_store ';
-    if (req.session.superuser != 1) {
-        sql += ("WHERE account = '" + req.session.account + "'");
+    if (req.session.SuperUser != 1) {
+        sql += ("WHERE Account = '" + req.session.Account + "'");
     }
     mysqlQuery(sql, function (err, rows) {
         if (err) {
@@ -30,14 +30,14 @@ router.get('/', function (req, res, next) {
         }
         var data = rows;
 
-        mysqlQuery('SELECT account, name FROM mqtt_user', function (err, rows) {
+        mysqlQuery('SELECT Account, name FROM mqtt_user', function (err, rows) {
             if (err) {
                 console.log(err);
             }
             var user = rows;
             for (var i = 0; i < data.length; i++) {
                 for (var j = 0; j < user.length; j++) {
-                    if (data[i].account == user[j].account) {
+                    if (data[i].Account == user[j].Account) {
                         data[i].owner = user[j].name;
                         break;
                     }
@@ -77,12 +77,12 @@ router.post('/storeAdd', function (req, res, next) {
 
     var sql = {
         name: req.body.name,
-        account: req.body.account,
+        Account: req.body.Account,
         area: req.body.area,
         address: req.body.address,
         lat: req.body.lat,
         lng: req.body.lng,
-        createdate: Date.now()
+        CreateDate: Date.now()
     };
 
     //console.log(sql);
@@ -110,7 +110,7 @@ router.get('/storeEdit', function (req, res, next) {
         }
 
         var data = rows;
-        mysqlQuery('SELECT account, name FROM mqtt_user', function (err, rows) {
+        mysqlQuery('SELECT Account, name FROM mqtt_user', function (err, rows) {
             if (err) {
                 console.log(err);
             }
@@ -132,7 +132,7 @@ router.post('/storeEdit', function (req, res, next) {
     var id = req.body.id;
 
     var sql = {
-        account: req.body.account,
+        Account: req.body.Account,
         area: req.body.area,
         address: req.body.address,
         lat: req.body.lat,

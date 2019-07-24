@@ -9,10 +9,10 @@
     <script type="text/javascript">
         function Check() {
 
-            var account = document.getElementsByName('account')[0].value;
-            var name = document.getElementsByName('name')[0].value;
-            var password = document.getElementsByName('password')[0].value;
-            if (account && name && password) {
+            var Account = document.getElementsByName('Account')[0].value;
+            var Name = document.getElementsByName('Name')[0].value;
+            var Password = document.getElementsByName('Password')[0].value;
+            if (Account && Name && Password) {
                 return true;
             }
             alert('please input the info.');
@@ -25,24 +25,24 @@
 <body>
     <form name="editform" action="userEdit" method="post" accept-charset="utf-8" onSubmit="return Check();">
         <h1>用戶 - 修改</h1>
-        <input type="hidden" name="id" value="<%=data[0].id  %>" />
+        <input type="hidden" name="AccountNo" value="<%=data[0].AccountNo  %>" />
         <div class="row">
             <label>帳號：</label>
-            <input type="text" name="account" placeholder="account" value="<%=data[0].account %>" readonly />
+            <input type="text" name="Account" placeholder="Account" value="<%=data[0].Account %>" readonly />
         </div>
         <div class="row">
             <label>名稱：</label>
-            <input type="text" name="name" placeholder="name" value="<%=data[0].name %>" />
+            <input type="text" name="Name" placeholder="Name" value="<%=data[0].Name %>" />
         </div>
         <div class="row">
             <label>密碼：</label>
-            <input type="text" name="password" placeholder="password" value="<%=data[0].password %>" />
+            <input type="text" name="Password" placeholder="Password" value="<%=data[0].Password %>" />
         </div>
-        <% if (locals.superuser == 1) { %>
+        <% if (locals.SuperUser == 1) { %>
         <div class="row">
             <label>權限：</label>
-            <input type="radio" name="enable" value="1" <%=data[0].enable ? "checked" : "" %>> 啟用 </input>
-            <input type="radio" name="enable" value="0" <%=data[0].enable ? "" : "checked" %>> 禁用 </input>
+            <input type="radio" name="Enable" value="1" <%=data[0].Enable ? "checked" : "" %>> 啟用 </input>
+            <input type="radio" name="Enable" value="0" <%=data[0].Enable ? "" : "checked" %>> 禁用 </input>
         </div>
         <% } %>
         <div class="row">

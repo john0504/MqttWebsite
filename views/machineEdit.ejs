@@ -9,10 +9,9 @@
     <script type="text/javascript">
         function Check() {
 
-            var name = document.getElementsByName('name')[0].value;
-            var storeid = document.getElementsByName('storeid')[0].value;
+            var Name = document.getElementsByName('Name')[0].value;
 
-            if (name && storeid) {
+            if (Name) {
                 return true;
             }
             alert('please input the info.');
@@ -25,20 +24,11 @@
 <body>
     <form name="editform" action="machineEdit" method="post" accept-charset="utf-8" onSubmit="return Check();">
         <h1>機台 - 修改</h1>
-        <input type="hidden" name="id" value="<%=data[0].id  %>" />
+        <input type="hidden" name="DevNo" value="<%=data[0].DevNo  %>" />
         <div class="row">
             <label>名稱:</label>
-            <input type="text" name="name" placeholder="name" value="<%=data[0].name %>" />
-        </div>
-        <div class="row">
-            <label>店舖:</label>
-            <select name="storeid">
-                <% for ( var i = 0 ; i < store.length ; i++){ %>
-                <option value="<%= store[i].id  %>" <%= data[0].storeid == store[i].id ? "selected='true'":""%>>
-                    <%= store[i].name  %></option>
-                <% } %>
-            </select>
-        </div>
+            <input type="text" name="Name" placeholder="name" value="<%=data[0].DevName %>" />
+        </div>        
         <div class="row">
             <input class="btn" type='submit' value='提交'>
             <input class="btn" type='reset' value='重置'>

@@ -15,9 +15,9 @@ router.post('/', function (req, res) {
 
     var mysqlQuery = req.mysqlQuery;
 
-    // check account exist
-    var account = userAccount;
-    mysqlQuery('SELECT account FROM mqtt_user WHERE account = ?', account, function (err, rows) {
+    // check Account exist
+    var Account = userAccount;
+    mysqlQuery('SELECT Account FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
         if (err) {
             console.log(err);
         }
@@ -30,14 +30,14 @@ router.post('/', function (req, res) {
 
         } else {
             var sql = {
-                account: userAccount,
-                password: userPwd,
-                name: userName,
-                createdate: Date.now()
+                Account: userAccount,
+                Password: userPwd,
+                Name: userName,
+                CreateDate: Date.now()/1000
             };
 
             //console.log(sql);
-            mysqlQuery('INSERT INTO mqtt_user SET ?', sql, function (err, rows) {
+            mysqlQuery('INSERT INTO AccountTbl SET ?', sql, function (err, rows) {
                 if (err) {
                     console.log(err);
                 }

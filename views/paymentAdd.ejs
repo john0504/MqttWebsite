@@ -8,8 +8,8 @@
     <title></title>
     <script type="text/javascript">
         function Check() {
-            var code = document.getElementsByName('code')[0].value;           
-            if (code) {
+            var CardNo = document.getElementsByName('CardNo')[0].value;           
+            if (CardNo) {
                 return true;
             }
             alert('please input the info.');
@@ -23,7 +23,7 @@
         <h1>加值卡 - 新增加值卡</h1>
         <div class="row">
             <label>序號：</label>
-            <input type="text" name="code" placeholder="code" />
+            <input type="text" name="CardNo" placeholder="CardNo" />
         </div>
         <div class="row">
             <input class="btn" type='submit' value='提交'>

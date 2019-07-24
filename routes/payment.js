@@ -3,13 +3,13 @@ var router = express.Router();
 
 // home page
 function checkSession(req, res) {
-    if (!req.session.sign || !req.session.superuser) {
+    if (!req.session.Sign || !req.session.SuperUser) {
         res.redirect('/');
         return false;
     } else {
-        res.locals.account = req.session.account;
-        res.locals.name = req.session.name;
-        res.locals.superuser = req.session.superuser;
+        res.locals.Account = req.session.Account;
+        res.locals.Name = req.session.Name;
+        res.locals.SuperUser = req.session.SuperUser;
     }
     return true;
 }
@@ -20,12 +20,12 @@ router.get('/', function (req, res, next) {
     }
     var mysqlQuery = req.mysqlQuery;
 
-    if (req.session.superuser == 1) {
-        mysqlQuery('SELECT * FROM mqtt_payment ', function (err, rows) {
+    if (req.session.SuperUser == 1) {
+        mysqlQuery('SELECT * FROM PaymentTbl ', function (err, payments) {
             if (err) {
                 console.log(err);
             }
-            var data = rows;
+            var data = payments;
 
             // use payment.ejs
             res.render('payment', { title: 'Payment Information', data: data });
@@ -50,29 +50,28 @@ router.post('/paymentAdd', function (req, res, next) {
     }
     var mysqlQuery = req.mysqlQuery;
 
-    // check account exist
-    var code = req.body.code;
-    mysqlQuery('SELECT code FROM mqtt_payment WHERE code = ?', code, function (err, rows) {
+    // check Account exist
+    var CardNo = req.body.CardNo;
+    mysqlQuery('SELECT * FROM PaymentTbl WHERE CardNo = ?', CardNo, function (err, payments) {
         if (err) {
             console.log(err);
         }
 
-        var count = rows.length;
+        var count = payments.length;
         if (count > 0) {
 
-            var msg = 'Code already exists.';
+            var msg = 'CardNo already exists.';
             res.render('paymentAdd', { title: 'Add Payment', msg: msg });
 
         } else {
 
             var sql = {
-                code: req.body.code,
-                used: 0,
-                createdate: Date.now()
+                CardNo: CardNo,
+                Used: 0,
             };
 
             //console.log(sql);
-            mysqlQuery('INSERT INTO mqtt_payment SET ?', sql, function (err, rows) {
+            mysqlQuery('INSERT INTO PaymentTbl SET ?', sql, function (err, rows) {
                 if (err) {
                     console.log(err);
                 }
@@ -87,11 +86,11 @@ router.get('/paymentDelete', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var id = req.query.id;
+    var CardNo = req.query.CardNo;
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('DELETE FROM mqtt_payment WHERE id = ?', id, function (err, rows) {
+    mysqlQuery('DELETE FROM PaymentTbl WHERE CardNo = ?', CardNo, function (err, rows) {
         if (err) {
             console.log(err);
         }

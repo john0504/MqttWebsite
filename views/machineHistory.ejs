@@ -9,11 +9,11 @@
 </head>
 
 <body>
-    <% if (locals.name) { %>
+    <% if (locals.Name) { %>
     <table border="0" align="right">
         <tr>
             <th>
-                <h3>您好, <%= name %></h1>
+                <h3>您好, <%= Name %></h1>
             </th>
             <th><a href="/logout">登出</a></th>
         </tr>
@@ -22,7 +22,6 @@
     <table border="0" align="center">
         <tr>
             <th><a href="/user">用戶</a></th>
-            <th><a href="/store">店舖</a></th>
             <th><a href="/machine">機台</a></th>
         </tr>
     </table>
@@ -36,7 +35,7 @@
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
             <td>
-                <% var date = new Date(data[i].date/1); %>
+                <% var date = new Date(data[i].DateCode*1000); %>
                 <%= date.getFullYear() + "-" 
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() + " " 
@@ -45,10 +44,10 @@
                     + date.getSeconds()  %>
             </td>
             <td>
-                <%= data[i].money  %>
+                <%= data[i].H60  %>
             </td>
             <td>
-                <%= data[i].gift  %>
+                <%= data[i].H61  %>
             </td>
         </tr>
         <% } %>

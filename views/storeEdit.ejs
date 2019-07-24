@@ -9,10 +9,10 @@
     <script type="text/javascript">
         function Check() {
 
-            var account = document.getElementsByName('account')[0].value;
+            var Account = document.getElementsByName('Account')[0].value;
             var name = document.getElementsByName('name')[0].value;
             var password = document.getElementsByName('password')[0].value;
-            if (account && name && password) {
+            if (Account && name && password) {
                 return true;
             }
             alert('please input the info.');
@@ -32,9 +32,9 @@
         </div>
         <div class="row">
             <label>所有者：</label>
-            <select name="account">
+            <select name="Account">
                 <% for ( var i = 0 ; i < user.length ; i++){ %>
-                <option value="<%= user[i].account  %>" <%= data[0].account == user[i].account ? "selected='true'":""%>>
+                <option value="<%= user[i].Account  %>" <%= data[0].Account == user[i].Account ? "selected='true'":""%>>
                     <%= user[i].name  %></option>
                 <% } %>
             </select>

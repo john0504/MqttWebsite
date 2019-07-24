@@ -37,20 +37,20 @@ var pool = mysql.createPool({
     host: "localhost",
     user: "tywu",
     password: "12345678",
-    database: "mqtt_DB",
-    connectionLimit: 1
+    database: "wawa_db",
+    connectionLimit: 100
 });
 
-var mysqlQuery = function(sql, options, callback) {
+var mysqlQuery = function (sql, options, callback) {
     if (typeof options === "function") {
         callback = options;
         options = undefined;
     }
-    pool.getConnection(function(err, conn){
+    pool.getConnection(function (err, conn) {
         if (err) {
             callback(err, null, null);
         } else {
-            conn.query(sql, options, function(err, results, fields){
+            conn.query(sql, options, function (err, results, fields) {
                 // callback
                 callback(err, results, fields);
             });
@@ -64,197 +64,243 @@ var mysqlQuery = function(sql, options, callback) {
 //===========================================
 
 var mqtt = require('mqtt');
+var fs = require('fs');
 var opt = {
     port: 1883,
-    clientId: 'nodejs'
+    clientId: 'CECTCO-nodejs',
+    protocol: 'mqtt',
+    username: 'ZWN0Y28uY29tMCAXDTE5MDcxODAzMzUyMVoYDzIxMTkwNjI0MDMzNTIxWjBlMQsw',
+    password: 'CQYDVQQGEwJUVzEPMA0GA1UECAwGVGFpd2FuMRAwDgYDVQQHDAdIc2luY2h1MQ8w',
+    key: fs.readFileSync('./client.key'),
+    cert: fs.readFileSync('./client.crt'),
+    ca: fs.readFileSync('./ca.crt'),
+    rejectUnauthorized: false
 };
 
 var client = mqtt.connect('mqtt://localhost', opt);
 
 client.on('connect', function () {
     console.log('MQTT server connected.');
-    client.subscribe("TENX/+/+/status_up");
-    client.subscribe("CECT/alldevice");
-    client.subscribe("CECT/updatedevice");
+    client.subscribe("WAWA/#");
 });
 
 client.on('message', function (topic, msg) {
-    console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
-    var index = topic.indexOf("status_up");
-    
-    if (index != -1) {
+    // console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
+    var PrjName = topic.substring(0, 4);
+    var No = "";
+    var action = "";
+    var idx = topic.indexOf("/"); //4
+    var msgType = "";
+
+    if (topic.substring(idx + 5, idx + 6) == "/") {
+        No = topic.substring(idx + 1, idx + 5);
+        action = topic.substring(idx + 6);
+        msgType = "app";
+    } else {
+        No = topic.substring(idx + 1, idx + 13);
+        action = topic.substring(idx + 14);
+        msgType = "device";
+    }
+    if (action == "C") {
+        //for device const
         const obj = JSON.parse(msg.toString());
-
-        var sql = {
-            totalmoney: obj.totalmoney,
-            totalgift: obj.totalgift,
-            // bank: obj.bank,
-            money: obj.money,
-            gift: obj.gift,
-            serial: obj.serial,
-            date: Date.now(),
-        };
-
-        var addmoney = 0;
-        var addgift = 0;
-        var addbank = 0;
-        
-        mysqlQuery("SELECT * FROM mqtt_client WHERE serial = ? ORDER BY id DESC LIMIT 1", sql.serial, function (err, result) {
+        mysqlQuery("SELECT * FROM DeviceTbl WHERE DevNo = ?", No, function (err, device) {
             if (err) {
                 console.log('[SELECT ERROR] - ', err.message);
                 return;
             }
-            if (result != '' && 
-                result[0].totalmoney == sql.totalmoney &&
-                result[0].totalgift == sql.totalgift &&
-                result[0].money == sql.money &&
-                result[0].gift == sql.gift) {                
-                console.log('--------------------Superfluous Data----------------------');                       
-            } else {
-                if (result != '') {
-                    addmoney = sql.money - result[0].money;
-                    addgift = sql.gift - result[0].gift;
-                    addbank = addgift > 0 ? 0 : addmoney; 
-                }
-
-                mysqlQuery("INSERT INTO mqtt_client SET ?", sql, function (err, result) {
+            if (device.length == 0 || device[0].AccountNo == null || device[0].AccountNo == parseInt(obj.Account, 16)) {
+                var insertsql = {
+                    DevNo: No,
+                    DevName: obj.DevName,
+                    AccountNo: parseInt(obj.Account, 16),
+                    PrjName: PrjName,
+                    DevAlias: obj.DevAlias,
+                    S01: obj.S01,
+                    S02: obj.S02,
+                    ExpireDate: 1609459200,//20210101 00:00:00(UTC)
+                    CreateDate: Date.now() / 1000,
+                };
+                var updatesql = {
+                    DevName: obj.DevName,
+                    AccountNo: parseInt(obj.Account, 16),
+                    PrjName: PrjName,
+                    DevAlias: obj.DevAlias,
+                    S01: obj.S01,
+                    S02: obj.S02,
+                    UpdateDate: Date.now() / 1000
+                };
+                var sqlstring = "INSERT INTO DeviceTbl SET ? ON DUPLICATE KEY UPDATE ? ";
+                mysqlQuery(sqlstring, [insertsql, updatesql], function (err, result) {
                     if (err) {
-                        console.log('[SELECT ERROR] - ', err.message);
+                        console.log('[INSERT ERROR] - ', err.message);
                         return;
                     }
-                    console.log('--------------------------INSERT----------------------------');
+                    var mytopic = `${PrjName}/${obj.Account}/U`
+                    var mymsg = { action: "list" };
+                    client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
+                    console.log('--------------------------UPDATE----------------------------');
                 });
+            } else if (device.length != 0 && device[0].AccountNo != null && device[0].AccountNo != parseInt(obj.Account, 16)) {
+                var token = device[0].AccountNo.toString(16);
+                if (token.length == 1) {
+                    token = "000" + token;
+                } else if (token.length == 2) {
+                    token = "00" + token;
+                } else if (token.length == 3) {
+                    token = "0" + token;
+                }
+                var mytopic = `${PrjName}/${No}/D`
+                var mymsg = { Account: token };
+                client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
             }
-            var sqlstring = "INSERT INTO mqtt_machine SET ? ON DUPLICATE KEY UPDATE ? ";
+            return;
+        });
+    } else if (action == "U") {
+        //for device var
+        if (msgType == "device") {
+            var arrayBuffer = new ArrayBuffer(msg.length);
+            var view = new Uint8Array(arrayBuffer);
+            for (var i = 0; i < msg.length; i++) {
+                view[i] = msg[i];
+            }
+            var dataView = new DataView(arrayBuffer);
+            // var Timestamp = dataView.getUint32(0);
+            // console.log("Timestamp:" + Timestamp);
+            var obj = {};
+            for (i = 4; i < msg.length; i += 3) {
+                var service = dataView.getUint8(i);
+                var value = dataView.getUint16(i + 1);
+                obj["H" + service.toString(16).toUpperCase()] = value;
+            }
             var insertsql = {
-                totalmoney: obj.totalmoney,
-                totalgift: obj.totalgift,
-                // bank: obj.bank,
-                money: obj.money,
-                gift: obj.gift,
-                name: obj.name,
-                serial: obj.serial,
-                type: obj.typename,
-                lat: obj.lat,
-                lng: obj.lng,
-                // expiredate: ???,
-                createdate: Date.now()
+                DevNo: No,
+                H60: obj.H60,
+                H61: obj.H61,
+                H62: obj.H62,
+                H63: obj.H63,
+                H64: obj.H64,
+                H65: obj.H65,
+                H66: obj.H66,
+                H67: obj.H67,
+                H68: obj.H68,
+                H69: obj.H69,
+                H6A: obj.H6A,
+                H6B: obj.H6B,
+                H6C: obj.H6C,
+                H6D: obj.H6D,
+                H6E: obj.H6E,
+                H6F: obj.H6F,
+                DateCode: Date.now() / 1000,
             };
-            var updatesql = {
-                totalmoney: obj.totalmoney,
-                totalgift: obj.totalgift,
-                updatedate: Date.now()
-            };
-            if (addgift > 0) {
-                updatesql.bank = 0;
-            } else {
-                sqlstring = sqlstring + ", bank = bank + " + addbank;
-            }
-            sqlstring = sqlstring + ", money = money + " + addmoney;
-            sqlstring = sqlstring + ", gift = gift + " + addgift;
-            mysqlQuery(sqlstring, [insertsql, updatesql], function (err, result) {
+            // console.log(JSON.stringify(insertsql));
+            mysqlQuery("INSERT INTO MessageTbl SET ?", insertsql, function (err, result) {
                 if (err) {
                     console.log('[SELECT ERROR] - ', err.message);
                     return;
                 }
-                console.log('--------------------------UPDATE----------------------------');
+                // console.log('--------------------------INSERT----------------------------');
             });
-        });
-    }
+        } else if (msgType == "app") {
+            const obj = JSON.parse(msg.toString());
+            if (obj.action == "list") {
+                console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
+                var AccountNo = parseInt(No, 16);
+                mysqlQuery('SELECT * FROM AccountTbl WHERE AccountNo = ?', AccountNo, function (err, rows) {
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
 
-    index = topic.indexOf("alldevice");
+                    var count = rows.length;
+                    if (count == 0) {
+                        console.log('Auth fail.');
+                        return;
+                    } else {
+                        if (rows[0].Enable == 0) {
+                            console.log('使用者被拒絕存取');
+                            return;
+                        } else {
+                            mysqlQuery('SELECT * FROM DeviceTbl WHERE AccountNo = ?', AccountNo, function (err, result) {
+                                if (err) {
+                                    console.log(err);
+                                    return;
+                                }
+                                var count = result.length;
+                                var message = { data: [] };
+                                var token = AccountNo.toString(16);
+                                if (token.length == 1) {
+                                    token = "000" + token;
+                                } else if (token.length == 2) {
+                                    token = "00" + token;
+                                } else if (token.length == 3) {
+                                    token = "0" + token;
+                                }
 
-    if (index != -1) {
-        const obj = JSON.parse(msg.toString());
-        var account = obj.account;
-        //var token = obj.token;
-        mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
-            if (err) {
-                console.log(err);
-                return;
-            }
-    
-            var count = rows.length;
-            if (count == 0) {
-                console.log('Auth fail.');
-                return;
-            } else {
-                if (rows[0].enable == 0) {
-                    console.log('使用者被拒絕存取');
-                    return;
-                } else {
-                    mysqlQuery('SELECT * FROM mqtt_machine WHERE account = ?', account, function (err, result) {
+                                if (count == 0) {
+                                    var topic = `${PrjName}/${token}/D`
+                                    client.publish(topic, JSON.stringify(message), { qos: 1, retain: true });
+                                    return;
+                                }
+
+                                for (var i = 0; i < count; i++) {
+                                    var device = {
+                                        DevName: result[i].DevName,
+                                        DevNo: result[i].DevNo,
+                                        DevAlias: result[i].DevAlias,
+                                        ExpireDate: result[i].ExpireDate,
+                                        UpdateDate: result[i].UpdateDate
+                                    };
+                                    message.data.push(device);
+                                }
+                                var topic = `${PrjName}/${token}/D`
+                                client.publish(topic, JSON.stringify(message), { qos: 1, retain: true });
+                                return;
+                            });
+                        }
+                    }
+                });
+            } else if (obj.action == "delete") {
+                var AccountNo = parseInt(No, 16);
+                var DevNo = obj.DevNo;
+                mysqlQuery('SELECT * FROM DeviceTbl WHERE AccountNo = ? AND DevNo = ?'
+                    , [AccountNo, DevNo], function (err, result) {
                         if (err) {
                             console.log(err);
+                        }
+                        if (result.length == 0) {
                             return;
-                        }
-                        var count = result.length;
-                        var message = { data: [] };
-    
-                        for (var i = 0; i < count; i++) {
-                            var device = {
-                                name: result[i].name,
-                                serial: result[i].serial,
-                                type: result[i].type,
-                                bank: result[i].bank,
-                                money: result[i].money,
-                                gift: result[i].gift,
-                                // expiredate: result[i].expiredate,
-                                status: Date.now() - result[i].updatedate < 5 * 60 * 1000 ? 1 : 0
-                            };
-                            message.data.push(device);
-                        }
-                        var topic = `CECT/${account}/alldevice`
-                        console.log(`${topic}:${JSON.stringify(message)}`);
-                        client.publish(topic, JSON.stringify(message), { qos:1, retain: true});
-                        return;
-    
-                    });
-                }
-            }
-        });
-    }
-
-    index = topic.indexOf("updatedevice");
-    if (index != -1) {
-        const obj = JSON.parse(msg.toString());
-        var account = obj.account;
-        var serial = obj.serial;
-        var data = obj.data;
-        mysqlQuery('SELECT * FROM mqtt_user WHERE account = ?', account, function (err, rows) {
-            if (err) {
-                console.log(err);
-                return;
-            }
-    
-            var count = rows.length;
-            if (count == 0) {
-                console.log('Auth fail.');
-                return;
-            } else {
-                if (rows[0].enable == 0) {
-                    console.log('使用者被拒絕存取');
-                    return;
-                } else {
-                    mysqlQuery('SELECT * FROM mqtt_machine WHERE account = ? AND serial = ?'
-                        , [account, serial], function (err, result) {
-                            if (err) {
-                                console.log(err);
-                                return;
-                            }
-                            mysqlQuery('UPDATE mqtt_machine SET ? WHERE id = ?'
-                                , [data, result[0].id], function (err, result2) {
+                        } else {
+                            mysqlQuery('UPDATE DeviceTbl SET AccountNo = NULL WHERE DevNo = ?'
+                                , result[0].DevNo, function (err, result2) {
                                     if (err) {
                                         console.log(err);
                                     }
-                                    console.log(err);
+                                    var mytopic = `WAWA/${No}/U`
+                                    var mymsg = { action: "list" };
+                                    client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
                                     return;
                                 });
-                        });
-                }
+                        }
+                    });
+            }
+        }
+    } else if (action == "S") {
+        //for device status
+        var updatesql = {
+            UpdateDate: Date.now() / 1000
+        };
+        var sqlstring = "UPDATE DeviceTbl SET ? WHERE DevNo = ?";
+        mysqlQuery(sqlstring, [updatesql, No], function (err, result) {
+            if (err) {
+                console.log('[UPDATE ERROR] - ', err.message);
+                return;
             }
         });
-    }    
+    } else {
+        console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
+        console.log("Don't Care Topic");
+    }
 });
 
 //===========================================
