@@ -21,50 +21,30 @@ router.get('/', function (req, res, next) {
     var index = req.query.index ? req.query.index : 0;
     var mysqlQuery = req.mysqlQuery;
 
-    var sql = 'SELECT * FROM DeviceTbl ';
+    var sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
 
     if (req.session.SuperUser != 1) {
-        sql += (`WHERE AccountNo = ${req.session.AccountNo}`);
+        sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
     }
-    var data;
+
     mysqlQuery(sql, function (err, devices) {
         if (err) {
             console.log(err);
         }
-        data = devices;
-        
-        for (var i = 0; i < data.length; i++) {
-            var forIndex = i;
-            if (req.session.SuperUser == 1) {
-                if (data[forIndex].AccountNo) {
-                    mysqlQuery("SELECT * FROM AccountTbl where AccountNo = ?",data[forIndex].AccountNo, function (err, accounts) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        data[forIndex].Account = accounts != "" ? accounts[0].Account : "--";
-                    });
-                } else {
-                    data[forIndex].Account = "--";
-                }
-            }  else {
-                data[forIndex].Account = req.session.Account;               
-            } 
-            if (Date.now()/1000 - data[forIndex].UpdateDate < 5 * 60) {
-                data[forIndex].Status = 1;
-            } else {
-                data[forIndex].Status = 0;
-            }
-            mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1', data[forIndex].DevNo, function (err, msgs) {
-                if (err) {
-                    console.log(err);
-                }
-                Object.assign(data[forIndex], msgs[0]);
-                if (forIndex == data.length -1) {
-                    // use machine.ejs
-                    res.render('machine', { title: 'Machine Information', data: data, index: index });
-                }                
+        if (devices.length > 0) {
+
+            devices.forEach(data => {
+                mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1', data.DevNo, function (err, msgs) {
+                    Object.assign(data, msgs[0]);
+                    if (devices[devices.length - 1].DevNo == data.DevNo) {
+                        // use machine.ejs
+                        res.render('machine', { title: 'Machine Information', data: devices, index: index });
+                    }
+                });
             });
-        }          
+        } else {
+            res.render('machine', { title: 'Machine Information', data: devices, index: index });
+        }
     });
 
 });
@@ -191,7 +171,7 @@ router.get('/machineDelete', function (req, res, next) {
     }
     var DevNo = req.query.DevNo;
     var mysqlQuery = req.mysqlQuery;
-  
+
     mysqlQuery('DELETE FROM mqtt_client WHERE DevNo = ?', DevNo, function (err, rows) {
         if (err) {
             console.log(err);
