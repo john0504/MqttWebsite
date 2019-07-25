@@ -77,7 +77,7 @@ router.put('/user', function (req, res) {
     var md5 = crypto.createHash('md5');
     mailtoken = md5.update(mailtoken).digest('hex').substring(0, 8);
     if (token != mailtoken) {
-        res.status(400).send('Auth fail.');
+        res.status(401).send('Auth fail.');
         return;
     }
     var mysqlQuery = req.mysqlQuery;
@@ -109,7 +109,15 @@ router.put('/user', function (req, res) {
                 }
                 mysqlQuery('SELECT * FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
                     var AccountNo = rows[0].AccountNo;
-                    res.status(200).send({ token: AccountNo });
+                    var token = AccountNo.toString(16);
+                    if (token.length == 1) {
+                        token = "000" + token;
+                    } else if (token.length == 2) {
+                        token = "00" + token;
+                    } else if (token.length == 3) {
+                        token = "0" + token;
+                    }
+                    res.status(200).send({ token: token });
                     return;
                 });
             });

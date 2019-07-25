@@ -202,6 +202,7 @@ client.on('message', function (topic, msg) {
                 // console.log('--------------------------INSERT----------------------------');
             });
         } else if (msgType == "app") {
+            console.log(msg.toString());
             const obj = JSON.parse(msg.toString());
             if (obj.action == "list") {
                 console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
