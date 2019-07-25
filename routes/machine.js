@@ -36,6 +36,11 @@ router.get('/', function (req, res, next) {
             devices.forEach(data => {
                 mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1', data.DevNo, function (err, msgs) {
                     Object.assign(data, msgs[0]);
+                    if (data.DateCode >= Date.now() / 1000 - 5 * 60) {
+                        data.Status = 1;
+                    } else {
+                        data.Status = 0;
+                    }
                     if (devices[devices.length - 1].DevNo == data.DevNo) {
                         // use machine.ejs
                         res.render('machine', { title: 'Machine Information', data: devices, index: index });
