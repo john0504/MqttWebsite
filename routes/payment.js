@@ -52,32 +52,20 @@ router.post('/paymentAdd', function (req, res, next) {
 
     // check Account exist
     var CardNo = req.body.CardNo;
-    mysqlQuery('SELECT * FROM PaymentTbl WHERE CardNo = ?', CardNo, function (err, payments) {
-        if (err) {
-            console.log(err);
-        }
-
-        var count = payments.length;
-        if (count > 0) {
-
-            var msg = 'CardNo already exists.';
-            res.render('paymentAdd', { title: 'Add Payment', msg: msg });
-
-        } else {
-
-            var sql = {
-                CardNo: CardNo,
-                Used: 0,
-            };
-
-            //console.log(sql);
-            mysqlQuery('INSERT INTO PaymentTbl SET ?', sql, function (err, rows) {
-                if (err) {
-                    console.log(err);
-                }
+    var CardNoArr = CardNo.toString().split(',');
+    CardNoArr.forEach(cardNo => {
+        var sql = {
+            CardNo: cardNo
+        };
+        mysqlQuery('INSERT IGNORE INTO PaymentTbl SET ?', sql, function (err, rows) {
+            if (err) {
+                console.log(err);
+            }
+            if (CardNoArr[CardNoArr.length - 1] == cardNo) {
                 res.redirect('/payment');
-            });
-        }
+                return;
+            }
+        });
     });
 });
 

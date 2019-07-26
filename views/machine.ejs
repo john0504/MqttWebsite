@@ -59,6 +59,7 @@
     <table border="0" align="center">
         <tr>
             <% if (locals.SuperUser == 1) { %>
+                <th><a href="/serial">白名單</a></th>
                 <th><a href="/payment">加值卡</a></th>
             <% } %>
             <th><a href="/user">用戶</a></th>
@@ -81,6 +82,7 @@
             <th>機台名稱</th>
             <th>所有者</th>
             <th>序號</th>
+            <th>版本號</th>
             <th>保夾</th>
             <th>投幣</th>
             <th>出獎</th>
@@ -101,13 +103,16 @@
                 <%= data[i].DevNo  %>
             </td>
             <td>
-                <%= data[i].H62  %>
+                <%= data[i].VerNum  %>
+            </td>
+            <td>
+                <%= data[i].H61  %>
             </td>
             <td>
                 <%= data[i].H60  %>
             </td>
             <td>
-                <%= data[i].H61  %>
+                <%= data[i].H62  %>
             </td>
             <td>
                 <% if(data[i].Status > 0) { %>

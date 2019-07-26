@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script>
+        function Delete(DevNo) {
+            var rs = confirm('確定要刪除?');
+            if (rs) {
+                window.location.href = "/serial/serialDelete?DevNo=" + DevNo;
+            }
+        }
+        function Move(count) {
+            var rs = confirm(`確定要搬移${count}筆資料進白名單?`);
+            if (rs) {
+                window.location.href = "/serial/move";
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <% if (locals.name) { %>
+    <table border="0" align="right">
+        <tr>
+            <th>
+                <h3>您好, <%= name %></h1>
+            </th>
+            <th><a href="/logout">登出</a></th>
+        </tr>
+    </table>
+    <% } %>
+    <table border="0" align="center">
+        <tr>
+            <th><a href="/serial">白名單</a></th>
+            <th><a href="/payment">加值卡</a></th>
+            <th><a href="/user">用戶</a></th>
+            <th><a href="/machine">機台</a></th>
+        </tr>
+    </table>
+    <h1>預備白名單 - 列表</h1>
+    <div class="control">
+        <input class="btn" type='submit' value='新增' onclick="javascript: location.href='/serial/add'">
+        <input class="btn" type='button' value='搬移' onclick="Move('<%= data.length  %>')">
+    </div>
+    <table class="table">
+        <tr>
+            <th>編號</th>
+            <th>序號</th>
+            <th>使用期限</th>
+        </tr>
+        <% for ( var i = 0 ; i < data.length ; i++){ %>
+        <tr>
+            <td>
+                <%= i+1 %>
+            </td>
+            <td>
+                <%= data[i].DevNo  %>
+            </td>
+            <td>
+                <% var date = new Date(data[i].ExpireDate * 1000); %>
+                <%= date.getFullYear() + "-" 
+                    + (date.getMonth() + 1) + "-" 
+                    + date.getDate() %>
+            </td>
+            <td>                               
+                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].DevNo  %>');" />                
+            </td>
+        </tr>
+        <% } %>
+    </table>
+    <h1>白名單 - 列表</h1>
+    <table class="table">
+        <tr>
+            <th>編號</th>
+            <th>序號</th>
+            <th>使用期限</th>
+        </tr>
+        <% for ( var j = 0 ; j < allow.length ; j++){ %>
+        <tr>
+            <td>
+                <%= j+1 %>
+            </td>
+            <td>
+                <%= allow[j].DevNo  %>
+            </td>
+            <td>
+                <% var date = new Date(allow[j].ExpireDate * 1000); %>
+                <%= date.getFullYear() + "-" 
+                    + (date.getMonth() + 1) + "-" 
+                    + date.getDate() %>
+            </td>
+        </tr>
+        <% } %>
+    </table>
+</body>
+
+</html>

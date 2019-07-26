@@ -36,7 +36,7 @@ router.get('/', function (req, res, next) {
             devices.forEach(data => {
                 mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1', data.DevNo, function (err, msgs) {
                     Object.assign(data, msgs[0]);
-                    if (data.DateCode >= Date.now() / 1000 - 5 * 60) {
+                    if (data.DateCode >= Date.now() / 1000 - 5 * 60 || data.UpdateDate  >= Date.now() / 1000 - 5 * 60) {
                         data.Status = 1;
                     } else {
                         data.Status = 0;

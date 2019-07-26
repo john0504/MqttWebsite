@@ -16,6 +16,7 @@ var store = require('./routes/store');
 var reg = require('./routes/reg');
 var api = require('./routes/api');
 var payment = require('./routes/payment');
+var serial = require('./routes/serial');
 
 var mailTransport = nodemailer.createTransport(
     {
@@ -103,8 +104,8 @@ client.on('message', function (topic, msg) {
     }
     if (action == "C") {
         //for device const        
-        mysqlQuery("SELECT count(*) as cnt FROM AllowTbl WHERE DevNo = ?", No, function (err, allow) {
-            if (allow.cnt != 1) {
+        mysqlQuery("SELECT * FROM AllowTbl WHERE DevNo = ?", No, function (err, allow) {
+            if (allow.length != 1) {
                 return;
             } else {
                 const obj = JSON.parse(msg.toString());
@@ -120,9 +121,10 @@ client.on('message', function (topic, msg) {
                             AccountNo: parseInt(obj.Account, 16),
                             PrjName: PrjName,
                             DevAlias: obj.DevAlias,
+                            VerNum: obj.VerNum,
                             S01: obj.S01,
                             S02: obj.S02,
-                            ExpireDate: 1609459200,//20210101 00:00:00(UTC)
+                            ExpireDate: allow[0].ExpireDate,
                             CreateDate: Date.now() / 1000,
                         };
                         var updatesql = {
@@ -162,7 +164,6 @@ client.on('message', function (topic, msg) {
                 });
             }
         });
-
     } else if (action == "U") {
         //for device var
         if (msgType == "device") {
@@ -347,6 +348,7 @@ app.use('/store', store);
 app.use('/user', user);
 app.use('/api:1', api);
 app.use('/payment', payment);
+app.use('/serial', serial);
 
 
 // catch 404 and forward to error handler
