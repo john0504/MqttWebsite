@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.26, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.27, for Linux (x86_64)
 --
 -- Host: localhost    Database: wawa_db
 -- ------------------------------------------------------
--- Server version	5.7.26-0ubuntu0.18.04.1
+-- Server version	5.7.27-0ubuntu0.18.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -31,7 +31,7 @@ CREATE TABLE `AccountTbl` (
   `Enable` tinyint(1) NOT NULL DEFAULT '1',
   `SuperUser` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`AccountNo`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +40,7 @@ CREATE TABLE `AccountTbl` (
 
 LOCK TABLES `AccountTbl` WRITE;
 /*!40000 ALTER TABLE `AccountTbl` DISABLE KEYS */;
-INSERT INTO `AccountTbl` VALUES (1,'cectco','Cectco123@','SuperAdmin',1563333264,1,1),(3,'tywu@cectco.com','12345678','tywu@cectco.com',1563342996,1,0),(4,'hylin@cectco.com','12345678','hylin@cectco.com',1563431075,1,0);
+INSERT INTO `AccountTbl` VALUES (1,'cectco','Cectco123@','SuperAdmin',1563333264,1,1),(2,'hylin@cectco.com','12345678','hylin@cectco.com',1563431075,1,0),(3,'tywu@cectco.com','12345678','tywu@cectco.com',1564034324,1,0);
 /*!40000 ALTER TABLE `AccountTbl` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,6 +81,7 @@ CREATE TABLE `DeviceTbl` (
   `AccountNo` int(11) DEFAULT NULL,
   `PrjName` char(4) DEFAULT NULL,
   `DevAlias` char(128) DEFAULT NULL,
+  `VerNum` int(11) DEFAULT NULL,
   `GroupNo` int(11) DEFAULT NULL,
   `S01` char(128) DEFAULT NULL,
   `S02` char(128) DEFAULT NULL,
@@ -98,7 +99,6 @@ CREATE TABLE `DeviceTbl` (
 
 LOCK TABLES `DeviceTbl` WRITE;
 /*!40000 ALTER TABLE `DeviceTbl` DISABLE KEYS */;
-INSERT INTO `DeviceTbl` VALUES ('38A28CEB32B5','Test001',3,'WAWA','',NULL,'24.7896211','121.0045206',1563866487,1563957637,1609459200),('409F38A78332','pppppppppppp',4,'WAWA','',NULL,'0','0',1563269254,1563957637,1609459200);
 /*!40000 ALTER TABLE `DeviceTbl` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -168,6 +168,29 @@ LOCK TABLES `PaymentTbl` WRITE;
 /*!40000 ALTER TABLE `PaymentTbl` DISABLE KEYS */;
 /*!40000 ALTER TABLE `PaymentTbl` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `TempTbl`
+--
+
+DROP TABLE IF EXISTS `TempTbl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `TempTbl` (
+  `DevNo` char(12) NOT NULL,
+  `ExpireDate` int(11) DEFAULT NULL,
+  PRIMARY KEY (`DevNo`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `TempTbl`
+--
+
+LOCK TABLES `TempTbl` WRITE;
+/*!40000 ALTER TABLE `TempTbl` DISABLE KEYS */;
+/*!40000 ALTER TABLE `TempTbl` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -178,4 +201,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-07-24 17:30:26
+-- Dump completed on 2019-07-26 17:09:01

@@ -132,6 +132,7 @@ client.on('message', function (topic, msg) {
                             AccountNo: parseInt(obj.Account, 16),
                             PrjName: PrjName,
                             DevAlias: obj.DevAlias,
+                            VerNum: obj.VerNum,
                             S01: obj.S01,
                             S02: obj.S02,
                             UpdateDate: Date.now() / 1000
