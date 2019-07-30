@@ -111,6 +111,22 @@ router.get('/move', function (req, res, next) {
     });
 });
 
+router.get('/remove', function (req, res, next) {
+    if (!checkSession(req, res)) {
+        return;
+    }
+
+    var mysqlQuery = req.mysqlQuery;
+
+    mysqlQuery('TRUNCATE TABLE TempTbl', function (err, rows) {
+        if (err) {
+            console.log(err);
+        }
+
+        res.redirect('/serial');
+    });
+});
+
 router.get('/serialDelete', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;

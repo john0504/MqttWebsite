@@ -19,15 +19,21 @@
                 window.location.href = "/serial/move";
             }
         }
+        function Remove(count) {
+            var rs = confirm(`確定要清除${count}筆資料?`);
+            if (rs) {
+                window.location.href = "/serial/remove";
+            }
+        }
     </script>
 </head>
 
 <body>
-    <% if (locals.name) { %>
+    <% if (locals.Name) { %>
     <table border="0" align="right">
         <tr>
             <th>
-                <h3>您好, <%= name %></h1>
+                <h3>您好, <%= Name %></h1>
             </th>
             <th><a href="/logout">登出</a></th>
         </tr>
@@ -45,6 +51,7 @@
     <div class="control">
         <input class="btn" type='submit' value='新增' onclick="javascript: location.href='/serial/add'">
         <input class="btn" type='button' value='搬移' onclick="Move('<%= data.length  %>')">
+        <input class="btn" type='button' value='清除' onclick="Remove('<%= data.length  %>')">
     </div>
     <table class="table">
         <tr>
