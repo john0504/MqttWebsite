@@ -67,19 +67,26 @@ router.post('/serialAdd', function (req, res, next) {
         return;
     }
     DevNoArr.forEach(devNo => {
-        var sql = {
-            DevNo: devNo,
-            ExpireDate: ExpireDate
-        };
-        mysqlQuery('INSERT IGNORE INTO TempTbl SET ?', sql, function (err, rows) {
-            if (err) {
-                console.log(err);
-            }
+        if (devNo.trim().length == 12) {
+            var sql = {
+                DevNo: devNo.trim(),
+                ExpireDate: ExpireDate
+            };
+            mysqlQuery('INSERT IGNORE INTO TempTbl SET ?', sql, function (err, rows) {
+                if (err) {
+                    console.log(err);
+                }
+                if (DevNoArr[DevNoArr.length - 1].toString() == devNo.toString()) {
+                    res.redirect('/serial');
+                    return;
+                }
+            });
+        } else {
             if (DevNoArr[DevNoArr.length - 1] == devNo) {
                 res.redirect('/serial');
                 return;
             }
-        });
+        }
     });
 });
 
