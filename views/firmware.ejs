@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script>
+        function Delete(sha1, FilePath) {
+            var rs = confirm('確定要刪除?');
+            if (rs) {
+                window.location.href = "/firmware/delete?sha1=" + sha1 + "&FilePath=" + FilePath;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <% if (locals.Name) { %>
+    <table border="0" align="right">
+        <tr>
+            <th>
+                <h3>您好, <%= Name %></h1>
+            </th>
+            <th><a href="/logout">登出</a></th>
+        </tr>
+    </table>
+    <% } %>
+    <table border="0" align="center">
+        <tr>
+            <th><a href="/firmware">OTA</a></th>
+            <th><a href="/serial">白名單</a></th>
+            <th><a href="/payment">加值卡</a></th>
+            <th><a href="/user">用戶</a></th>
+            <th><a href="/machine">機台</a></th>
+        </tr>
+    </table>
+    <h1>OTA - 列表</h1>
+    <div class="control">
+        <input class="btn" type='submit' value='新增' onclick="javascript: location.href='/firmware/add'">
+    </div>
+    <table class="table">
+        <tr>
+            <th>編號</th>
+            <th>下載路徑</th>
+            <th>檔案路徑</th>
+            <th>版號</th>
+            <th>sha1</th>
+            <th>OTA</th>
+        </tr>
+        <% for ( var i = 0 ; i < data.length ; i++){ %>
+        <tr>
+            <td>
+                <%= i+1 %>
+            </td>
+            <td>
+                <%= data[i].url  %>
+            </td>
+            <td>
+                <%= data[i].FilePath  %>
+            </td>
+            <td>
+                <%= data[i].VerNum  %>
+            </td>
+            <td>
+                <%= data[i].sha1  %>
+            </td>
+            <td>
+                <%= data[i].OTA  %>
+            </td>
+            <td>
+                <input type="button" name="delete" value="刪除" class="btn"
+                    onclick="Delete('<%= data[i].sha1  %>', '<%= data[i].FilePath  %>');" />
+            </td>
+        </tr>
+        <% } %>
+    </table>
+</body>
+
+</html>

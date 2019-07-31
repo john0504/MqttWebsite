@@ -18,6 +18,7 @@ var api = require('./routes/api');
 var ota = require('./routes/ota');
 var payment = require('./routes/payment');
 var serial = require('./routes/serial');
+var firmware = require('./routes/firmware');
 
 var mailTransport = nodemailer.createTransport(
     {
@@ -350,6 +351,7 @@ app.use('/store', store);
 app.use('/user', user);
 app.use('/api:1', api);
 app.use('/download/ota/wawa', ota);
+app.use('/firmware', firmware);
 app.use('/payment', payment);
 app.use('/serial', serial);
 
