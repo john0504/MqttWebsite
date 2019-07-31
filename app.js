@@ -15,6 +15,7 @@ var user = require('./routes/user');
 var store = require('./routes/store');
 var reg = require('./routes/reg');
 var api = require('./routes/api');
+var ota = require('./routes/ota');
 var payment = require('./routes/payment');
 var serial = require('./routes/serial');
 
@@ -85,7 +86,7 @@ client.on('connect', function () {
     client.subscribe("WAWA/#");
 });
 
-client.on('message', function (topic, msg) {
+client.on('message', function (topic, msg) {     
     // console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
     var PrjName = topic.substring(0, 4);
     var No = "";
@@ -348,6 +349,7 @@ app.use('/machine', machine);
 app.use('/store', store);
 app.use('/user', user);
 app.use('/api:1', api);
+app.use('/download/ota/wawa', ota);
 app.use('/payment', payment);
 app.use('/serial', serial);
 

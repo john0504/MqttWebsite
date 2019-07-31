@@ -63,7 +63,7 @@ router.get('/machineHistory', function (req, res, next) {
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc', DevNo, function (err, msgs) {
+    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 100', DevNo, function (err, msgs) {
         if (err) {
             console.log(err);
         }
@@ -106,10 +106,10 @@ router.get('/machineChart', function (req, res, next) {
                 moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
                 money = data[i].H60;
 
-                giftDataSet.data.push(data[i].H61 - gift);
+                giftDataSet.data.push(data[i].H62 - gift);
                 giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
                 giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
-                gift = data[i].H61;
+                gift = data[i].H62;
             } else {
                 if (money != data[i].H60) {
                     var tempmoney = moneyDataSet.data.pop();
@@ -117,10 +117,10 @@ router.get('/machineChart', function (req, res, next) {
                     money = data[i].H60;
                 }
 
-                if (gift != data[i].H61) {
+                if (gift != data[i].H62) {
                     var tempgift = giftDataSet.data.pop();
-                    giftDataSet.data.push(tempgift + data[i].H61 - gift);
-                    gift = data[i].H61;
+                    giftDataSet.data.push(tempgift + data[i].H62 - gift);
+                    gift = data[i].H62;
                 }
             }
         }
