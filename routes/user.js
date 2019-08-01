@@ -19,6 +19,7 @@ router.get('/', function (req, res, next) {
         return;
     }
     var mysqlQuery = req.mysqlQuery;
+    var SearchAccount = "";
 
     if (req.session.SuperUser == 1) {
         mysqlQuery('SELECT * FROM AccountTbl ', function (err, accounts) {
@@ -28,7 +29,7 @@ router.get('/', function (req, res, next) {
             var data = accounts;
 
             // use user.ejs
-            res.render('user', { title: 'User Information', data: data });
+            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount  });
         });
     } else {
         var AccountNo = req.session.AccountNo;
@@ -39,8 +40,30 @@ router.get('/', function (req, res, next) {
             var data = accounts;
 
             // use user.ejs
-            res.render('user', { title: 'User Information', data: data });
+            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount });
         });
+    }
+});
+
+router.get('/search', function (req, res, next) {
+    if (!checkSession(req, res)) {
+        return;
+    }
+    var SearchAccount = req.query.SearchAccount;
+    var mysqlQuery = req.mysqlQuery;
+
+    if (req.session.SuperUser == 1) {
+        mysqlQuery('SELECT * FROM AccountTbl WHERE Account LIKE ?', `%${SearchAccount}%`, function (err, accounts) {
+            if (err) {
+                console.log(err);
+            }
+            var data = accounts;
+
+            // use user.ejs
+            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount });
+        });
+    } else {
+        return;
     }
 });
 
@@ -79,7 +102,7 @@ router.post('/userAdd', function (req, res, next) {
                 Account: req.body.Account,
                 Password: req.body.Password,
                 Name: req.body.Name,
-                CreateDate: Date.now()/1000
+                CreateDate: Date.now() / 1000
             };
 
             //console.log(sql);
@@ -136,7 +159,7 @@ router.post('/userEdit', function (req, res, next) {
         if (err) {
             console.log(err);
         }
-        
+
         res.locals.Account = req.session.Account;
         res.locals.Name = req.session.Name;
         res.setHeader('Content-Type', 'application/json');

@@ -7,6 +7,18 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script>
+        function Search() {
+            var SearchAccount = document.getElementsByName('SearchAccount')[0].value;
+            var regex = /^([a-zA-Z0-9])+$/;
+            if (SearchAccount.length == 0) {
+                window.location.href = "/user";
+                return true;
+            }
+            if (!regex.test(SearchAccount)) {
+                return false;
+            }
+            window.location.href = "/user/search?SearchAccount=" + SearchAccount;
+        }
         function Edit(AccountNo) {
             window.location.href = "/user/userEdit?AccountNo=" + AccountNo;
         }
@@ -34,9 +46,9 @@
     <table border="0" align="center">
         <tr>
             <% if (locals.SuperUser == 1) { %>
-                <th><a href="/firmware">OTA</a></th>
-                <th><a href="/serial">白名單</a></th>
-                <th><a href="/payment">加值卡</a></th>
+            <th><a href="/firmware">OTA</a></th>
+            <th><a href="/serial">白名單</a></th>
+            <th><a href="/payment">加值卡</a></th>
             <% } %>
             <th><a href="/user">用戶</a></th>
             <th><a href="/machine">機台</a></th>
@@ -47,6 +59,8 @@
     <div class="control">
         <input class="btn" type='submit' value='新增' onclick="javascript: location.href='/user/add'">
     </div>
+    <input type="text" name="SearchAccount" placeholder="搜尋帳號" value="<%= SearchAccount %>" />
+    <input type="button" name="search" value="搜尋" class="btn" onclick="Search();" />
     <% } %>
     <table class="table">
         <tr>
@@ -86,7 +100,8 @@
             <td>
                 <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].AccountNo  %>');" />
                 <% if (locals.SuperUser == 1) { %>
-                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].AccountNo  %>');" />
+                <input type="button" name="delete" value="刪除" class="btn"
+                    onclick="Delete('<%= data[i].AccountNo  %>');" />
                 <% } %>
             </td>
         </tr>
