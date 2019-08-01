@@ -1,6 +1,7 @@
 var express = require('express'),
     router = express.Router(),
     //crypto = require('crypto'),
+    svgCaptcha = require('svg-captcha'),
     title = '登入';
 
 
@@ -9,15 +10,36 @@ router.get('/', function (req, res, next) {
         res.locals.Account = req.session.Account;
         res.locals.Name = req.session.Name;
     }
+
     res.render('login', { title: title });
 });
 
+router.get('/captcha', function (req, res, next) {
+    var option = {
+        size: 4,
+        ignoreChars: '0o1i',
+        noise: 2,
+        color: true,
+        background: '#cc9966'
+    };
+    var captcha = svgCaptcha.create(option);
+    req.session.captcha = captcha.text;
+    res.type('svg');
+
+    res.status(200).send(captcha.data);
+});
 
 router.post('/', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
     var Account = req.body['txtUserName'],
-        Password = req.body['txtUserPwd'];
+        Password = req.body['txtUserPwd'],
+        Captcha = req.body['txtCaptcha'];
     //md5 = crypto.createHash('md5');
+    if (Captcha != req.session.captcha) {
+        res.locals.error = '驗證碼錯誤';
+        res.render('login', { title: res.locals.error });
+        return;
+    }
     var cmd = "select * from AccountTbl where Account = ?";
     mysqlQuery(cmd, [Account], function (err, result) {
         if (err) {
