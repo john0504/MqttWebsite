@@ -7,6 +7,19 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script>
+        function Search() {
+            var DevNo = document.getElementsByName('SearchDevNo')[0].value;
+            var regex = /^([A-Z0-9])+$/;
+            if (DevNo.length == 0) {
+                window.location.href = "/machine";
+                return true;
+            }
+            if(!regex.test(DevNo)) {
+                return false;
+            }
+            window.location.href = "/machine/search?DevNo=" + DevNo;
+        }
+
         function History(DevNo) {
             window.location.href = "/machine/machineHistory?DevNo=" + DevNo;
         }
@@ -59,9 +72,9 @@
     <table border="0" align="center">
         <tr>
             <% if (locals.SuperUser == 1) { %>
-                <th><a href="/firmware">OTA</a></th>
-                <th><a href="/serial">白名單</a></th>
-                <th><a href="/payment">加值卡</a></th>
+            <th><a href="/firmware">OTA</a></th>
+            <th><a href="/serial">白名單</a></th>
+            <th><a href="/payment">加值卡</a></th>
             <% } %>
             <th><a href="/user">用戶</a></th>
             <th><a href="/machine">機台</a></th>
@@ -77,6 +90,8 @@
         src=http://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=<%=data[index].lng %>,<%=data[index].lat %>&z=16&output=embed&t=>
         </iframe> <% } %> <br /><br />
     <h1>機台 - 列表</h1>
+    <input type="text" name="SearchDevNo" placeholder="搜尋產品序號" value="<%= DevNo %>" />
+    <input type="button" name="search" value="搜尋" class="btn" onclick="Search();" />
     <table class="table">
         <tr>
             <th>編號</th>

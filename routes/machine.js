@@ -18,6 +18,7 @@ router.get('/', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
+    var DevNo = "";
     var index = req.query.index ? req.query.index : 0;
     var mysqlQuery = req.mysqlQuery;
 
@@ -36,19 +37,60 @@ router.get('/', function (req, res, next) {
             devices.forEach(data => {
                 mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1', data.DevNo, function (err, msgs) {
                     Object.assign(data, msgs[0]);
-                    if (data.DateCode >= Date.now() / 1000 - 5 * 60 || data.UpdateDate  >= Date.now() / 1000 - 5 * 60) {
+                    if (data.DateCode >= Date.now() / 1000 - 5 * 60 || data.UpdateDate >= Date.now() / 1000 - 5 * 60) {
                         data.Status = 1;
                     } else {
                         data.Status = 0;
                     }
                     if (devices[devices.length - 1].DevNo == data.DevNo) {
                         // use machine.ejs
-                        res.render('machine', { title: 'Machine Information', data: devices, index: index });
+                        res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo  });
                     }
                 });
             });
         } else {
-            res.render('machine', { title: 'Machine Information', data: devices, index: index });
+            res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo  });
+        }
+    });
+
+});
+
+router.get('/search', function (req, res, next) {
+    if (!checkSession(req, res)) {
+        return;
+    }
+    var index = req.query.index ? req.query.index : 0;
+    var DevNo = req.query.DevNo;
+    var mysqlQuery = req.mysqlQuery;
+
+    var sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
+    sql += (` WHERE a.DevNo LIKE '%${DevNo}%'`);
+    if (req.session.SuperUser != 1) {
+        sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
+    }
+
+    mysqlQuery(sql, function (err, devices) {
+        if (err) {
+            console.log(err);
+        }
+        if (devices.length > 0) {
+
+            devices.forEach(data => {
+                mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1', data.DevNo, function (err, msgs) {
+                    Object.assign(data, msgs[0]);
+                    if (data.DateCode >= Date.now() / 1000 - 5 * 60 || data.UpdateDate >= Date.now() / 1000 - 5 * 60) {
+                        data.Status = 1;
+                    } else {
+                        data.Status = 0;
+                    }
+                    if (devices[devices.length - 1].DevNo == data.DevNo) {
+                        // use machine.ejs
+                        res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo  });
+                    }
+                });
+            });
+        } else {
+            res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo });
         }
     });
 
