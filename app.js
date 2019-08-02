@@ -87,7 +87,7 @@ client.on('connect', function () {
     client.subscribe("WAWA/#");
 });
 
-client.on('message', function (topic, msg) {     
+client.on('message', function (topic, msg) {
     // console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
     var PrjName = topic.substring(0, 4);
     var No = "";
@@ -124,6 +124,7 @@ client.on('message', function (topic, msg) {
                             PrjName: PrjName,
                             DevAlias: obj.DevAlias,
                             VerNum: obj.VerNum,
+                            GroupNo: obj.GroupNo ? obj.GroupNo : null,
                             S01: obj.S01,
                             S02: obj.S02,
                             ExpireDate: allow[0].ExpireDate,
@@ -135,6 +136,7 @@ client.on('message', function (topic, msg) {
                             PrjName: PrjName,
                             DevAlias: obj.DevAlias,
                             VerNum: obj.VerNum,
+                            GroupNo: obj.GroupNo ? obj.GroupNo : null,
                             S01: obj.S01,
                             S02: obj.S02,
                             UpdateDate: Date.now() / 1000
@@ -151,6 +153,25 @@ client.on('message', function (topic, msg) {
                             console.log('--------------------------UPDATE----------------------------');
                         });
                     } else if (device.length != 0 && device[0].AccountNo != null && device[0].AccountNo != parseInt(obj.Account, 16)) {
+                        updatesql = {
+                            DevName: obj.DevName,
+                            VerNum: obj.VerNum,
+                            GroupNo: obj.GroupNo ? obj.GroupNo : null,
+                            S01: obj.S01,
+                            S02: obj.S02,
+                            UpdateDate: Date.now() / 1000
+                        };
+                        sqlstring = "UPDATE DeviceTbl SET ? WHERE DevNo = ?";
+                        mysqlQuery(sqlstring, [updatesql, No], function (err, result) {
+                            if (err) {
+                                console.log('[UPDATE ERROR] - ', err.message);
+                                return;
+                            }
+                            var mytopic = `${PrjName}/${obj.Account}/U`
+                            var mymsg = { action: "list" };
+                            client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
+                            console.log('--------------------------UPDATE----------------------------');
+                        });
                         var token = device[0].AccountNo.toString(16);
                         if (token.length == 1) {
                             token = "000" + token;
