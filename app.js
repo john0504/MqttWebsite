@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var nodemailer = require('nodemailer');
+var cors = require('cors');
 
 var routes = require('./routes/index');
 var login = require('./routes/login');
@@ -363,6 +364,7 @@ app.use(function (req, res, next) {
     next();
 });
 
+app.use(cors());
 app.use('/', routes);
 app.use('/reg', reg);
 app.use('/login', login);
