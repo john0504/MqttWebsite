@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var cryptpJS = require('crypto-js');
 
 // home page
 function checkSession(req, res) {
@@ -40,7 +41,8 @@ router.get('/add', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    res.render('paymentAdd', { title: 'Add Payment', msg: '' });
+    var CardNoList = "";
+    res.render('paymentAdd', { title: 'Add Payment', msg: '', CardNoList: CardNoList });
 });
 
 // add post
@@ -52,10 +54,12 @@ router.post('/paymentAdd', function (req, res, next) {
 
     // check Account exist
     var CardNo = req.body.CardNo;
+    var CardMonth = req.body.CardMonth;
     var CardNoArr = CardNo.toString().split(',');
     CardNoArr.forEach(cardNo => {
         var sql = {
-            CardNo: cardNo
+            CardNo: cardNo,
+            CardMonth : CardMonth
         };
         mysqlQuery('INSERT IGNORE INTO PaymentTbl SET ?', sql, function (err, rows) {
             if (err) {
@@ -69,16 +73,63 @@ router.post('/paymentAdd', function (req, res, next) {
     });
 });
 
+router.get('/create', function (req, res, next) {
+    if (!checkSession(req, res)) {
+        return;
+    }
+    var CardNoList = "";
+    var count = req.query.count;
+    var months = req.query.month;
+
+    var option = {
+        mode: cryptpJS.mode.ECB
+    };
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+    var dateStr = `${year}/${month}/${day}`;
+    dateStr += `-${hour}:/${minute}/${second}`;
+    for (var i = 1; i <= count; i++) {
+        var No = i;
+        if (i < 10) {
+            No = `0000${i}`;
+        } else if (i < 100) {
+            No = `000${i}`;
+        } else if (i < 1000) {
+            No = `00${i}`;
+        } else if (i < 10000) {
+            No = `0${i}`;
+        }
+        var str = `CECTCO-WAWA-${dateStr}-${No}-${months}`;
+        var key = "cEctCoWAwaeNcoDe";
+        key = cryptpJS.enc.Utf8.parse(key);
+        var encrypted = cryptpJS.AES.encrypt(str, key, option);
+        encrypted = encrypted.toString();
+        if (CardNoList == "") {
+            CardNoList = encrypted;
+        } else {
+            CardNoList += `,${encrypted}`;
+        }
+    }
+    res.render('paymentAdd', { title: 'Add Payment', msg: '', CardNoList: CardNoList });
+});
 
 router.get('/paymentDelete', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var CardNo = req.query.CardNo;
+    var id = req.query.id;
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('DELETE FROM PaymentTbl WHERE CardNo = ?', CardNo, function (err, rows) {
+    var sql = {
+        id: id
+    };
+    mysqlQuery('DELETE FROM PaymentTbl WHERE ?', sql, function (err, rows) {
         if (err) {
             console.log(err);
         }

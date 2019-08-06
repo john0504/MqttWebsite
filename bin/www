@@ -5,12 +5,14 @@
  */
 
 var app = require('../app');
+var app2 = require('../app2');
 var debug = require('debug')('mysqldemo:server');
+var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var options = {
-  key: fs.readFileSync('./server05.key'),
-  cert: fs.readFileSync('./server05.crt'),
+  key: fs.readFileSync('./server06.key'),
+  cert: fs.readFileSync('./server06.crt'),
   ca: fs.readFileSync('./ca.crt'),
 };
 
@@ -20,13 +22,15 @@ var options = {
 
 var port = normalizePort(process.env.PORT || '443');
 app.set('port', port);
+var port2 = normalizePort(process.env.PORT || '80');
+app2.set('port', port2);
 
 /**
  * Create HTTP server.
  */
 
 var server = https.createServer(options, app);
-
+var server2 = http.createServer(app2);
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -35,6 +39,9 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+server2.listen(port2);
+server2.on('error', onError);
+server2.on('listening', onListening);
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -93,4 +100,10 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+
+  var addr2 = server2.address();
+  var bind2 = typeof addr2 === 'string'
+    ? 'pipe ' + addr2
+    : 'port ' + addr2.port;
+  debug('Listening on ' + bind2);
 }

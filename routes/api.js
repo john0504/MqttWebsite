@@ -7,6 +7,9 @@ router.put('/session', function (req, res) {
     var Account = req.body['account'],
         token = req.body['token'];
     var AccountNo = parseInt(token, 16);
+    if (!Account || !token) {
+        return;
+    }
     var cmd = "select * from AccountTbl where Account = ?";
     mysqlQuery(cmd, [Account], function (err, result) {
         if (err) {
@@ -34,6 +37,10 @@ router.post('/session', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
     var Account = req.body['email'],
         Password = req.body['password'];
+    if (!Account || !Password) {
+        return;
+    }
+
     var cmd = "select * from AccountTbl where Account = ?";
     console.log(`Account=${Account}&Password=${Password}`);
     mysqlQuery(cmd, [Account], function (err, result) {
@@ -71,6 +78,9 @@ router.put('/user', function (req, res) {
     var Account = req.body['account'],
         Password = req.body['password'],
         token = req.body['token'];
+    if (!Account || !Password || !token) {
+        return;
+    }
 
     var mailtoken = 'cectmail' + Account;
 
@@ -138,6 +148,9 @@ router.get('/info-model', function (req, res) {
 router.post('/sendmail', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
     var Account = req.body['email'];
+    if (!Account) {
+        return;
+    }
     mysqlQuery('SELECT Account FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
         if (err) {
             console.log(err);
@@ -173,6 +186,9 @@ router.post('/sendmail', function (req, res, next) {
 router.post('/reset', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
     var Account = req.body['email'];
+    if (!Account) {
+        return;
+    }
     mysqlQuery('SELECT * FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
         if (err) {
             console.log(err);
@@ -184,7 +200,7 @@ router.post('/reset', function (req, res, next) {
             return;
         } else {
             var mail = req.mailTransport;
-            var password = rows[0].password;
+            var password = rows[0].Password;
             mail.sendMail({
                 from: 'no-reply <cect@cectco.com>',
                 to: Account + ' <' + Account + '>',
@@ -209,6 +225,11 @@ router.post('/payment', function (req, res, next) {
     var AccountNo = parseInt(token, 16);
     var DevNo = req.body['serial'];
     var CardNo = req.body['code'];
+
+    if (!Account || !token || !DevNo || !CardNo) {
+        return;
+    }
+
     mysqlQuery('SELECT * FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
         if (err) {
             console.log(err);

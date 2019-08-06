@@ -7,10 +7,10 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script>
-        function Delete(CardNo) {
+        function Delete(id) {
             var rs = confirm('確定要刪除?');
             if (rs) {
-                window.location.href = "/payment/paymentDelete?CardNo=" + CardNo;
+                window.location.href = "/payment/paymentDelete?id=" + id;
             }
         }
     </script>
@@ -92,7 +92,7 @@
                 <% } %>    
             </td>
             <td>                               
-                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].CardNo  %>');" />                
+                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].id  %>');" />                
             </td>
         </tr>
         <% } %>
