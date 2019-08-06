@@ -11,9 +11,9 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var options = {
-  key: fs.readFileSync('./server05.key'),
-  cert: fs.readFileSync('./server05.crt'),
-  ca: fs.readFileSync('./ca.crt'),
+  key: fs.readFileSync('./private.key'),
+  cert: fs.readFileSync('./certificate.crt'),
+  ca: fs.readFileSync('./ca_bundle.crt'),
 };
 
 /**
