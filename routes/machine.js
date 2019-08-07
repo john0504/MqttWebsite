@@ -44,12 +44,12 @@ router.get('/', function (req, res, next) {
                     }
                     if (devices[devices.length - 1].DevNo == data.DevNo) {
                         // use machine.ejs
-                        res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo  });
+                        res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo });
                     }
                 });
             });
         } else {
-            res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo  });
+            res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo });
         }
     });
 
@@ -85,7 +85,7 @@ router.get('/search', function (req, res, next) {
                     }
                     if (devices[devices.length - 1].DevNo == data.DevNo) {
                         // use machine.ejs
-                        res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo  });
+                        res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo });
                     }
                 });
             });
@@ -105,7 +105,7 @@ router.get('/machineHistory', function (req, res, next) {
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 100', DevNo, function (err, msgs) {
+    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1000', DevNo, function (err, msgs) {
         if (err) {
             console.log(err);
         }
@@ -125,11 +125,10 @@ router.get('/machineChart', function (req, res, next) {
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id asc', DevNo, function (err, msgs) {
+    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1000', DevNo, function (err, msgs) {
         if (err) {
             console.log(err);
         }
-        console.log(JSON.stringify(msgs));
         var data = msgs;
         var labels = [];
         var moneyDataSet = { data: [], backgroundColor: [], borderColor: [] };
@@ -137,7 +136,7 @@ router.get('/machineChart', function (req, res, next) {
         var money = 0;
         var gift = 0;
         var day = new Date(1);
-        for (var i = 0; i < data.length; i++) {
+        for (var i = data.length - 1; i >= 0; i--) {
             var date = new Date(data[i].DateCode * 1000);
             if (date.getDate() != day.getDate() || date.getMonth() != day.getMonth() || date.getFullYear() != day.getFullYear()) {
                 day = date;

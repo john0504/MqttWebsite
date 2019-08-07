@@ -17,7 +17,7 @@ router.get('/', function (req, res, next) {
 router.get('/captcha', function (req, res, next) {
     var option = {
         size: 4,
-        ignoreChars: '0o1i',
+        ignoreChars: '0o1iIl',
         noise: 2,
         color: true,
         background: '#cc9966'
