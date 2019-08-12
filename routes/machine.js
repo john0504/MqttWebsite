@@ -218,13 +218,7 @@ router.get('/machineDelete', function (req, res, next) {
     var DevNo = req.query.DevNo;
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('DELETE FROM mqtt_client WHERE DevNo = ?', DevNo, function (err, rows) {
-        if (err) {
-            console.log(err);
-        }
-    });
-
-    mysqlQuery('DELETE FROM mqtt_machine WHERE DevNo = ?', DevNo, function (err, rows) {
+    mysqlQuery('UPDATE DeviceTbl SET AccountNo = NULL WHERE DevNo = ?', DevNo, function (err, rows) {
         if (err) {
             console.log(err);
         }
