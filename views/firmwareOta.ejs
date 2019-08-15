@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <title></title>
+    <script type="text/javascript">
+        function Check(length) {
+            var Time = document.getElementsByName('Time')[0].value;
+            var Second = document.getElementsByName('Second')[0].value;
+
+            var chkStart = document.getElementsByName('CheckStart')[0].checked;
+            const DevNoListLength = document.getElementsByName('chkDevNo').length;
+            if (DevNoListLength == 0) {
+                return;
+            }
+            if (Time) {
+                const myDate = Time.substring(0, 8);
+                if (myDate / 10000 < 1970 || myDate / 10000 > 2200) {
+                    alert('請檢查年份');
+                    return false;
+                } else if (myDate % 100 < 1 || myDate % 100 > 31) {
+                    alert('請檢查日期');
+                    return false;
+                } else if (myDate / 100 % 100 < 1 || myDate / 100 % 100 > 12) {
+                    alert('請檢查月份');
+                    return false;
+                }
+                const myTime = Time.substring(9, 15);
+                if (myTime / 10000 < 0 || myTime / 10000 > 23) {
+                    alert('請檢查小時');
+                    return false;
+                } else if (myTime % 100 < 0 || myTime % 100 > 59) {
+                    alert('請檢查秒鐘');
+                    return false;
+                } else if (myTime / 100 % 100 < 0 || myTime / 100 % 100 > 59) {
+                    alert('請檢查分鐘');
+                    return false;
+                }
+            }
+
+            if (Time && Second || chkStart) {
+                return true;
+            }
+            return false;
+        }
+        function Search(sha1) {
+            var DevNo = document.getElementsByName('SearchDevNo')[0].value;
+            var VerNumMax = document.getElementsByName('SearchVerNumMax')[0].value;
+            var VerNumMin = document.getElementsByName('SearchVerNumMin')[0].value;
+            var regex = /^([A-Z0-9])+$/;
+            if (!regex.test(DevNo) && DevNo.length != 0) {
+                return false;
+            }
+
+            VerNumMax = VerNumMax ? VerNumMax : 0;
+            VerNumMin = VerNumMin ? VerNumMin : 0;
+
+            window.location.href = `/firmware/ota?sha1=${sha1}&DevNo=${DevNo}&VerNumMin=${VerNumMin}&VerNumMax=${VerNumMax}`;
+        }
+        function Test() {
+            var timestamp = 0;
+            const CheckStart = document.getElementsByName('CheckStart')[0].checked;
+            const Time = document.getElementsByName('Time')[0].value;
+            const Second = document.getElementsByName('Second')[0].value;
+            const DevNoListLength = document.getElementsByName('chkDevNo').length;
+            var DevNoList = [];
+            for (var i = 0; i < DevNoListLength; i++) {
+                const checked = document.getElementsByName('chkDevNo')[i].checked;
+                if (checked) {
+                    const DevNo = document.getElementsByName('chkDevNo')[i].value;
+                    DevNoList.push(DevNo);
+                }
+            }
+            const sha1 = document.getElementsByName('sha1')[0].value;
+            const OTA = document.getElementsByName('OTA')[0].value;
+            const VerNum = document.getElementsByName('VerNum')[0].value;
+            const url = document.getElementsByName('url')[0].value;
+
+            if (Time.length > 0) {
+                const year = Time.substring(0, 4);
+                const month = Time.substring(4, 6) - 1;
+                const day = Time.substring(6, 8);
+                const hour = Time.substring(9, 11);
+                const minute = Time.substring(11, 13);
+                const second = Time.substring(13, 15);
+                var myDate = new Date();
+                myDate.setFullYear(year, month, day);
+                myDate.setHours(hour, minute, second);
+                timestamp = parseInt(`${myDate.getTime() / 1000}`, 10);
+            }
+            var paylod = {
+                sha1: sha1,
+                OTA: OTA,
+                VerNum: parseInt(VerNum, 10),
+                url: url
+            };
+
+            if (!CheckStart) {
+                paylod.RunTime = timestamp;
+            }
+
+            var log = "";
+            DevNoList.forEach(DevNo => {
+                const topic = `WAWA/${DevNo}/D`;
+                log += `[${topic}]\n[${JSON.stringify(paylod)}]\n`;
+                if (paylod.RunTime) {
+                    paylod.RunTime = parseInt(paylod.RunTime) + parseInt(Second);
+                }
+            });
+
+            document.getElementsByName('TestArea')[0].value = log;
+        }
+    </script>
+</head>
+
+<body>
+
+    <h1>OTA - 進行排程</h1>
+    <label>檔案路徑:<%= data.FilePath %></label>
+    <br />
+    <label>版號:"<%= data.VerNum %>"</label>
+    <br /><br />
+    <input type="text" name="SearchDevNo" placeholder="搜尋產品序號" value="<%= data.DevNo %>" />
+    <input type="number" name="SearchVerNumMin" placeholder="搜尋版本號（下限）" value="<%= data.VerNumMin %>" />
+    <input type="number" name="SearchVerNumMax" placeholder="搜尋版本號（上限）" value="<%= data.VerNumMax %>" />
+    <input type="button" name="search" value="搜尋" class="btn" onclick="Search('<%=data.sha1%>');" />
+    <form name="editform" action="ota" method="post" accept-charset="utf-8"
+        onSubmit="return Check('<%=device.length%>');">
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>編號</th>
+                <th>序號</th>
+                <th>版本號</th>
+                <th>機台名稱</th>
+            </tr>
+            <% for ( var i = 0 ; i < device.length ; i++){ %>
+            <tr>
+                <td>
+                    <input type="checkbox" name="chkDevNo" id="chkDevNo" value="<%=device[i].DevNo%>" />
+                </td>
+                <td>
+                    <%= i+1 %>
+                </td>
+                <td>
+                    <%= device[i].DevNo  %>
+                </td>
+                <td>
+                    <%= device[i].VerNum  %>
+                </td>
+                <td>
+                    <%= device[i].DevName  %>
+                </td>
+            </tr>
+            <% } %>
+        </table>
+        <br />
+        <br />
+        <input type="hidden" name="sha1" value="<%=data.sha1  %>" />
+        <input type="hidden" name="OTA" value="<%=data.OTA  %>" />
+        <input type="hidden" name="VerNum" value="<%=data.VerNum  %>" />
+        <input type="hidden" name="url" value="<%=data.url  %>" />
+
+        <label><input type="checkbox" name="CheckStart" id="CheckStart" value="checked">立即開始</label>
+        <br />
+        <label>排程開始時間:(請輸入如:20210101 182030)</label>
+        <br />
+        <input type="text" name="Time" placeholder="請輸入如:20210101 182030" value="<%=data.Time %>" />
+        <br />
+        <label>排程間隔（秒）:</label>
+        <input type="number" name="Second" placeholder="Second" value="<%=data.Second %>" />
+        <br />
+        <input class="btn" type='submit' value='提交'>
+        <input class="btn" type='reset' value='重置'>
+        <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
+        <input type="button" name="search" value="測試" class="btn" onclick="Test();" />
+        <br />
+        <textarea rows="6" cols="60" name="TestArea" placeholder=""></textarea>
+    </form>
+</body>
+
+</html>

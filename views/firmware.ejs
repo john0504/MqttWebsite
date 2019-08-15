@@ -13,6 +13,9 @@
                 window.location.href = "/firmware/delete?sha1=" + sha1 + "&FilePath=" + FilePath;
             }
         }
+        function Ota(sha1) {
+            window.location.href = "/firmware/ota?sha1=" + sha1;
+        }
     </script>
 </head>
 
@@ -47,7 +50,6 @@
             <th>檔案路徑</th>
             <th>版號</th>
             <th>sha1</th>
-            <th>OTA</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
@@ -67,9 +69,7 @@
                 <%= data[i].sha1  %>
             </td>
             <td>
-                <%= data[i].OTA  %>
-            </td>
-            <td>
+                <input type="button" name="ota" value="OTA" class="btn" onclick="Ota('<%= data[i].sha1  %>');" />
                 <input type="button" name="delete" value="刪除" class="btn"
                     onclick="Delete('<%= data[i].sha1  %>', '<%= data[i].FilePath  %>');" />
             </td>

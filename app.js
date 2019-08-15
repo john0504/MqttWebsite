@@ -89,7 +89,6 @@ client.on('connect', function () {
 });
 
 client.on('message', function (topic, msg) {
-    // console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
     var PrjName = topic.substring(0, 4);
     var No = "";
     var action = "";
@@ -106,90 +105,94 @@ client.on('message', function (topic, msg) {
         msgType = "device";
     }
     if (action == "C") {
-        //for device const        
-        mysqlQuery("SELECT * FROM AllowTbl WHERE DevNo = ?", No, function (err, allow) {
-            if (allow.length != 1) {
-                return;
-            } else {
-                const obj = JSON.parse(msg.toString());
-                mysqlQuery("SELECT * FROM DeviceTbl WHERE DevNo = ?", No, function (err, device) {
-                    if (err) {
-                        console.log('[SELECT ERROR] - ', err.message);
-                        return;
-                    }
-                    if (device.length == 0 || device[0].AccountNo == null || device[0].AccountNo == parseInt(obj.Account, 16)) {
-                        var insertsql = {
-                            DevNo: No,
-                            DevName: obj.DevName,
-                            AccountNo: parseInt(obj.Account, 16),
-                            PrjName: PrjName,
-                            DevAlias: obj.DevAlias,
-                            VerNum: obj.VerNum,
-                            GroupNo: obj.GroupNo ? obj.GroupNo : null,
-                            S01: obj.S01,
-                            S02: obj.S02,
-                            ExpireDate: allow[0].ExpireDate,
-                            CreateDate: Date.now() / 1000,
-                        };
-                        var updatesql = {
-                            DevName: obj.DevName,
-                            AccountNo: parseInt(obj.Account, 16),
-                            PrjName: PrjName,
-                            DevAlias: obj.DevAlias,
-                            VerNum: obj.VerNum,
-                            GroupNo: obj.GroupNo ? obj.GroupNo : null,
-                            S01: obj.S01,
-                            S02: obj.S02,
-                            UpdateDate: Date.now() / 1000
-                        };
-                        var sqlstring = "INSERT INTO DeviceTbl SET ? ON DUPLICATE KEY UPDATE ? ";
-                        mysqlQuery(sqlstring, [insertsql, updatesql], function (err, result) {
-                            if (err) {
-                                console.log('[INSERT ERROR] - ', err.message);
-                                return;
-                            }
-                            var mytopic = `${PrjName}/${obj.Account}/U`
-                            var mymsg = { action: "list" };
-                            client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
-                            console.log('--------------------------UPDATE----------------------------');
-                        });
-                    } else if (device.length != 0 && device[0].AccountNo != null && device[0].AccountNo != parseInt(obj.Account, 16)) {
-                        updatesql = {
-                            DevName: obj.DevName,
-                            VerNum: obj.VerNum,
-                            GroupNo: obj.GroupNo ? obj.GroupNo : null,
-                            S01: obj.S01,
-                            S02: obj.S02,
-                            UpdateDate: Date.now() / 1000
-                        };
-                        sqlstring = "UPDATE DeviceTbl SET ? WHERE DevNo = ?";
-                        mysqlQuery(sqlstring, [updatesql, No], function (err, result) {
-                            if (err) {
-                                console.log('[UPDATE ERROR] - ', err.message);
-                                return;
-                            }
-                            var mytopic = `${PrjName}/${obj.Account}/U`
-                            var mymsg = { action: "list" };
-                            client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
-                            console.log('--------------------------UPDATE----------------------------');
-                        });
-                        var token = device[0].AccountNo.toString(16);
-                        if (token.length == 1) {
-                            token = "000" + token;
-                        } else if (token.length == 2) {
-                            token = "00" + token;
-                        } else if (token.length == 3) {
-                            token = "0" + token;
-                        }
-                        var mytopic = `${PrjName}/${No}/D`
-                        var mymsg = { Account: token };
-                        client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
-                    }
+        console.log('get Topic:' + topic);
+        //for device const   
+        if (msgType == "device") {
+            mysqlQuery("SELECT * FROM AllowTbl WHERE DevNo = ?", No, function (err, allow) {
+                if (allow.length != 1) {
                     return;
-                });
-            }
-        });
+                } else {
+                    const obj = JSON.parse(msg.toString());
+                    mysqlQuery("SELECT * FROM DeviceTbl WHERE DevNo = ?", No, function (err, device) {
+                        if (err) {
+                            console.log('[SELECT ERROR] - ', err.message);
+                            return;
+                        }
+                        if (device.length == 0 || device[0].AccountNo == null || device[0].AccountNo == parseInt(obj.Account, 16)) {
+                            var insertsql = {
+                                DevNo: No,
+                                DevName: obj.DevName,
+                                AccountNo: parseInt(obj.Account, 16),
+                                PrjName: PrjName,
+                                DevAlias: obj.DevAlias,
+                                VerNum: obj.VerNum,
+                                GroupNo: obj.GroupNo ? obj.GroupNo : null,
+                                S01: obj.S01,
+                                S02: obj.S02,
+                                ExpireDate: allow[0].ExpireDate,
+                                CreateDate: Date.now() / 1000,
+                            };
+                            var updatesql = {
+                                DevName: obj.DevName,
+                                AccountNo: parseInt(obj.Account, 16),
+                                PrjName: PrjName,
+                                DevAlias: obj.DevAlias,
+                                VerNum: obj.VerNum,
+                                GroupNo: obj.GroupNo ? obj.GroupNo : null,
+                                S01: obj.S01,
+                                S02: obj.S02,
+                                UpdateDate: Date.now() / 1000
+                            };
+                            var sqlstring = "INSERT INTO DeviceTbl SET ? ON DUPLICATE KEY UPDATE ? ";
+                            mysqlQuery(sqlstring, [insertsql, updatesql], function (err, result) {
+                                if (err) {
+                                    console.log('[INSERT ERROR] - ', err.message);
+                                    return;
+                                }
+                                var mytopic = `${PrjName}/${obj.Account}/U`
+                                var mymsg = { action: "list" };
+                                client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
+                                // console.log('--------------------------UPDATE----------------------------');
+                            });
+                        } else if (device.length != 0 && device[0].AccountNo != null && device[0].AccountNo != parseInt(obj.Account, 16)) {
+                            updatesql = {
+                                DevName: obj.DevName,
+                                VerNum: obj.VerNum,
+                                GroupNo: obj.GroupNo ? obj.GroupNo : null,
+                                S01: obj.S01,
+                                S02: obj.S02,
+                                UpdateDate: Date.now() / 1000
+                            };
+                            sqlstring = "UPDATE DeviceTbl SET ? WHERE DevNo = ?";
+                            mysqlQuery(sqlstring, [updatesql, No], function (err, result) {
+                                if (err) {
+                                    console.log('[UPDATE ERROR] - ', err.message);
+                                    return;
+                                }
+                                var mytopic = `${PrjName}/${obj.Account}/U`
+                                var mymsg = { action: "list" };
+                                client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
+                                // console.log('--------------------------UPDATE----------------------------');
+                            });
+                            var token = device[0].AccountNo.toString(16);
+                            if (token.length == 1) {
+                                token = "000" + token;
+                            } else if (token.length == 2) {
+                                token = "00" + token;
+                            } else if (token.length == 3) {
+                                token = "0" + token;
+                            }
+                            var mytopic = `${PrjName}/${No}/D`
+                            var mymsg = { Account: token };
+                            client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
+                        }
+                        return;
+                    });
+                }
+            });
+        }
     } else if (action == "U") {
+        console.log('get Topic:' + topic);
         //for device var
         if (msgType == "device") {
             var arrayBuffer = new ArrayBuffer(msg.length);
@@ -230,15 +233,25 @@ client.on('message', function (topic, msg) {
             mysqlQuery("INSERT INTO MessageTbl SET ?", insertsql, function (err, result) {
                 if (err) {
                     console.log('[SELECT ERROR] - ', err.message);
+                    var updatesql = {
+                        UpdateDate: Date.now() / 1000
+                    };
+                    var sqlstring = "UPDATE DeviceTbl SET ? WHERE DevNo = ?";
+                    mysqlQuery(sqlstring, [updatesql, No], function (err, result) {
+                        if (err) {
+                            console.log('[UPDATE ERROR] - ', err.message);
+                            return;
+                        }
+                    });
                     return;
                 }
                 // console.log('--------------------------INSERT----------------------------');
             });
         } else if (msgType == "app") {
-            console.log(msg.toString());
+            // console.log(msg.toString());
             const obj = JSON.parse(msg.toString());
             if (obj.action == "list") {
-                console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
+                // console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
                 var AccountNo = parseInt(No, 16);
                 mysqlQuery('SELECT * FROM AccountTbl WHERE AccountNo = ?', AccountNo, function (err, rows) {
                     if (err) {
@@ -273,22 +286,20 @@ client.on('message', function (topic, msg) {
 
                                 if (count == 0) {
                                     var topic = `${PrjName}/${token}/D`
-                                    client.publish(topic, JSON.stringify(message), { qos: 1, retain: true });
+                                    client.publish(topic, JSON.stringify(message), { qos: 1, retain: false });
                                     return;
                                 }
 
                                 for (var i = 0; i < count; i++) {
                                     var device = {
-                                        DevName: result[i].DevName,
                                         DevNo: result[i].DevNo,
-                                        DevAlias: result[i].DevAlias,
                                         ExpireDate: result[i].ExpireDate,
                                         UpdateDate: result[i].UpdateDate
                                     };
                                     message.data.push(device);
                                 }
                                 var topic = `${PrjName}/${token}/D`
-                                client.publish(topic, JSON.stringify(message), { qos: 1, retain: true });
+                                client.publish(topic, JSON.stringify(message), { qos: 1, retain: false });
                                 return;
                             });
                         }
@@ -312,7 +323,7 @@ client.on('message', function (topic, msg) {
                                     }
                                     var mytopic = `WAWA/${No}/U`
                                     var mymsg = { action: "list" };
-                                    client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
+                                    client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
                                     return;
                                 });
                         }
@@ -332,8 +343,7 @@ client.on('message', function (topic, msg) {
             }
         });
     } else {
-        console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
-        console.log("Don't Care Topic");
+        console.log('get Topic:' + topic + " - Don't Care");
     }
 });
 
