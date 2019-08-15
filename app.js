@@ -292,9 +292,9 @@ client.on('message', function (topic, msg) {
 
                                 for (var i = 0; i < count; i++) {
                                     var device = {
-                                        DevNo: result[i].DevNo,
-                                        ExpireDate: result[i].ExpireDate,
-                                        UpdateDate: result[i].UpdateDate
+                                        D: result[i].DevNo,
+                                        E: result[i].ExpireDate,
+                                        U: result[i].UpdateDate
                                     };
                                     message.data.push(device);
                                 }
