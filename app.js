@@ -119,7 +119,7 @@ client.on('message', function (topic, msg) {
                             return;
                         }
                         if (device.length == 0 || device[0].AccountNo == null || device[0].AccountNo == parseInt(obj.Account, 16)) {
-                            if (obj.Account = "0000") {
+                            if (obj.Account == "0000") {
                                 return;
                             }
                             var insertsql = {
