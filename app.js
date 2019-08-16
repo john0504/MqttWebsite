@@ -119,6 +119,9 @@ client.on('message', function (topic, msg) {
                             return;
                         }
                         if (device.length == 0 || device[0].AccountNo == null || device[0].AccountNo == parseInt(obj.Account, 16)) {
+                            if (obj.Account = "0000") {
+                                return;
+                            }
                             var insertsql = {
                                 DevNo: No,
                                 DevName: obj.DevName,
@@ -232,7 +235,7 @@ client.on('message', function (topic, msg) {
             // console.log(JSON.stringify(insertsql));
             mysqlQuery("INSERT INTO MessageTbl SET ?", insertsql, function (err, result) {
                 if (err) {
-                    console.log('[SELECT ERROR] - ', err.message);                    
+                    console.log('[SELECT ERROR] - ', err.message);
                     return;
                 }
                 var updatesql = {
@@ -324,6 +327,11 @@ client.on('message', function (topic, msg) {
                                     var mytopic = `WAWA/${No}/U`
                                     var mymsg = { action: "list" };
                                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
+
+                                    var DevNo = result[0].DevNo
+                                    var mytopic = `${PrjName}/${DevNo}/D`
+                                    var mymsg = { Account: "0000" };
+                                    client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
                                     return;
                                 });
                         }
