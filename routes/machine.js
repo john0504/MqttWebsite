@@ -216,12 +216,30 @@ router.get('/machineDelete', function (req, res, next) {
         return;
     }
     var DevNo = req.query.DevNo;
+    var AccountNo = req.query.AccountNo;
     var mysqlQuery = req.mysqlQuery;
-
+    var client = req.mqttClient;
+    console.log(`DevNo:${DevNo} AccountNo:${AccountNo}`);
+    var token = AccountNo.toString(16);
+    if (token.length == 1) {
+        token = "000" + token;
+    } else if (token.length == 2) {
+        token = "00" + token;
+    } else if (token.length == 3) {
+        token = "0" + token;
+    }
     mysqlQuery('UPDATE DeviceTbl SET AccountNo = NULL WHERE DevNo = ?', DevNo, function (err, rows) {
         if (err) {
             console.log(err);
         }
+
+        var mytopic = `WAWA/${token}/U`
+        var mymsg = { action: "list" };
+        client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
+
+        var mytopic = `WAWA/${DevNo}/D`
+        var mymsg = { Account: "0000" };
+        client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
 
         res.redirect('/machine');
     });

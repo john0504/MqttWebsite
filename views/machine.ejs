@@ -14,7 +14,7 @@
                 window.location.href = "/machine";
                 return true;
             }
-            if(!regex.test(DevNo)) {
+            if (!regex.test(DevNo)) {
                 return false;
             }
             window.location.href = "/machine/search?DevNo=" + DevNo;
@@ -32,10 +32,13 @@
             window.location.href = "/machine/machineEdit?DevNo=" + DevNo;
         }
 
-        function Delete(DevNo) {
+        function Delete(DevNo, AccountNo) {
+            if (!DevNo || !AccountNo) {
+                return;
+            }
             var rs = confirm('確定要刪除?');
             if (rs) {
-                window.location.href = "/machine/machineDelete?DevNo=" + DevNo;
+                window.location.href = "/machine/machineDelete?DevNo=" + DevNo + "&AccountNo=" + AccountNo;
             }
         }
 
@@ -143,7 +146,8 @@
                 <input type="button" name="chart" value="圖表" class="btn" onclick="Chart('<%= data[i].DevNo  %>');" />
                 <% if (locals.SuperUser == 1) { %>
                 <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].DevNo  %>');" />
-                <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].DevNo  %>');" />
+                <input type="button" name="delete" value="刪除" class="btn"
+                    onclick="Delete('<%= data[i].DevNo %>','<%= data[i].AccountNo %>');" />
                 <% } %>
             </td>
         </tr>
