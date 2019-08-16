@@ -41,6 +41,13 @@
                 }
             }
 
+            if (!chkStart) {
+                if (!Second || Second < 0) {
+                    alert('請檢查排程間隔');
+                    return false;
+                }
+            }
+
             if (Time && Second || chkStart) {
                 return true;
             }
