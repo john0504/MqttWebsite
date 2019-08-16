@@ -238,8 +238,8 @@ router.get('/machineDelete', function (req, res, next) {
         client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
 
         var mytopic = `WAWA/${DevNo}/D`
-        var mymsg = { Account: "0000" };
-        client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
+        var mymsg = { Account: "0000", CMD: "REBOOT" };
+        client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });        
 
         res.redirect('/machine');
     });
