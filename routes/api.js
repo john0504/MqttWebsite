@@ -224,7 +224,7 @@ router.post('/payment', function (req, res, next) {
     var token = req.body['token'];
     var AccountNo = parseInt(token, 16);
     var DevNo = req.body['serial'];
-    var CardNo = req.body['code'];
+    var CardNo = req.body['code'].trim();
 
     if (!Account || !token || !DevNo || !CardNo) {
         return;
@@ -246,7 +246,7 @@ router.post('/payment', function (req, res, next) {
                 res.status(400).send('使用者被拒絕存取');
                 return;
             } else {
-                mysqlQuery('SELECT DevNo FROM DeviceTbl WHERE DevNo = ?'
+                mysqlQuery('SELECT * FROM DeviceTbl WHERE DevNo = ?'
                     , DevNo, function (err, device) {
                         if (err) {
                             console.log(err);
@@ -270,14 +270,19 @@ router.post('/payment', function (req, res, next) {
                                             res.status(400).send('This payment CardNo has been used.');
                                             return;
                                         } else {
+                                            var addTime = 31536000;
+                                            if (payment[0].CardMonth) {
+                                                addTime = payment[0].CardMonth * 30 * 24 * 60 * 60;
+                                            }
                                             var ExpireDate = device[0].ExpireDate;
                                             if (ExpireDate - Date.now() / 1000 > 0) {
-                                                ExpireDate += 31536000;
+                                                ExpireDate += addTime;
                                             } else {
-                                                ExpireDate = Date.now() / 1000 + 31536000;
+                                                ExpireDate = Date.now() / 1000 + addTime;
                                             }
                                             var sql = {
                                                 Used: 1,
+                                                Account: Account,
                                                 AccountNo: AccountNo,
                                                 PayDate: Date.now() / 1000,
                                                 DevNo: DevNo
@@ -288,7 +293,7 @@ router.post('/payment', function (req, res, next) {
                                                         console.log(err);
                                                     }
                                                     mysqlQuery('UPDATE DeviceTbl SET ExpireDate = ? WHERE DevNo = ?'
-                                                        , [expiredate, device[0].DevNo], function (err, result2) {
+                                                        , [ExpireDate, device[0].DevNo], function (err, result2) {
                                                             if (err) {
                                                                 console.log(err);
                                                             }

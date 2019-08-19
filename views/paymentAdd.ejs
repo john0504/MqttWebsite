@@ -9,7 +9,7 @@
     <script type="text/javascript">
         function Check() {
             var CardNo = document.getElementsByName('CardNo')[0].value;
-            var month = document.getElementsByName('months')[0].value;
+            var month = document.getElementsByName('CardMonth')[0].value;
             if (CardNo && month) {
                 return true;
             }
@@ -27,6 +27,19 @@
             return false;
 
         }
+        function Download(text) {
+            var element = document.createElement('a');
+            var month = document.getElementsByName('CardMonth')[0].value;
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', `PaymentFile_${month}m.csv`);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
     </script>
 </head>
 
@@ -40,11 +53,11 @@
         </div>
         <div class="row">
             <label>請輸入儲值月數:</label>
-            <input type="number" name="months" placeholder="month" />
+            <input type="number" name="CardMonth" placeholder="month" value="<%=CardMonth %>" />
         </div>
         <div class="row">
+            <input class="btn" type='button' value='下載' onclick="Download('<%=CardNoList %>');">
             <input class="btn" type='submit' value='提交'>
-            <input class="btn" type='reset' value='重置'>
             <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
             <br />
             <label class="msgerr">

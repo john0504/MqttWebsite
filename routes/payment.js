@@ -42,7 +42,8 @@ router.get('/add', function (req, res, next) {
         return;
     }
     var CardNoList = "";
-    res.render('paymentAdd', { title: 'Add Payment', msg: '', CardNoList: CardNoList });
+    var CardMonth = "";
+    res.render('paymentAdd', { title: 'Add Payment', msg: '', CardNoList: CardNoList, CardMonth: CardMonth });
 });
 
 // add post
@@ -59,7 +60,7 @@ router.post('/paymentAdd', function (req, res, next) {
     CardNoArr.forEach(cardNo => {
         var sql = {
             CardNo: cardNo,
-            CardMonth : CardMonth
+            CardMonth: CardMonth
         };
         mysqlQuery('INSERT IGNORE INTO PaymentTbl SET ?', sql, function (err, rows) {
             if (err) {
@@ -80,6 +81,7 @@ router.get('/create', function (req, res, next) {
     var CardNoList = "";
     var count = req.query.count;
     var months = req.query.month;
+    var CardMonth = months;
 
     var option = {
         mode: cryptpJS.mode.ECB
@@ -115,7 +117,7 @@ router.get('/create', function (req, res, next) {
             CardNoList += `,${encrypted}`;
         }
     }
-    res.render('paymentAdd', { title: 'Add Payment', msg: '', CardNoList: CardNoList });
+    res.render('paymentAdd', { title: 'Add Payment', msg: '', CardNoList: CardNoList, CardMonth: CardMonth });
 });
 
 router.get('/paymentDelete', function (req, res, next) {

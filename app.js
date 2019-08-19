@@ -253,6 +253,9 @@ client.on('message', function (topic, msg) {
         } else if (msgType == "app") {
             // console.log(msg.toString());
             const obj = JSON.parse(msg.toString());
+            if (!obj) {
+                return;
+            }
             if (obj.action == "list") {
                 // console.log('get Topic:' + topic + ' & Msg:' + msg.toString());
                 var AccountNo = parseInt(No, 16);
@@ -308,6 +311,24 @@ client.on('message', function (topic, msg) {
                         }
                     }
                 });
+            } else if (obj.action == "gifttime") {
+                var DevNo = obj.DevNo;
+                mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1000', DevNo, function (err, msgs) {
+                    var timelist = [];
+                    var H62 = 0;
+                    var DateCode = 0;
+                    msgs.forEach(msg => {
+                        if (H62 > msg.H62 && timelist.length < 3) {
+                            timelist.push(DateCode);
+                        }
+                        H62 = msg.H62;
+                        DateCode = msg.DateCode;
+                    });
+                    var mytopic = `${PrjName}/${No}/G`
+                    var mymsg = { T: timelist };
+                    client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
+                });
+
             } else if (obj.action == "delete") {
                 var AccountNo = parseInt(No, 16);
                 var DevNo = obj.DevNo;
