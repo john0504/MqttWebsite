@@ -40,7 +40,7 @@ CREATE TABLE `AccountTbl` (
 
 LOCK TABLES `AccountTbl` WRITE;
 /*!40000 ALTER TABLE `AccountTbl` DISABLE KEYS */;
-INSERT INTO `AccountTbl` VALUES (1,'cectco','Cectco123@','SuperAdmin',1563333264,1,1),(2,'hylin@cectco.com','12345678','hylin@cectco.com',1563431075,1,0),(3,'tywu@cectco.com','12345678','tywu@cectco.com',1564034324,1,0);
+INSERT INTO `AccountTbl` VALUES (1,'cectco','NTg.7fz1+BwL/4!U,FwZMj','SuperAdmin',1563333264,1,1),(3,'tywu@cectco.com','12345678','tywu@cectco.com',1564034324,1,0),(4,'hylin@cectco.com','12345678','hylin@cectco.com',1563431075,1,0),(5,'cectdemo@cectco.com','www.cectco.c0m','cectdemo@cectco.com',1564993800,1,0);
 /*!40000 ALTER TABLE `AccountTbl` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -76,21 +76,21 @@ DROP TABLE IF EXISTS `DeviceTbl`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `DeviceTbl` (
-  `DevNo` char(12) NOT NULL,
+  `DevNo` char(12) CHARACTER SET latin1 NOT NULL,
   `DevName` char(128) DEFAULT NULL,
   `AccountNo` int(11) DEFAULT NULL,
-  `PrjName` char(4) DEFAULT NULL,
-  `DevAlias` char(128) DEFAULT NULL,
+  `PrjName` char(4) CHARACTER SET latin1 DEFAULT NULL,
+  `DevAlias` char(128) CHARACTER SET latin1 DEFAULT NULL,
   `VerNum` int(11) DEFAULT NULL,
   `GroupNo` int(11) DEFAULT NULL,
-  `S01` char(128) DEFAULT NULL,
-  `S02` char(128) DEFAULT NULL,
+  `S01` char(128) CHARACTER SET latin1 DEFAULT NULL,
+  `S02` char(128) CHARACTER SET latin1 DEFAULT NULL,
   `CreateDate` int(11) DEFAULT NULL,
   `UpdateDate` int(11) DEFAULT NULL,
   `ExpireDate` int(11) DEFAULT NULL,
   PRIMARY KEY (`DevNo`),
   UNIQUE KEY `DevNo` (`DevNo`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,6 +100,32 @@ CREATE TABLE `DeviceTbl` (
 LOCK TABLES `DeviceTbl` WRITE;
 /*!40000 ALTER TABLE `DeviceTbl` DISABLE KEYS */;
 /*!40000 ALTER TABLE `DeviceTbl` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FirmwareTbl`
+--
+
+DROP TABLE IF EXISTS `FirmwareTbl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `FirmwareTbl` (
+  `OTA` char(64) DEFAULT NULL,
+  `VerNum` int(11) DEFAULT NULL,
+  `sha1` char(40) NOT NULL,
+  `url` char(255) DEFAULT NULL,
+  `FilePath` char(255) DEFAULT NULL,
+  PRIMARY KEY (`sha1`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FirmwareTbl`
+--
+
+LOCK TABLES `FirmwareTbl` WRITE;
+/*!40000 ALTER TABLE `FirmwareTbl` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FirmwareTbl` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -130,7 +156,7 @@ CREATE TABLE `MessageTbl` (
   `H6F` int(11) DEFAULT NULL,
   `DateCode` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1762 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -150,14 +176,17 @@ DROP TABLE IF EXISTS `PaymentTbl`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `PaymentTbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `CardNo` char(128) NOT NULL,
   `AccountNo` int(11) DEFAULT NULL,
-  `DevNo` int(11) DEFAULT NULL,
+  `DevNo` char(12) DEFAULT NULL,
   `Used` tinyint(1) DEFAULT NULL,
   `PayDate` int(11) DEFAULT NULL,
-  PRIMARY KEY (`CardNo`),
+  `CardMonth` int(11) DEFAULT NULL,
+  `Account` char(128) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `CardNo` (`CardNo`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -201,4 +230,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-07-26 17:09:01
+-- Dump completed on 2019-08-20  9:19:42
