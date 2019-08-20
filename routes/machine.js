@@ -32,11 +32,13 @@ router.get('/', function (req, res, next) {
         if (err) {
             console.log(err);
         }
-        if (devices.UpdateDate >= Date.now() / 1000 - 2 * 60) {
-            devices.Status = 1;
-        } else {
-            devices.Status = 0;
-        }
+        devices.forEach(device => {
+            if (device.UpdateDate >= Date.now() / 1000 - 2 * 60) {
+                device.Status = 1;
+            } else {
+                device.Status = 0;
+            }
+        });
         res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo });
     });
 });
@@ -58,12 +60,14 @@ router.get('/search', function (req, res, next) {
     mysqlQuery(sql, function (err, devices) {
         if (err) {
             console.log(err);
-        }
-        if (devices.UpdateDate >= Date.now() / 1000 - 2 * 60) {
-            devices.Status = 1;
-        } else {
-            devices.Status = 0;
-        }
+        }        
+        devices.forEach(device => {
+            if (device.UpdateDate >= Date.now() / 1000 - 2 * 60) {
+                device.Status = 1;
+            } else {
+                device.Status = 0;
+            }
+        });
         res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo });
     });
 });
@@ -211,7 +215,7 @@ router.get('/machineDelete', function (req, res, next) {
 
         var mytopic = `WAWA/${DevNo}/D`
         var mymsg = { Account: "0000", CMD: "REBOOT" };
-        client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });        
+        client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
 
         res.redirect('/machine');
     });
