@@ -102,9 +102,6 @@
             <th>所有者</th>
             <th>序號</th>
             <th>版本號</th>
-            <th>保夾</th>
-            <th>投幣</th>
-            <th>出獎</th>
             <th>狀態</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
@@ -123,15 +120,6 @@
             </td>
             <td>
                 <%= data[i].VerNum  %>
-            </td>
-            <td>
-                <%= data[i].H61  %>
-            </td>
-            <td>
-                <%= data[i].H60  %>
-            </td>
-            <td>
-                <%= data[i].H62  %>
             </td>
             <td>
                 <% if(data[i].Status > 0) { %>
