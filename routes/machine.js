@@ -22,10 +22,10 @@ router.get('/', function (req, res, next) {
     var index = req.query.index ? req.query.index : 0;
     var mysqlQuery = req.mysqlQuery;
 
-    var sql = 'SELECT * FROM DeviceTbl';
+    var sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
 
     if (req.session.SuperUser != 1) {
-        sql += (` WHERE AccountNo = ${req.session.AccountNo}`);
+        sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
     }
 
     mysqlQuery(sql, function (err, devices) {
@@ -51,10 +51,10 @@ router.get('/search', function (req, res, next) {
     var DevNo = req.query.DevNo;
     var mysqlQuery = req.mysqlQuery;
 
-    var sql = 'SELECT * FROM DeviceTbl';
-    sql += (` WHERE DevNo LIKE '%${DevNo}%'`);
+    var sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
+    sql += (` WHERE a.DevNo LIKE '%${DevNo}%'`);
     if (req.session.SuperUser != 1) {
-        sql += (` AND AccountNo = ${req.session.AccountNo}`);
+        sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
     }
 
     mysqlQuery(sql, function (err, devices) {
