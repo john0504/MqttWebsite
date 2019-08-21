@@ -143,6 +143,7 @@
                 <th>序號</th>
                 <th>版本號</th>
                 <th>機台名稱</th>
+                <th>狀態</th>
             </tr>
             <% for ( var i = 0 ; i < device.length ; i++){ %>
             <tr>
@@ -160,6 +161,13 @@
                 </td>
                 <td>
                     <%= device[i].DevName  %>
+                </td>
+                <td>
+                    <% if(device[i].Status > 0) { %>
+                    連線
+                    <% } else { %>
+                    離線
+                    <% } %>
                 </td>
             </tr>
             <% } %>

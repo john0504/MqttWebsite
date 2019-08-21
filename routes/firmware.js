@@ -123,11 +123,19 @@ router.get('/ota', function (req, res, next) {
         }
         console.log(sql);
 
-        mysqlQuery(sql, function (err, device) {
+        mysqlQuery(sql, function (err, devices) {
             if (err) {
                 console.log(err);
             }
-            res.render('firmwareOta', { title: 'Firmware Ota', data: data, device: device });
+
+            devices.forEach(device => {
+                if (device.UpdateDate >= Date.now() / 1000 - 2 * 60) {
+                    device.Status = 1;
+                } else {
+                    device.Status = 0;
+                }
+            });
+            res.render('firmwareOta', { title: 'Firmware Ota', data: data, device: devices });
         });
     });
 });
