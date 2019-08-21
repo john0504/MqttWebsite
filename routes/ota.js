@@ -6,7 +6,7 @@ router.get('/az', function (req, res) {
     var DevNo = req.headers["devno"];
     var sha1 = req.headers["sha1"];
 
-    mysqlQuery("SELECT * FROM DeviceTbl WHERE DevNo = ?", DevNo, function (err, device) {
+    mysqlQuery("SELECT * FROM AllowTbl WHERE DevNo = ?", DevNo, function (err, device) {
         if (err) {
             console.log('[SELECT ERROR] - ', err.message);
             return;
