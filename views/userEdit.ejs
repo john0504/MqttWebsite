@@ -30,15 +30,19 @@
             <label>帳號：</label>
             <input type="text" name="Account" placeholder="Account" value="<%=data[0].Account %>" readonly />
         </div>
+        <% if (locals.SuperUser !=2) { %>
         <div class="row">
             <label>名稱：</label>
-            <input type="text" name="Name" placeholder="Name" value="<%=data[0].Name %>" />
+            <input type="text" name="Name" placeholder="Name" value="<%=data[0].Name %>" />   
         </div>
+        <% } %>
+        <% if (locals.SuperUser !=2) { %>
         <div class="row">
             <label>密碼：</label>
             <input type="text" name="Password" placeholder="Password" value="<%=data[0].Password %>" />
         </div>
-        <% if (locals.SuperUser == 1) { %>
+        <% } %>
+        <% if (locals.SuperUser != 0) { %>
         <div class="row">
             <label>權限：</label>
             <input type="radio" name="Enable" value="1" <%=data[0].Enable ? "checked" : "" %>> 啟用 </input>

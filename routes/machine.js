@@ -24,7 +24,7 @@ router.get('/', function (req, res, next) {
 
     var sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
 
-    if (req.session.SuperUser != 1) {
+    if (req.session.SuperUser == 0) {
         sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
     }
 
@@ -53,7 +53,7 @@ router.get('/search', function (req, res, next) {
 
     var sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
     sql += (` WHERE a.DevNo LIKE '%${DevNo}%'`);
-    if (req.session.SuperUser != 1) {
+    if (req.session.SuperUser == 0) {
         sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
     }
 

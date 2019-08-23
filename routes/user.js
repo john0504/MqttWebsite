@@ -29,7 +29,17 @@ router.get('/', function (req, res, next) {
             var data = accounts;
 
             // use user.ejs
-            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount  });
+            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount });
+        });
+    } else if (req.session.SuperUser == 2) {
+        mysqlQuery('SELECT * FROM AccountTbl WHERE SuperUser != 1', function (err, accounts) {
+            if (err) {
+                console.log(err);
+            }
+            var data = accounts;
+
+            // use user.ejs
+            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount });
         });
     } else {
         var AccountNo = req.session.AccountNo;
@@ -52,7 +62,7 @@ router.get('/search', function (req, res, next) {
     var SearchAccount = req.query.SearchAccount;
     var mysqlQuery = req.mysqlQuery;
 
-    if (req.session.SuperUser == 1) {
+    if (req.session.SuperUser != 0) {
         mysqlQuery('SELECT * FROM AccountTbl WHERE Account LIKE ?', `%${SearchAccount}%`, function (err, accounts) {
             if (err) {
                 console.log(err);
@@ -146,10 +156,16 @@ router.post('/userEdit', function (req, res, next) {
     var AccountNo = req.body.AccountNo;
 
     var sql = {
-        Account: req.body.Account,
-        Password: req.body.Password,
-        Name: req.body.Name
+        Account: req.body.Account        
     };
+
+    if (req.body.Password) {
+        sql.Password = req.body.Password;
+    }
+
+    if (req.body.Name) {
+        sql.Name = req.body.Name;
+    }
 
     if (req.body.Enable) {
         sql.Enable = req.body.Enable;
