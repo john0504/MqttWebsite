@@ -12,19 +12,20 @@
 </head>
 
 <body>
+    <img src="/img/logo.png" class="logo">
     <div class="container">
         <% if (locals.Name) { %>
         <h1>您好, <%= Name %></h1>
         <a href="/logout">登出</a>
         <% } else { %>
         <form class="form-signin" role="form" method="post">
-            <h2 class="form-signin-heading">登入</h2>
+            <h2 class="form-signin-heading">後台管理系統</h2>
 
             <input id="txtUserName" name="txtUserName" type="text" class="form-control" placeholder="帳號" required />
             </br>
             <input id="txtUserPwd" name="txtUserPwd" type="password" class="form-control" placeholder="密碼" required />
             </br>
-            <img src="/login/captcha"></br>
+            <img src="/login/captcha"  class="form-control"></br>
             <input id="txtCaptcha" name="txtCaptcha" type="text" class="form-control" placeholder="驗證碼" required />
             </br>
             <button id="btnSub" class="btn btn-lg btn-primary" type="submit">登入</button>

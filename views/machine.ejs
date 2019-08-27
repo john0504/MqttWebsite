@@ -36,7 +36,7 @@
             if (!DevNo || !AccountNo) {
                 return;
             }
-            var rs = confirm('確定要刪除?');
+            var rs = confirm(`確定要刪除${DevNo}?`);
             if (rs) {
                 window.location.href = "/machine/machineDelete?DevNo=" + DevNo + "&AccountNo=" + AccountNo;
             }
@@ -72,6 +72,7 @@
         </tr>
     </table>
     <% } %>
+    <img src="/img/logo.png" class="logo-left">
     <table border="0" align="center">
         <tr>
             <% if (locals.SuperUser == 1) { %>

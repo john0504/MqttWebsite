@@ -7,12 +7,33 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script>
+         function Search() {
+            var SearchAllow = document.getElementsByName('SearchAllow')[0].value;
+            var regex = /^([a-zA-Z0-9])+$/;
+            if (SearchAllow.length == 0) {
+                window.location.href = "/serial";
+                return true;
+            }
+            if (!regex.test(SearchAllow)) {
+                return false;
+            }
+            window.location.href = "/serial/search?SearchAllow=" + SearchAllow;
+        }
+        function Edit(DevNo) {
+            window.location.href = "/serial/serialEdit?DevNo=" + DevNo;
+        }
         function Delete(DevNo) {
-            var rs = confirm('確定要刪除?');
+            var rs = confirm(`確定要刪除${DevNo}?`);
             if (rs) {
                 window.location.href = "/serial/serialDelete?DevNo=" + DevNo;
             }
         }
+        function DeleteAllow(DevNo) {
+            var rs = confirm(`確定要刪除${DevNo}?`);
+            if (rs) {
+                window.location.href = "/serial/allowDelete?DevNo=" + DevNo;
+            }
+        }        
         function Move(count) {
             var rs = confirm(`確定要搬移${count}筆資料進白名單?`);
             if (rs) {
@@ -39,6 +60,7 @@
         </tr>
     </table>
     <% } %>
+    <img src="/img/logo.png" class="logo-left">
     <table border="0" align="center">
         <tr>
             <th><a href="/firmware">OTA</a></th>
@@ -81,6 +103,8 @@
         <% } %>
     </table>
     <h1>白名單 - 列表</h1>
+    <input type="text" name="SearchAllow" placeholder="搜尋序號" value="<%= SearchAllow %>" />
+    <input type="button" name="search" value="搜尋" class="btn" onclick="Search();" />
     <table class="table">
         <tr>
             <th>編號</th>
@@ -100,6 +124,10 @@
                 <%= date.getFullYear() + "-" 
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() %>
+            </td>
+            <td>                               
+                <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= allow[j].DevNo  %>');" />                          
+                <input type="button" name="deleteallow" value="刪除" class="btn" onclick="DeleteAllow('<%= allow[j].DevNo  %>');" />                
             </td>
         </tr>
         <% } %>

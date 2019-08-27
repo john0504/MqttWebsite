@@ -103,3 +103,28 @@ a:hover {
     color: #f00;
     font-size: 12px;
 }
+
+.container {
+    text-align: center;
+    margin-top: 150px;
+}
+.logo{
+    position: absolute;
+    left:50%;
+    top:0%;
+    width: 200px;
+    margin:  0 0 0 -100px;
+}
+.logo-left{
+    position: absolute;
+    left:10%;
+    top:0%;
+    width: 100px;
+    margin:  0 0 0 -50px;
+}
+.form-control{
+    width: 300px;
+}
+.form-signin-heading{
+    font-size: 30px
+}

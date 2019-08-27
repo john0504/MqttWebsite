@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <title></title>
+    <script type="text/javascript">
+        function Check() {
+
+            var ExpireDate = document.getElementsByName('ExpireDate')[0].value;
+            if (ExpireDate) {
+                if (ExpireDate / 10000 < 1970 || ExpireDate / 10000 > 2200) {
+                    alert('請檢查年份');
+                    return false;
+                } else if (ExpireDate % 100 < 1 || ExpireDate % 100 > 31) {
+                    alert('請檢查日期');
+                    return false;
+                } else if (ExpireDate / 100 % 100 < 1 || ExpireDate / 100 % 100 > 12) {
+                    alert('請檢查月份');
+                    return false;
+                }
+                return true;
+            }
+            alert('please input the info.');
+            return false;
+
+        }
+    </script>
+</head>
+
+<body>
+    <form name="editform" action="serialEdit" method="post" accept-charset="utf-8" onSubmit="return Check();">
+        <h1>白名單  - 修改</h1>
+        <div class="row">
+            <label>序號：</label>
+            <input type="text" name="DevNo" placeholder="DevNo" value="<%=data[0].DevNo %>" readonly />
+        </div>        
+        <div class="row">
+            <label>使用期限：</label>
+            <input type="number" name="ExpireDate" placeholder="請輸入如:20210101" value="<%=data[0].ExpireStr %>"/>
+        </div>       
+        <div class="row">
+            <input class="btn" type='submit' value='提交'>
+            <input class="btn" type='reset' value='重置'>
+            <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
+        </div>
+    </form>
+</body>
+
+</html>
