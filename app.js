@@ -109,10 +109,13 @@ client.on('message', function (topic, msg) {
         //for device const   
         if (msgType == "device") {
             mysqlQuery("SELECT * FROM AllowTbl WHERE DevNo = ?", No, function (err, allow) {
+                const obj = JSON.parse(msg.toString());
                 if (allow.length != 1) {
+                    var topic = `${PrjName}/${obj.Account}/M`;
+                    var paylod = "此裝置未被授權";
+                    client.publish(topic, paylod, { qos: 1, retain: false });
                     return;
                 } else {
-                    const obj = JSON.parse(msg.toString());
                     mysqlQuery("SELECT * FROM DeviceTbl WHERE DevNo = ?", No, function (err, device) {
                         if (err) {
                             console.log('[SELECT ERROR] - ', err.message);
@@ -185,9 +188,13 @@ client.on('message', function (topic, msg) {
                             } else if (token.length == 3) {
                                 token = "0" + token;
                             }
-                            var mytopic = `${PrjName}/${No}/D`
+                            var mytopic = `${PrjName}/${No}/D`;
                             var mymsg = { Account: token };
                             client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
+
+                            var topic = `${PrjName}/${obj.Account}/M`;
+                            var paylod = "此裝置已在其他帳號上建立裝置";
+                            client.publish(topic, paylod, { qos: 1, retain: false });
                         }
                         return;
                     });
@@ -377,6 +384,85 @@ client.on('message', function (topic, msg) {
 });
 
 //===========================================
+
+setInterval(function () {
+    var date = new Date(Date.now());
+    if (date.getHours() != 1) {
+        return;
+    }
+    console.log("Daily History Start");
+    date.setHours(0, 0, 0, 0);
+    var timestamp = parseInt(date.getTime() / 1000);
+    var pastTimestamp = timestamp - 60 * 60 * 24;
+    var sqlstring = "SELECT * FROM MessageTbl WHERE id IN (SELECT MAX(id) from MessageTbl WHERE DateCode >= ? AND DateCode < ? GROUP BY DevNo)";
+    mysqlQuery(sqlstring, [pastTimestamp, timestamp], function (err, messages) {
+        if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return;
+        }
+        messages.forEach(message => {
+            var sqlstring = "SELECT * FROM MessageTbl WHERE DateCode <= ? AND DevNo = ? ORDER BY id desc LIMIT 1";
+            mysqlQuery(sqlstring, [pastTimestamp, message.DevNo], function (err, pastMsg) {
+                if (err) {
+                    console.log('[SELECT ERROR] - ', err.message);
+                    return;
+                }
+                var insertSql;
+                if (pastMsg.length != 0) {
+                    insertSql = {
+                        DevNo: message.DevNo,
+                        H60: message.H60 - pastMsg[0].H60,
+                        H61: message.H61 - pastMsg[0].H61,
+                        H62: message.H62 - pastMsg[0].H62,
+                        H63: message.H63 - pastMsg[0].H63,
+                        H64: message.H64 - pastMsg[0].H64,
+                        H65: message.H65 - pastMsg[0].H65,
+                        H66: message.H66 - pastMsg[0].H66,
+                        H67: message.H67 - pastMsg[0].H67,
+                        H68: message.H68 - pastMsg[0].H68,
+                        H69: message.H69 - pastMsg[0].H69,
+                        H6A: message.H6A - pastMsg[0].H6A,
+                        H6B: message.H6B - pastMsg[0].H6B,
+                        H6C: message.H6C - pastMsg[0].H6C,
+                        H6D: message.H6D - pastMsg[0].H6D,
+                        H6E: message.H6E - pastMsg[0].H6E,
+                        H6F: message.H6F - pastMsg[0].H6F,
+                        DateCode: pastTimestamp
+                    };
+                } else {
+                    insertSql = {
+                        DevNo: message.DevNo,
+                        H60: message.H60,
+                        H61: message.H61,
+                        H62: message.H62,
+                        H63: message.H63,
+                        H64: message.H64,
+                        H65: message.H65,
+                        H66: message.H66,
+                        H67: message.H67,
+                        H68: message.H68,
+                        H69: message.H69,
+                        H6A: message.H6A,
+                        H6B: message.H6B,
+                        H6C: message.H6C,
+                        H6D: message.H6D,
+                        H6E: message.H6E,
+                        H6F: message.H6F,
+                        DateCode: pastTimestamp
+                    };
+                }
+                sqlstring = "INSERT INTO HistoryTbl SET ?"
+                mysqlQuery(sqlstring, insertSql, function (err, result) {
+                    if (err) {
+                        console.log('[INSERT ERROR] - ', err.message);
+                        return;
+                    }
+                });
+            });
+        });
+    });
+}, 60 * 60 * 1000);
+
 var app = express();
 
 // view engine setup

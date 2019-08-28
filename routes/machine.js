@@ -60,7 +60,7 @@ router.get('/search', function (req, res, next) {
     mysqlQuery(sql, function (err, devices) {
         if (err) {
             console.log(err);
-        }        
+        }
         devices.forEach(device => {
             if (device.UpdateDate >= Date.now() / 1000 - 2 * 60) {
                 device.Status = 1;
@@ -101,7 +101,7 @@ router.get('/machineChart', function (req, res, next) {
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1000', DevNo, function (err, msgs) {
+    mysqlQuery('SELECT * FROM HistoryTbl WHERE DevNo = ? order by id desc limit 1000', DevNo, function (err, msgs) {
         if (err) {
             console.log(err);
         }
@@ -109,37 +109,18 @@ router.get('/machineChart', function (req, res, next) {
         var labels = [];
         var moneyDataSet = { data: [], backgroundColor: [], borderColor: [] };
         var giftDataSet = { data: [], backgroundColor: [], borderColor: [] };
-        var money = 0;
-        var gift = 0;
-        var day = new Date(1);
+
         for (var i = data.length - 1; i >= 0; i--) {
             var date = new Date(data[i].DateCode * 1000);
-            if (date.getDate() != day.getDate() || date.getMonth() != day.getMonth() || date.getFullYear() != day.getFullYear()) {
-                day = date;
-                labels.push((date.getMonth() + 1) + "-" + date.getDate());
+            labels.push((date.getMonth() + 1) + "-" + date.getDate());
 
-                moneyDataSet.data.push(data[i].H60 - money);
-                moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
-                moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
-                money = data[i].H60;
+            moneyDataSet.data.push(data[i].H68 << 16 + data[i].H69);
+            moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
+            moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
 
-                giftDataSet.data.push(data[i].H62 - gift);
-                giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
-                giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
-                gift = data[i].H62;
-            } else {
-                if (money != data[i].H60) {
-                    var tempmoney = moneyDataSet.data.pop();
-                    moneyDataSet.data.push(tempmoney + data[i].H60 - money);
-                    money = data[i].H60;
-                }
-
-                if (gift != data[i].H62) {
-                    var tempgift = giftDataSet.data.pop();
-                    giftDataSet.data.push(tempgift + data[i].H62 - gift);
-                    gift = data[i].H62;
-                }
-            }
+            giftDataSet.data.push(data[i].H6A << 16 + data[i].H6B);
+            giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
+            giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
         }
         res.render('machineChart', { title: 'Machine Chart', labels: labels, moneyDataSet: moneyDataSet, giftDataSet: giftDataSet });
     });

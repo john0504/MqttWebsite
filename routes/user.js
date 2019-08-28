@@ -156,7 +156,7 @@ router.post('/userEdit', function (req, res, next) {
     var AccountNo = req.body.AccountNo;
 
     var sql = {
-        Account: req.body.Account        
+        Account: req.body.Account
     };
 
     if (req.body.Password) {
@@ -174,6 +174,20 @@ router.post('/userEdit', function (req, res, next) {
     mysqlQuery('UPDATE AccountTbl SET ? WHERE AccountNo = ?', [sql, AccountNo], function (err, accounts) {
         if (err) {
             console.log(err);
+        }
+        if (req.body.Enable == false) {
+            var token = AccountNo.toString(16);
+            if (token.length == 1) {
+                token = "000" + token;
+            } else if (token.length == 2) {
+                token = "00" + token;
+            } else if (token.length == 3) {
+                token = "0" + token;
+            }
+            var topic = `WAWA/${token}/C`;
+            var paylod = JSON.stringify({ time: Date.now() });
+            var mqttClient = req.mqttClient;
+            mqttClient.publish(topic, paylod, { qos: 1, retain: false });
         }
 
         res.locals.Account = req.session.Account;
