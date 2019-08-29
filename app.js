@@ -155,10 +155,11 @@ client.on('message', function (topic, msg) {
                                     console.log('[INSERT ERROR] - ', err.message);
                                     return;
                                 }
-                                var mytopic = `${PrjName}/${obj.Account}/U`
-                                var mymsg = { action: "list" };
-                                client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
-                                // console.log('--------------------------UPDATE----------------------------');
+                                if (device.length == 0 || device[0].AccountNo == null) {
+                                    var mytopic = `${PrjName}/${obj.Account}/U`
+                                    var mymsg = { action: "list" };
+                                    client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
+                                }
                             });
                         } else if (device.length != 0 && device[0].AccountNo != null && device[0].AccountNo != parseInt(obj.Account, 16)) {
                             updatesql = {
