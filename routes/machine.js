@@ -114,11 +114,11 @@ router.get('/machineChart', function (req, res, next) {
             var date = new Date(data[i].DateCode * 1000);
             labels.push((date.getMonth() + 1) + "-" + date.getDate());
 
-            moneyDataSet.data.push(data[i].H68 << 16 + data[i].H69);
+            moneyDataSet.data.push((data[i].H68 << 16) + data[i].H69);
             moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
             moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
 
-            giftDataSet.data.push(data[i].H6A << 16 + data[i].H6B);
+            giftDataSet.data.push((data[i].H6A << 16) + data[i].H6B);
             giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
             giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
         }
