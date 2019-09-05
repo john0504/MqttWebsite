@@ -7,24 +7,10 @@
     </title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
 </head>
-
+<div class="row">
+    <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
+</div>
 <body>
-    <% if (locals.Name) { %>
-    <table border="0" align="right">
-        <tr>
-            <th>
-                <h3>您好, <%= Name %></h1>
-            </th>
-            <th><a href="/logout">登出</a></th>
-        </tr>
-    </table>
-    <% } %>
-    <table border="0" align="center">
-        <tr>
-            <th><a href="/user">用戶</a></th>
-            <th><a href="/machine">機台</a></th>
-        </tr>
-    </table>
     <h1>機台 - 歷史紀錄</h1>
     <table class="table">
         <tr>
@@ -60,9 +46,6 @@
         </tr>
         <% } %>
     </table>
-    <div class="row">
-        <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
-    </div>
 </body>
 
 </html>
