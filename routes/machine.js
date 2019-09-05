@@ -85,7 +85,10 @@ router.get('/machineHistory', function (req, res, next) {
         if (err) {
             console.log(err);
         }
-
+        msgs.forEach(msg => {
+            msg.totalmoney = (msg.H68 << 16) + msg.H69;
+            msg.totalgift = (msg.H6A << 16) + msg.H6B;
+        });
         var data = msgs;
         res.render('machineHistory', { title: 'Machine History', data: data });
     });

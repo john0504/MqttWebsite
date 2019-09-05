@@ -31,6 +31,8 @@
             <th>交易日期</th>
             <th>投幣數目</th>
             <th>出獎數目</th>
+            <th>投幣累計值</th>
+            <th>出獎累計值</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
@@ -48,6 +50,12 @@
             </td>
             <td>
                 <%= data[i].H62  %>
+            </td>
+            <td>
+                <%= data[i].totalmoney  %>
+            </td>
+            <td>
+                <%= data[i].totalgift  %>
             </td>
         </tr>
         <% } %>
