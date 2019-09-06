@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var linePerPage = 10;
 
 // home page
 function checkSession(req, res) {
@@ -20,26 +21,35 @@ router.get('/', function (req, res, next) {
     }
     var DevNo = "";
     var index = req.query.index ? req.query.index : 0;
+    var totalPage = 0;
     var mysqlQuery = req.mysqlQuery;
-
-    var sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
-
+    var sql = 'SELECT count(*) as count from DeviceTbl'
     if (req.session.SuperUser == 0) {
         sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
     }
+    mysqlQuery(sql, function (err, dev) {
+        var total = dev[0].count;
+        totalPage = Math.ceil(total / linePerPage);
+        sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
 
-    mysqlQuery(sql, function (err, devices) {
-        if (err) {
-            console.log(err);
+        if (req.session.SuperUser == 0) {
+            sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
         }
-        devices.forEach(device => {
-            if (device.UpdateDate >= Date.now() / 1000 - 2 * 60) {
-                device.Status = 1;
-            } else {
-                device.Status = 0;
+        sql += (` limit ${index * linePerPage},${linePerPage}`);
+
+        mysqlQuery(sql, function (err, devices) {
+            if (err) {
+                console.log(err);
             }
+            devices.forEach(device => {
+                if (device.UpdateDate >= Date.now() / 1000 - 2 * 60) {
+                    device.Status = 1;
+                } else {
+                    device.Status = 0;
+                }
+            });
+            res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo, totalPage: totalPage, linePerPage: linePerPage });
         });
-        res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo });
     });
 });
 
@@ -49,26 +59,36 @@ router.get('/search', function (req, res, next) {
     }
     var index = req.query.index ? req.query.index : 0;
     var DevNo = req.query.DevNo;
+    var totalPage = 0;
     var mysqlQuery = req.mysqlQuery;
-
-    var sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
-    sql += (` WHERE a.DevNo LIKE '%${DevNo}%'`);
+    var sql = 'SELECT count(*) as count from DeviceTbl'
+    sql += (` WHERE DevNo LIKE '%${DevNo}%'`);
     if (req.session.SuperUser == 0) {
-        sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
+        sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
     }
-
-    mysqlQuery(sql, function (err, devices) {
-        if (err) {
-            console.log(err);
+    mysqlQuery(sql, function (err, dev) {
+        var total = dev[0].count;
+        totalPage = Math.ceil(total / linePerPage);
+        sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
+        sql += (` WHERE a.DevNo LIKE '%${DevNo}%'`);
+        if (req.session.SuperUser == 0) {
+            sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
         }
-        devices.forEach(device => {
-            if (device.UpdateDate >= Date.now() / 1000 - 2 * 60) {
-                device.Status = 1;
-            } else {
-                device.Status = 0;
+        sql += (` limit ${index * linePerPage},${linePerPage}`);
+
+        mysqlQuery(sql, function (err, devices) {
+            if (err) {
+                console.log(err);
             }
+            devices.forEach(device => {
+                if (device.UpdateDate >= Date.now() / 1000 - 2 * 60) {
+                    device.Status = 1;
+                } else {
+                    device.Status = 0;
+                }
+            });
+            res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo, totalPage: totalPage, linePerPage: linePerPage });
         });
-        res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo });
     });
 });
 
@@ -78,21 +98,26 @@ router.get('/machineHistory', function (req, res, next) {
         return;
     }
     var DevNo = req.query.DevNo;
-
+    var index = req.query.index ? req.query.index : 0;
     var mysqlQuery = req.mysqlQuery;
-
-    mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1000', DevNo, function (err, msgs) {
-        if (err) {
-            console.log(err);
-        }
-        msgs.forEach(msg => {
-            msg.totalmoney = (msg.H68 << 16) + msg.H69;
-            msg.totalgift = (msg.H6A << 16) + msg.H6B;
+    var sql = `SELECT count(*) as count from MessageTbl WHERE DevNo ='${DevNo}'`;
+    mysqlQuery(sql, function (err, mes) {
+        var total = mes[0].count;
+        totalPage = Math.ceil(total / linePerPage);
+        sql = `SELECT * FROM MessageTbl WHERE DevNo ='${DevNo}'`;
+        sql += (`order by id desc limit ${index * linePerPage},${linePerPage}`);
+        mysqlQuery(sql, function (err, msgs) {
+            if (err) {
+                console.log(err);
+            }
+            msgs.forEach(msg => {
+                msg.totalmoney = (msg.H68 << 16) + msg.H69;
+                msg.totalgift = (msg.H6A << 16) + msg.H6B;
+            });
+            var data = msgs;
+            res.render('machineHistory', { title: 'Machine History', data: data, index: index, DevNo: DevNo, totalPage: totalPage, linePerPage: linePerPage });
         });
-        var data = msgs;
-        res.render('machineHistory', { title: 'Machine History', data: data });
     });
-
 });
 
 // chart page

@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var linePerPage = 10;
 
 // home page
 function checkSession(req, res) {
@@ -18,59 +19,66 @@ router.get('/', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
+    var index = req.query.index ? req.query.index : 0;
     var mysqlQuery = req.mysqlQuery;
     var SearchAccount = "";
-
+    var sql = 'SELECT count(*) as count from AccountTbl';
     if (req.session.SuperUser == 1) {
-        mysqlQuery('SELECT * FROM AccountTbl ', function (err, accounts) {
-            if (err) {
-                console.log(err);
-            }
-            var data = accounts;
 
-            // use user.ejs
-            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount });
-        });
     } else if (req.session.SuperUser == 2) {
-        mysqlQuery('SELECT * FROM AccountTbl WHERE SuperUser != 1', function (err, accounts) {
-            if (err) {
-                console.log(err);
-            }
-            var data = accounts;
-
-            // use user.ejs
-            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount });
-        });
+        sql += ' WHERE SuperUser != 1';
     } else {
         var AccountNo = req.session.AccountNo;
-        mysqlQuery('SELECT * FROM AccountTbl WHERE AccountNo = ?', AccountNo, function (err, accounts) {
+        sql += ` WHERE AccountNo = '${AccountNo}'`
+    }
+    mysqlQuery(sql, function (err, acc) {
+        var total = acc[0].count;
+        totalPage = Math.ceil(total / linePerPage);
+        if (req.session.SuperUser == 1) {
+            sql = 'SELECT * FROM AccountTbl ';
+        } else if (req.session.SuperUser == 2) {
+            sql = 'SELECT * FROM AccountTbl WHERE SuperUser != 1';
+        } else {
+            var AccountNo = req.session.AccountNo;
+            sql = `SELECT * FROM AccountTbl WHERE AccountNo = '${AccountNo}'`
+        }
+        sql += (` limit ${index * linePerPage},${linePerPage}`);
+        mysqlQuery(sql, function (err, accounts) {
             if (err) {
                 console.log(err);
             }
             var data = accounts;
 
             // use user.ejs
-            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount });
+            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount, index: index, totalPage: totalPage, linePerPage: linePerPage });
         });
-    }
+    });
 });
 
 router.get('/search', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
+    var index = req.query.index ? req.query.index : 0;
     var SearchAccount = req.query.SearchAccount;
     var mysqlQuery = req.mysqlQuery;
 
     if (req.session.SuperUser != 0) {
-        mysqlQuery('SELECT * FROM AccountTbl WHERE Account LIKE ?', `%${SearchAccount}%`, function (err, accounts) {
-            if (err) {
-                console.log(err);
-            }
-            var data = accounts;
+        var sql = 'SELECT count(*) as count from AccountTbl';
+        mysqlQuery(sql, function (err, acc) {
+            var total = acc[0].count;
+            totalPage = Math.ceil(total / linePerPage);
+            sql = `SELECT * FROM AccountTbl WHERE Account LIKE %${SearchAccount}%`
+            sql += (` limit ${index * linePerPage},${linePerPage}`);
+            mysqlQuery(sql, function (err, accounts) {
+                if (err) {
+                    console.log(err);
+                }
+                var data = accounts;
 
-            // use user.ejs
-            res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount });
+                // use user.ejs
+                res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount, totalPage: totalPage, linePerPage: linePerPage });
+            });
         });
     } else {
         return;

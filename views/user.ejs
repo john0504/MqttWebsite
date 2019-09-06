@@ -29,6 +29,22 @@
                 window.location.href = "/user/userDelete?AccountNo=" + AccountNo;
             }
         }
+
+        function Next(index, SearchAccount) {
+            if (SearchAccount != "") {
+                window.location.href = `/user/search?SearchAccount=${SearchAccount}&index=${++index}`;
+            } else {
+                window.location.href = `/user?index=${++index}`;
+            }
+        }
+
+        function Past(index, SearchAccount) {
+            if (SearchAccount != "") {
+                window.location.href = `/user/search?SearchAccount=${SearchAccount}&index=${index - 1}`;
+            } else {
+                window.location.href = `/user?index=${index - 1}`;
+            }
+        }
     </script>
 </head>
 
@@ -74,7 +90,7 @@
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
             <td>
-                <%= i+1 %>
+                <%= linePerPage*index+(i+1) %>
             </td>
             <td>
                 <%= data[i].Account  %>
@@ -108,6 +124,12 @@
         </tr>
         <% } %>
     </table>
+    <% if(index > 0) { %>
+    <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= SearchAccount %>');" />
+    <% } %>
+    <% if(index < totalPage - 1) { %>
+    <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= SearchAccount %>');" />
+    <% } %>
 </body>
 
 </html>

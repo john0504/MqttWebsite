@@ -42,20 +42,19 @@
             }
         }
 
-        function Next(index, length) {
-            if (index >= length - 1) {
-                window.location.href = "/machine?index=0";
+        function Next(index, DevNo) {
+            if (DevNo != "") {
+                window.location.href = `/machine/search?DevNo=${DevNo}&index=${++index}`;
             } else {
-                window.location.href = "/machine?index=" + (++index);
+                window.location.href = `/machine?index=${++index}`;
             }
-
         }
 
-        function Past(index, length) {
-            if (index - 1 < 0) {
-                window.location.href = "/machine?index=" + (length - 1);
+        function Past(index, DevNo) {
+            if (DevNo != "") {
+                window.location.href = `/machine/search?DevNo=${DevNo}&index=${index - 1}`;
             } else {
-                window.location.href = "/machine?index=" + (index - 1);
+                window.location.href = `/machine?index=${index - 1}`;
             }
         }
     </script>
@@ -109,7 +108,7 @@
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
             <td>
-                <%= i+1 %>
+                <%= linePerPage*index+(i+1) %>
             </td>
             <td>
                 <%= data[i].DevName  %>
@@ -128,7 +127,7 @@
             </td>
             <td>
                 <% if(data[i].Status > 0) { %>
-                連線            
+                連線
                 <% } %>
             </td>
             <td>
@@ -144,6 +143,12 @@
         </tr>
         <% } %>
     </table>
+    <% if(index > 0) { %>
+    <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <% } %>
+    <% if(index < totalPage - 1) { %>
+    <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <% } %>
 </body>
 
 </html>
