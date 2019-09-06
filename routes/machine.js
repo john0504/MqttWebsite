@@ -20,7 +20,10 @@ router.get('/', function (req, res, next) {
         return;
     }
     var DevNo = "";
-    var index = req.query.index ? req.query.index : 0;
+    var index = parseInt(req.query.index) ? parseInt(req.query.index) : 0;
+    if (index < 0) {
+        index = 0;
+    }
     var totalPage = 0;
     var mysqlQuery = req.mysqlQuery;
     var sql = 'SELECT count(*) as count from DeviceTbl'
@@ -57,7 +60,10 @@ router.get('/search', function (req, res, next) {
     if (!checkSession(req, res)) {
         return;
     }
-    var index = req.query.index ? req.query.index : 0;
+    var index = parseInt(req.query.index) ? parseInt(req.query.index) : 0;
+    if (index < 0) {
+        index = 0;
+    }
     var DevNo = req.query.DevNo;
     var totalPage = 0;
     var mysqlQuery = req.mysqlQuery;
@@ -98,7 +104,10 @@ router.get('/machineHistory', function (req, res, next) {
         return;
     }
     var DevNo = req.query.DevNo;
-    var index = req.query.index ? req.query.index : 0;
+    var index = parseInt(req.query.index) ? parseInt(req.query.index) : 0;
+    if (index < 0) {
+        index = 0;
+    }
     var mysqlQuery = req.mysqlQuery;
     var sql = `SELECT count(*) as count from MessageTbl WHERE DevNo ='${DevNo}'`;
     mysqlQuery(sql, function (err, mes) {
