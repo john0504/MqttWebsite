@@ -132,6 +132,7 @@ client.on('message', function (topic, msg) {
                                 PrjName: PrjName,
                                 DevAlias: obj.DevAlias,
                                 VerNum: obj.VerNum,
+                                SaaModel: obj.SaaModel,
                                 GroupNo: obj.GroupNo ? obj.GroupNo : null,
                                 S01: obj.S01,
                                 S02: obj.S02,
@@ -144,6 +145,7 @@ client.on('message', function (topic, msg) {
                                 PrjName: PrjName,
                                 DevAlias: obj.DevAlias,
                                 VerNum: obj.VerNum,
+                                SaaModel: obj.SaaModel,
                                 GroupNo: obj.GroupNo ? obj.GroupNo : null,
                                 S01: obj.S01,
                                 S02: obj.S02,
@@ -165,6 +167,7 @@ client.on('message', function (topic, msg) {
                             updatesql = {
                                 DevName: obj.DevName,
                                 VerNum: obj.VerNum,
+                                SaaModel: obj.SaaModel,
                                 GroupNo: obj.GroupNo ? obj.GroupNo : null,
                                 S01: obj.S01,
                                 S02: obj.S02,
