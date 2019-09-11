@@ -40,6 +40,19 @@
         </tr>
     </table>
     <h1>機台 - 歷史紀錄</h1>
+    <% if(index > 0) { %>
+    <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <% } else { %>
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true"
+        onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <% } %>
+    <%= index+1  %>
+    <% if(index < totalPage - 1) { %>
+    <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <% } else { %>
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true"
+        onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <% } %>
     <table class="table">
         <tr>
             <th>交易日期</th>
@@ -76,9 +89,16 @@
     </table>
     <% if(index > 0) { %>
     <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <% } else { %>
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true"
+        onclick="Past('<%= index %>','<%= DevNo %>');" />
     <% } %>
+    <%= index+1  %>
     <% if(index < totalPage - 1) { %>
     <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <% } else { %>
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true"
+        onclick="Next('<%= index %>','<%= DevNo %>');" />
     <% } %>
 </body>
 

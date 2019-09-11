@@ -20,6 +20,8 @@ router.get('/', function (req, res, next) {
         return;
     }
     var DevNo = "";
+    var DevName = "";
+    var Account = "";
     var index = parseInt(req.query.index) ? parseInt(req.query.index) : 0;
     if (index < 0) {
         index = 0;
@@ -51,7 +53,11 @@ router.get('/', function (req, res, next) {
                     device.Status = 0;
                 }
             });
-            res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo, totalPage: totalPage, linePerPage: linePerPage });
+            res.render('machine', {
+                title: 'Machine Information', data: devices, index: index, DevNo: DevNo,
+                DevName: DevName, Account: Account, totalPage: totalPage,
+                linePerPage: linePerPage
+            });
         });
     });
 });
@@ -65,20 +71,72 @@ router.get('/search', function (req, res, next) {
         index = 0;
     }
     var DevNo = req.query.DevNo;
+    var DevName = req.query.DevName;
+    var Account = req.query.Account;
     var totalPage = 0;
     var mysqlQuery = req.mysqlQuery;
-    var sql = 'SELECT count(*) as count from DeviceTbl'
-    sql += (` WHERE DevNo LIKE '%${DevNo}%'`);
+    var sql = 'SELECT count(*) as count from DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo'
+    var haswhere = false;
+    if (DevNo && DevNo != "") {
+        sql += (` WHERE a.DevNo LIKE '%${DevNo}%'`);
+        haswhere = true;
+    }
+    if (DevName && DevName != "") {
+        if (!haswhere) {
+            sql += (` WHERE a.DevName LIKE '%${DevName}%'`);
+            haswhere = true;
+        } else {
+            sql += (` AND a.DevName LIKE '%${DevName}%'`);
+        }
+    }
+    if (Account && Account != "") {
+        if (!haswhere) {
+            sql += (` WHERE b.Account LIKE '%${Account}%'`);
+            haswhere = true;
+        } else {
+            sql += (` AND b.Account LIKE '%${Account}%'`);
+        }
+    }
     if (req.session.SuperUser == 0) {
-        sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
+        if (!haswhere) {
+            sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
+            haswhere = true;
+        } else {
+            sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
+        }
     }
     mysqlQuery(sql, function (err, dev) {
         var total = dev[0].count;
         totalPage = Math.ceil(total / linePerPage);
         sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
-        sql += (` WHERE a.DevNo LIKE '%${DevNo}%'`);
+        haswhere = false;
+        if (DevNo && DevNo != "") {
+            sql += (` WHERE a.DevNo LIKE '%${DevNo}%'`);
+            haswhere = true;
+        }
+        if (DevName && DevName != "") {
+            if (!haswhere) {
+                sql += (` WHERE a.DevName LIKE '%${DevName}%'`);
+                haswhere = true;
+            } else {
+                sql += (` AND a.DevName LIKE '%${DevName}%'`);
+            }
+        }
+        if (Account && Account != "") {
+            if (!haswhere) {
+                sql += (` WHERE b.Account LIKE '%${Account}%'`);
+                haswhere = true;
+            } else {
+                sql += (` AND b.Account LIKE '%${Account}%'`);
+            }
+        }
         if (req.session.SuperUser == 0) {
-            sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
+            if (!haswhere) {
+                sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
+                haswhere = true;
+            } else {
+                sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
+            }
         }
         sql += (` limit ${index * linePerPage},${linePerPage}`);
 
@@ -93,7 +151,11 @@ router.get('/search', function (req, res, next) {
                     device.Status = 0;
                 }
             });
-            res.render('machine', { title: 'Machine Information', data: devices, index: index, DevNo: DevNo, totalPage: totalPage, linePerPage: linePerPage });
+            res.render('machine', {
+                title: 'Machine Information', data: devices, index: index, DevNo: DevNo,
+                DevName: DevName, Account: Account, totalPage: totalPage,
+                linePerPage: linePerPage
+            });
         });
     });
 });

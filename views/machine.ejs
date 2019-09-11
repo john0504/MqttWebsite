@@ -9,15 +9,38 @@
     <script>
         function Search() {
             var DevNo = document.getElementsByName('SearchDevNo')[0].value;
+            var DevName = document.getElementsByName('SearchDevName')[0].value;
+            var Account = document.getElementsByName('SearchAccount')[0].value;
+            if (DevNo.length == 0 && DevName.length == 0 && Account.length == 0) {
+                window.location.href = "/machine";
+                return true;
+            }
             var regex = /^([A-Z0-9])+$/;
+            if (DevNo.length != 0 && !regex.test(DevNo)) {
+                return false;
+            }
+            regex = /^([\u4e00-\u9fa5A-Za-z0-9\_\-])+$/;
+            if (DevName.length != 0 && !regex.test(DevName)) {
+                return false;
+            }
+            regex = /^([A-Za-z0-9\@\.])+$/;
+            if (Account.length != 0 && !regex.test(Account)) {
+                return false;
+            }
+            window.location.href = `/machine/search?DevNo=${DevNo}&DevName=${DevName}&Account=${Account}`;
+        }
+
+        function SearchDevNo() {
+            var DevNo = document.getElementsByName('SearchDevNo')[0].value;
             if (DevNo.length == 0) {
                 window.location.href = "/machine";
                 return true;
             }
-            if (!regex.test(DevNo)) {
+            var regex = /^([A-Z0-9])+$/;
+            if (DevNo.length != 0 && !regex.test(DevNo)) {
                 return false;
             }
-            window.location.href = "/machine/search?DevNo=" + DevNo;
+            window.location.href = `/machine/search?DevNo=${DevNo}`;
         }
 
         function History(DevNo) {
@@ -94,7 +117,27 @@
         </iframe> <% } %> <br /><br /> -->
     <h1>機台 - 列表</h1>
     <input type="text" name="SearchDevNo" placeholder="搜尋產品序號" value="<%= DevNo %>" />
+    <% if (locals.SuperUser == 1) { %>
+    <input type="text" name="SearchDevName" placeholder="搜尋機台名稱" value="<%= DevName %>" />
+    <input type="text" name="SearchAccount" placeholder="搜尋所有者" value="<%= Account %>" />
     <input type="button" name="search" value="搜尋" class="btn" onclick="Search();" />
+    <% } else { %>
+    <input type="button" name="search" value="搜尋" class="btn" onclick="SearchDevNo();" />
+    <% } %>
+    <br>
+    <% if(index > 0) { %>
+    <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <% } else { %>
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true"
+        onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <% } %>
+    <%= index+1  %>
+    <% if(index < totalPage - 1) { %>
+    <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <% } else { %>
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true"
+        onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <% } %>
     <table class="table">
         <tr>
             <th>編號</th>
@@ -145,9 +188,16 @@
     </table>
     <% if(index > 0) { %>
     <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <% } else { %>
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true"
+        onclick="Past('<%= index %>','<%= DevNo %>');" />
     <% } %>
+    <%= index+1  %>
     <% if(index < totalPage - 1) { %>
     <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <% } else { %>
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true"
+        onclick="Next('<%= index %>','<%= DevNo %>');" />
     <% } %>
 </body>
 

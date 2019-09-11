@@ -79,6 +79,20 @@
     <input type="text" name="SearchAccount" placeholder="搜尋帳號" value="<%= SearchAccount %>" />
     <input type="button" name="search" value="搜尋" class="btn" onclick="Search();" />
     <% } %>
+    <br>
+    <% if(index > 0) { %>
+    <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= SearchAccount %>');" />
+    <% } else { %>
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true"
+        onclick="Past('<%= index %>','<%= SearchAccount %>');" />
+    <% } %>
+    <%= index+1  %>
+    <% if(index < totalPage - 1) { %>
+    <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= SearchAccount %>');" />
+    <% } else { %>
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true"
+        onclick="Next('<%= index %>','<%= SearchAccount %>');" />
+    <% } %>
     <table class="table">
         <tr>
             <th>編號</th>
@@ -126,9 +140,16 @@
     </table>
     <% if(index > 0) { %>
     <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= SearchAccount %>');" />
+    <% } else { %>
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true"
+        onclick="Past('<%= index %>','<%= SearchAccount %>');" />
     <% } %>
+    <%= index+1  %>
     <% if(index < totalPage - 1) { %>
     <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= SearchAccount %>');" />
+    <% } else { %>
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true"
+        onclick="Next('<%= index %>','<%= SearchAccount %>');" />
     <% } %>
 </body>
 

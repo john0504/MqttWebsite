@@ -95,7 +95,11 @@ a:hover {
 }
 
 .btn:hover {
-    background: #6BB072;
+    background: #6BB072;    
+}
+
+.btn:disabled {
+    background: #AAAAAA;   
 }
 
 .msgerr {
