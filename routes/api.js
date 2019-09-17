@@ -85,11 +85,11 @@ router.put('/user', function (req, res) {
         return;
     }
 
-    var mailtoken = 'cectmail' + Account;
+    var phonetoken = 'cectphone' + Account;
 
     var md5 = crypto.createHash('md5');
-    mailtoken = md5.update(mailtoken).digest('hex').substring(0, 8);
-    if (token != mailtoken) {
+    phonetoken = md5.update(phonetoken).digest('hex').substring(0, 8);
+    if (token != phonetoken) {
         res.status(401).send('Auth fail.');
         return;
     }
@@ -230,14 +230,14 @@ router.post('/sendmail', function (req, res, next) {
 
         } else {
             var mail = req.mailTransport;
-            var mailtoken = 'cectmail' + Account;
+            var phonetoken = 'cectphone' + Account;
             var md5 = crypto.createHash('md5');
-            mailtoken = md5.update(mailtoken).digest('hex').substring(0, 8);
+            phonetoken = md5.update(phonetoken).digest('hex').substring(0, 8);
             mail.sendMail({
                 from: 'no-reply <cect@cectco.com>',
                 to: Account + ' <' + Account + '>',
                 subject: 'Welcome to register CECT',
-                html: '<h1>' + mailtoken +
+                html: '<h1>' + phonetoken +
                     '</h1><p>This is your registration key. </p>' +
                     '<p>If you have not applied to register, please ignore this mail.</p>'
             }, function (err) {
