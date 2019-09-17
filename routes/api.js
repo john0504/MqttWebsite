@@ -145,6 +145,74 @@ router.get('/info-model', function (req, res) {
     return;
 });
 
+router.post('/sendsms', function (req, res, next) {
+    var mysqlQuery = req.mysqlQuery;
+    var Account = req.body['phone'];
+    if (!Account) {
+        return;
+    }
+    mysqlQuery('SELECT Account FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
+        if (err) {
+            console.log(err);
+        }
+
+        var count = rows.length;
+        if (count > 0) {
+            res.status(400).send('The phone has already been taken.');
+            return;
+        } else {
+            var phonetoken = 'cectphone' + Account;
+            var md5 = crypto.createHash('md5');
+            phonetoken = md5.update(phonetoken).digest('hex').substring(0, 8);
+            var api = "https://oms.every8d.com/API21/HTTP/sendSMS.ashx";
+            var uid = "42689212";
+            var pwd = "KMSJSQ";
+            var msg = `Your%20token%20is%20${phonetoken}`
+            var url = `${api}?UID=${uid}&PWD=${pwd}&SB=&MSG=${msg}&DEST=${Account}`;
+            var request = require('request');
+            request(url, function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(body);
+                }
+            });
+            res.status(200).send({});
+        }
+    });
+});
+
+router.post('/resetsms', function (req, res, next) {
+    var mysqlQuery = req.mysqlQuery;
+    var Account = req.body['phone'];
+    if (!Account) {
+        return;
+    }
+    mysqlQuery('SELECT * FROM AccountTbl WHERE Account = ?', Account, function (err, rows) {
+        if (err) {
+            console.log(err);
+        }
+
+        var count = rows.length;
+        if (count == 0) {
+            res.status(400).send('Auth fail.');
+            return;
+        } else {
+            var password = rows[0].Password;
+            var api = "https://oms.every8d.com/API21/HTTP/sendSMS.ashx";
+            var uid = "42689212";
+            var pwd = "KMSJSQ";
+            var msg = `Your%20password%20is%20${password}`
+            var url = `${api}?UID=${uid}&PWD=${pwd}&SB=&MSG=${msg}&DEST=${Account}`;
+            var request = require('request');
+            request(url, function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(body);
+                }
+            });
+            res.status(200).send({});
+        }
+    });
+});
+
 router.post('/sendmail', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
     var Account = req.body['email'];

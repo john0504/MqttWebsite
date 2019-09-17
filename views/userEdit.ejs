@@ -28,12 +28,16 @@
         <input type="hidden" name="AccountNo" value="<%=data[0].AccountNo  %>" />
         <div class="row">
             <label>帳號：</label>
+            <% if (locals.SuperUser == 1) { %>
+            <input type="text" name="Account" placeholder="Account" value="<%=data[0].Account %>" />
+            <% } else { %>
             <input type="text" name="Account" placeholder="Account" value="<%=data[0].Account %>" readonly />
+            <% } %>
         </div>
         <% if (locals.SuperUser !=2) { %>
         <div class="row">
             <label>名稱：</label>
-            <input type="text" name="Name" placeholder="Name" value="<%=data[0].Name %>" />   
+            <input type="text" name="Name" placeholder="Name" value="<%=data[0].Name %>" />
         </div>
         <% } %>
         <% if (locals.SuperUser !=2) { %>
