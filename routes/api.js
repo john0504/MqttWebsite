@@ -2,6 +2,9 @@ var express = require('express'),
     router = express.Router();
 var crypto = require('crypto');
 
+var uid = "42689212";
+var pwd = "";
+
 router.put('/session', function (req, res) {
     var mysqlQuery = req.mysqlQuery;
     var Account = req.body['account'],
@@ -165,8 +168,6 @@ router.post('/sendsms', function (req, res, next) {
             var md5 = crypto.createHash('md5');
             phonetoken = md5.update(phonetoken).digest('hex').substring(0, 8);
             var api = "https://oms.every8d.com/API21/HTTP/sendSMS.ashx";
-            var uid = "42689212";
-            var pwd = "KMSJSQ";
             var msg = `Your%20token%20is%20${phonetoken}`
             var url = `${api}?UID=${uid}&PWD=${pwd}&SB=&MSG=${msg}&DEST=${Account}`;
             var request = require('request');
@@ -198,8 +199,6 @@ router.post('/resetsms', function (req, res, next) {
         } else {
             var password = rows[0].Password;
             var api = "https://oms.every8d.com/API21/HTTP/sendSMS.ashx";
-            var uid = "42689212";
-            var pwd = "KMSJSQ";
             var msg = `Your%20password%20is%20${password}`
             var url = `${api}?UID=${uid}&PWD=${pwd}&SB=&MSG=${msg}&DEST=${Account}`;
             var request = require('request');
