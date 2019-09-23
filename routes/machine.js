@@ -30,7 +30,7 @@ router.get('/', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
     var sql = 'SELECT count(*) as count from DeviceTbl'
     if (req.session.SuperUser == 0) {
-        sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
+        sql += (` WHERE AccountNo = ${req.session.AccountNo}`);
     }
     mysqlQuery(sql, function (err, dev) {
         var total = dev[0].count;

@@ -65,20 +65,12 @@
             }
         }
 
-        function Next(index, DevNo) {
-            if (DevNo != "") {
-                window.location.href = `/machine/search?DevNo=${DevNo}&index=${++index}`;
-            } else {
-                window.location.href = `/machine?index=${++index}`;
-            }
+        function Next(index, DevNo, DevName, Account) {
+            window.location.href = `/machine/search?DevNo=${DevNo}&DevName=${DevName}&Account=${Account}&index=${++index}`;
         }
 
-        function Past(index, DevNo) {
-            if (DevNo != "") {
-                window.location.href = `/machine/search?DevNo=${DevNo}&index=${index - 1}`;
-            } else {
-                window.location.href = `/machine?index=${index - 1}`;
-            }
+        function Past(index, DevNo, DevName, Account) {
+            window.location.href = `/machine/search?DevNo=${DevNo}&DevName=${DevName}&Account=${Account}&index=${++index}&index=${index - 1}`;
         }
     </script>
 </head>
@@ -126,17 +118,17 @@
     <% } %>
     <br>
     <% if(index > 0) { %>
-    <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <input type="button" name="past" value="上一頁" class="btn"
+        onclick="Past('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>');" />
     <% } else { %>
-    <input type="button" name="past" value="上一頁" class="btn" disabled="true"
-        onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true" />
     <% } %>
     <%= index+1  %>
     <% if(index < totalPage - 1) { %>
-    <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <input type="button" name="next" value="下一頁" class="btn"
+        onclick="Next('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>');" />
     <% } else { %>
-    <input type="button" name="next" value="下一頁" class="btn" disabled="true"
-        onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true" />
     <% } %>
     <table class="table">
         <tr>
@@ -187,17 +179,17 @@
         <% } %>
     </table>
     <% if(index > 0) { %>
-    <input type="button" name="past" value="上一頁" class="btn" onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <input type="button" name="past" value="上一頁" class="btn"
+        onclick="Past('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>');" />
     <% } else { %>
-    <input type="button" name="past" value="上一頁" class="btn" disabled="true"
-        onclick="Past('<%= index %>','<%= DevNo %>');" />
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true" />
     <% } %>
     <%= index+1  %>
     <% if(index < totalPage - 1) { %>
-    <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <input type="button" name="next" value="下一頁" class="btn"
+        onclick="Next('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>');" />
     <% } else { %>
-    <input type="button" name="next" value="下一頁" class="btn" disabled="true"
-        onclick="Next('<%= index %>','<%= DevNo %>');" />
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true" />
     <% } %>
 </body>
 

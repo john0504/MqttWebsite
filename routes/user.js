@@ -74,7 +74,7 @@ router.get('/search', function (req, res, next) {
         mysqlQuery(sql, function (err, acc) {
             var total = acc[0].count;
             totalPage = Math.ceil(total / linePerPage);
-            sql = `SELECT * FROM AccountTbl WHERE Account LIKE %${SearchAccount}%`
+            sql = `SELECT * FROM AccountTbl WHERE Account LIKE '%${SearchAccount}%'`
             sql += (` limit ${index * linePerPage},${linePerPage}`);
             mysqlQuery(sql, function (err, accounts) {
                 if (err) {
@@ -83,7 +83,7 @@ router.get('/search', function (req, res, next) {
                 var data = accounts;
 
                 // use user.ejs
-                res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount, totalPage: totalPage, linePerPage: linePerPage });
+                res.render('user', { title: 'User Information', data: data, SearchAccount: SearchAccount, index: index, totalPage: totalPage, linePerPage: linePerPage });
             });
         });
     } else {
