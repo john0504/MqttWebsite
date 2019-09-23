@@ -108,6 +108,9 @@ client.on('message', function (topic, msg) {
         console.log('get Topic:' + topic);
         //for device const   
         if (msgType == "device") {
+            if (msg == "") {
+                return;
+            }
             mysqlQuery("SELECT * FROM AllowTbl WHERE DevNo = ?", No, function (err, allow) {
                 const obj = JSON.parse(msg.toString());
                 if (allow.length != 1) {
@@ -364,6 +367,11 @@ client.on('message', function (topic, msg) {
                                     var mytopic = `${PrjName}/${DevNo}/D`
                                     var mymsg = { Account: "0000", Owner: No };
                                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
+
+                                    var mytopic = `WAWA/${DevNo}/C`
+                                    var mymsg = "";
+                                    client.publish(mytopic, mymsg, { qos: 1, retain: true });
+
                                     return;
                                 });
                         }
