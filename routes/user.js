@@ -70,7 +70,7 @@ router.get('/search', function (req, res, next) {
     var mysqlQuery = req.mysqlQuery;
 
     if (req.session.SuperUser != 0) {
-        var sql = 'SELECT count(*) as count from AccountTbl';
+        var sql = `SELECT count(*) as count from AccountTbl WHERE Account LIKE '%${SearchAccount}%'`;
         mysqlQuery(sql, function (err, acc) {
             var total = acc[0].count;
             totalPage = Math.ceil(total / linePerPage);
