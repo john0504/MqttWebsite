@@ -241,6 +241,19 @@ router.get('/machineEdit', function (req, res, next) {
         }
 
         var data = rows;
+        if (data.length != 0) {
+            var date = new Date(data[0].ExpireDate * 1000);
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            if (month < 10) {
+                month = "0" + month;
+            }
+            var day = date.getDate();
+            if (day < 10) {
+                day = "0" + day;
+            }
+            data[0].ExpireStr = `${year}${month}${day}`;
+        }
         res.render('machineEdit', { title: 'Edit Machine', data: data });
     });
 
@@ -258,6 +271,15 @@ router.post('/machineEdit', function (req, res, next) {
     var sql = {
         DevName: req.body.Name
     };
+    var dateStr = req.body.ExpireDate;
+    var year = dateStr.substring(0, 4);
+    var month = dateStr.substring(4, 6);
+    var day = dateStr.substring(6, 8);
+    var date = new Date(year, month - 1, day, 0, 0, 0);
+    var ExpireDate = date.getTime() / 1000;
+    if (ExpireDate) {
+        sql.ExpireDate = ExpireDate;
+    }
     mysqlQuery('UPDATE DeviceTbl SET ? WHERE DevNo = ?', [sql, DevNo], function (err, rows) {
         if (err) {
             console.log('UPDATE error:' + err);

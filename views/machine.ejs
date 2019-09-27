@@ -138,6 +138,7 @@
             <th>序號</th>
             <th>WiFi版本</th>
             <th>SAA版本</th>
+            <th>使用期限</th>
             <th>狀態</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
@@ -159,6 +160,12 @@
             </td>
             <td>
                 <%= data[i].SaaModel  %>
+            </td>
+            <td>
+                <% var date = new Date(data[i].ExpireDate * 1000); %>
+                <%= date.getFullYear() + "-" 
+                    + (date.getMonth() + 1) + "-" 
+                    + date.getDate() %>
             </td>
             <td>
                 <% if(data[i].Status > 0) { %>

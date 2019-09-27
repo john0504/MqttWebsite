@@ -8,7 +8,6 @@
     <title></title>
     <script type="text/javascript">
         function Check() {
-
             var ExpireDate = document.getElementsByName('ExpireDate')[0].value;
             if (ExpireDate) {
                 if (ExpireDate / 10000 < 1970 || ExpireDate / 10000 > 2200) {
@@ -17,7 +16,7 @@
                 } else if (ExpireDate % 100 < 1 || ExpireDate % 100 > 31) {
                     alert('請檢查日期');
                     return false;
-                } else if (ExpireDate / 100 % 100 < 1 || ExpireDate / 100 % 100 > 12) {
+                } else if (Math.floor(ExpireDate / 100) % 100 < 1 || Math.floor(ExpireDate / 100) % 100 > 12) {
                     alert('請檢查月份');
                     return false;
                 }
@@ -25,7 +24,6 @@
             }
             alert('please input the info.');
             return false;
-
         }
     </script>
 </head>

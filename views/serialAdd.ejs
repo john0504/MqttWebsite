@@ -17,7 +17,7 @@
                 } else if (ExpireDate % 100 < 1 || ExpireDate % 100 > 31) {
                     alert('請檢查日期');
                     return false;
-                } else if (ExpireDate / 100 % 100 < 1 || ExpireDate / 100 % 100 > 12) {
+                } else if (Math.floor(ExpireDate / 100) % 100 < 1 || Math.floor(ExpireDate / 100) % 100 > 12) {
                     alert('請檢查月份');
                     return false;
                 }

@@ -8,6 +8,20 @@
     <title></title>
     <script type="text/javascript">
         function Check() {
+            var ExpireDate = document.getElementsByName('ExpireDate')[0].value;
+            if (ExpireDate) {
+                if (ExpireDate / 10000 < 1970 || ExpireDate / 10000 > 2200) {
+                    alert('請檢查年份');
+                    return false;
+                } else if (ExpireDate % 100 < 1 || ExpireDate % 100 > 31) {
+                    alert('請檢查日期');
+                    return false;
+                } else if (Math.floor(ExpireDate / 100) % 100 < 1 || Math.floor(ExpireDate / 100) % 100 > 12) {
+                    alert('請檢查月份');
+                    return false;
+                }
+                return true;
+            }
 
             var Name = document.getElementsByName('Name')[0].value;
 
@@ -28,7 +42,13 @@
         <div class="row">
             <label>名稱:</label>
             <input type="text" name="Name" placeholder="name" value="<%=data[0].DevName %>" />
-        </div>        
+        </div>
+        <% if (locals.SuperUser == 1) { %>         
+        <div class="row">
+            <label>使用期限：</label>
+            <input type="number" name="ExpireDate" placeholder="請輸入如:20210101" value="<%=data[0].ExpireStr %>"/>
+        </div> 
+        <%} %>            
         <div class="row">
             <input class="btn" type='submit' value='提交'>
             <input class="btn" type='reset' value='重置'>

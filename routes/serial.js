@@ -168,7 +168,7 @@ router.post('/serialEdit', function (req, res, next) {
     var date = new Date(year, month - 1, day, 0, 0, 0);
     var ExpireDate = date.getTime() / 1000;
     if (ExpireDate) {
-        sql.ExpireDate =ExpireDate;
+        sql.ExpireDate = ExpireDate;
     }
 
     mysqlQuery('UPDATE AllowTbl SET ? WHERE DevNo = ?', [sql, DevNo], function (err, allows) {
