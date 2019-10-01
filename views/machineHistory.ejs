@@ -16,6 +16,7 @@
         }
     </script>
 </head>
+
 <body>
     <% if (locals.Name) { %>
     <table border="0" align="right">
@@ -60,6 +61,7 @@
             <th>出獎數目</th>
             <th>投幣累計值</th>
             <th>出獎累計值</th>
+            <th>錯誤碼</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
@@ -83,6 +85,12 @@
             </td>
             <td>
                 <%= data[i].totalgift  %>
+            </td>
+            <td>
+                <% if( data[i].H63 !=0) { %>
+                <%= data[i].H63  %>
+                <% } else { %>
+                <% } %>
             </td>
         </tr>
         <% } %>
