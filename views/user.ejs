@@ -85,7 +85,7 @@
     <% } else { %>
     <input type="button" name="past" value="上一頁" class="btn" disabled="true" />
     <% } %>
-    <%= index+1  %>
+    <%= index+1  %>/<%= totalPage  %>
     <% if(index < totalPage - 1) { %>
     <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= SearchAccount %>');" />
     <% } else { %>
@@ -141,7 +141,7 @@
     <% } else { %>
     <input type="button" name="past" value="上一頁" class="btn" disabled="true" />
     <% } %>
-    <%= index+1  %>
+    <%= index+1  %>/<%= totalPage  %>
     <% if(index < totalPage - 1) { %>
     <input type="button" name="next" value="下一頁" class="btn" onclick="Next('<%= index %>','<%= SearchAccount %>');" />
     <% } else { %>

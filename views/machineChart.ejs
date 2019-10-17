@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>
         <%= title %>
@@ -7,15 +8,50 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script>
+        function Next(index, DevNo) {
+            window.location.href = `/machine/machineChart?DevNo=${DevNo}&index=${++index}`;
+        }
+        function Past(index, DevNo) {
+            window.location.href = `/machine/machineChart?DevNo=${DevNo}&index=${index-1}`;
+        }
+        function Go(DevNo) {
+            var year = document.getElementsByName('year')[0].value;
+            var month = document.getElementsByName('month')[0].value - 1;
+            var date = new Date(Date.now());
+            var getyear = date.getFullYear();
+            var getmonth = date.getMonth();
+            var index = (year - getyear) * 12 + (month - getmonth);
+            window.location.href = `/machine/machineChart?DevNo=${DevNo}&index=${index}`;
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js">
+    </script>
 </head>
-<body>
+
+<body><a href="/machine">上一頁</a>
     <h1>機台 - 圖表</h1>
+
+    <h2><%= cahrtdate.getFullYear() + "年" + (cahrtdate.getMonth() + 1) + "月" %></h2>
+    <input type="number" name="year" placeholder="輸入年份" value="<%= cahrtdate.getFullYear() %>" />
+    <input type="number" name="month" placeholder="輸入月份" value="<%= cahrtdate.getMonth() + 1%>"  />
+    <input type="button" name="search" value="前往" class="btn"
+        onclick="Go('<%= DevNo %>');" />
+
+    <div class="row">
+        <input type="button" name="past" value="上個月" class="btn" onclick="Past('<%= index  %>','<%= DevNo %>');" />
+        <% if(index < 0) { %>
+        <input type="button" name="next" value="下個月" class="btn" onclick="Next('<%= index  %>','<%= DevNo %>');" />
+        <% } else { %>
+        <input type="button" name="next" value="下個月" class="btn" disabled="true" />
+        <% } %>
+    </div>
+ 
     <canvas id="myChart" width="900" height="400"></canvas>
 
     <script>
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: <%- JSON.stringify(labels);  %>,
@@ -46,9 +82,7 @@
             }
         }
     });
-    </script>        
-    <div class="row">
-        <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
-    </div>
+    </script>
 </body>
+
 </html>

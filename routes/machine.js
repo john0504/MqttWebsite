@@ -22,6 +22,7 @@ router.get('/', function (req, res, next) {
     var DevNo = "";
     var DevName = "";
     var Account = "";
+    var order = "";
     var index = parseInt(req.query.index) ? parseInt(req.query.index) : 0;
     if (index < 0) {
         index = 0;
@@ -40,6 +41,7 @@ router.get('/', function (req, res, next) {
         if (req.session.SuperUser == 0) {
             sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
         }
+        // sql += (` order by a.DevName asc`);
         sql += (` limit ${index * linePerPage},${linePerPage}`);
 
         mysqlQuery(sql, function (err, devices) {
@@ -56,7 +58,7 @@ router.get('/', function (req, res, next) {
             res.render('machine', {
                 title: 'Machine Information', data: devices, index: index, DevNo: DevNo,
                 DevName: DevName, Account: Account, totalPage: totalPage,
-                linePerPage: linePerPage
+                linePerPage: linePerPage, order: order
             });
         });
     });
@@ -73,6 +75,7 @@ router.get('/search', function (req, res, next) {
     var DevNo = req.query.DevNo;
     var DevName = req.query.DevName;
     var Account = req.query.Account;
+    var order = req.query.order;
     var totalPage = 0;
     var mysqlQuery = req.mysqlQuery;
     var sql = 'SELECT count(*) as count from DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo'
@@ -138,6 +141,9 @@ router.get('/search', function (req, res, next) {
                 sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
             }
         }
+        if (order && order != "") {
+            sql += (` order by  ${order}`);
+        }
         sql += (` limit ${index * linePerPage},${linePerPage}`);
 
         mysqlQuery(sql, function (err, devices) {
@@ -154,7 +160,7 @@ router.get('/search', function (req, res, next) {
             res.render('machine', {
                 title: 'Machine Information', data: devices, index: index, DevNo: DevNo,
                 DevName: DevName, Account: Account, totalPage: totalPage,
-                linePerPage: linePerPage
+                linePerPage: linePerPage, order: order
             });
         });
     });
@@ -197,10 +203,29 @@ router.get('/machineChart', function (req, res, next) {
         return;
     }
     var DevNo = req.query.DevNo;
-
     var mysqlQuery = req.mysqlQuery;
+    var index = parseInt(req.query.index) ? parseInt(req.query.index) : 0;
 
-    mysqlQuery('SELECT * FROM HistoryTbl WHERE DevNo = ? order by id desc limit 1000', DevNo, function (err, msgs) {
+    var cahrtdate = new Date(Date.now());
+    cahrtdate.setHours(0, 0, 0, 0);
+    var datecodeEnd = parseInt(cahrtdate.getTime() / 1000);
+    if (index != 0) {
+        var month = cahrtdate.getMonth() + index + 1;
+        var pastYear = parseInt(month / 12);
+        cahrtdate.setFullYear(cahrtdate.getFullYear() + pastYear, month % 12, 1);
+        datecodeEnd = parseInt(cahrtdate.getTime() / 1000) - 1;
+    }
+    cahrtdate.setDate(1);
+    var datecodeStart = parseInt(cahrtdate.getTime() / 1000);
+    if (index != 0) {
+        cahrtdate = new Date(Date.now());
+        var month = cahrtdate.getMonth() + index;
+        var pastYear = parseInt(month / 12);
+        cahrtdate.setFullYear(cahrtdate.getFullYear() + pastYear, month % 12, 1);
+        cahrtdate.setHours(0, 0, 0, 0);
+        datecodeStart = parseInt(cahrtdate.getTime() / 1000);
+    }
+    mysqlQuery('SELECT * FROM HistoryTbl WHERE DevNo = ? AND DateCode >= ? AND DateCode <  ? order by id desc', [DevNo, datecodeStart, datecodeEnd], function (err, msgs) {
         if (err) {
             console.log(err);
         }
@@ -209,22 +234,57 @@ router.get('/machineChart', function (req, res, next) {
         var moneyDataSet = { data: [], backgroundColor: [], borderColor: [] };
         var giftDataSet = { data: [], backgroundColor: [], borderColor: [] };
 
-        for (var i = data.length - 1; i >= 0; i--) {
-            var date = new Date(data[i].DateCode * 1000);
-            labels.push((date.getMonth() + 1) + "-" + date.getDate());
+        for (var datecode = datecodeStart; datecode < datecodeEnd; datecode += 86400) {
+            var dataExist = false;
+            for (var i = data.length - 1; i >= 0; i--) {
+                if (data[i].DateCode >= datecode && data[i].DateCode < datecode + 86400) {
+                    dataExist = true;
+                    if ((data[i].H6A << 16) + data[i].H6B <= 1000 && (data[i].H68 << 16) + data[i].H69 <= 1000) {
+                        var date = new Date(data[i].DateCode * 1000);
+                        labels.push((date.getMonth() + 1) + "-" + date.getDate());
 
-            moneyDataSet.data.push((data[i].H68 << 16) + data[i].H69);
-            moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
-            moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
+                        moneyDataSet.data.push((data[i].H68 << 16) + data[i].H69);
+                        moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
+                        moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
 
-            giftDataSet.data.push((data[i].H6A << 16) + data[i].H6B);
-            giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
-            giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
+                        giftDataSet.data.push((data[i].H6A << 16) + data[i].H6B);
+                        giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
+                        giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
+                    } else {
+                        var date = new Date(data[i].DateCode * 1000);
+                        labels.push((date.getMonth() + 1) + "-" + date.getDate());
+
+                        moneyDataSet.data.push(0.1);
+                        moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
+                        moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
+
+                        giftDataSet.data.push(0.1);
+                        giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
+                        giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
+                    }
+                    break;
+                }
+            }
+            if (!dataExist) {
+                var date = new Date(datecode * 1000);
+                labels.push((date.getMonth() + 1) + "-" + date.getDate());
+
+                moneyDataSet.data.push(0);
+                moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
+                moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
+
+                giftDataSet.data.push(0);
+                giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
+                giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
+            }
         }
-        res.render('machineChart', { title: 'Machine Chart', labels: labels, moneyDataSet: moneyDataSet, giftDataSet: giftDataSet });
+
+
+        res.render('machineChart', { title: 'Machine Chart', DevNo: DevNo, index: index, cahrtdate: cahrtdate, labels: labels, moneyDataSet: moneyDataSet, giftDataSet: giftDataSet });
     });
 
 });
+
 
 // edit page
 router.get('/machineEdit', function (req, res, next) {
