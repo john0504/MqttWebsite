@@ -117,6 +117,8 @@
         src=http://maps.google.com.tw/maps?f=q&hl=zh-TW&geocode=&q=<%=data[index].lng %>,<%=data[index].lat %>&z=16&output=embed&t=>
         </iframe> <% } %> <br /><br /> -->
     <h1>機台 - 列表</h1>
+    <h2>目前連線機台數 - <%= totalOnline %>台</h2>
+    
     <input type="text" name="SearchDevNo" placeholder="搜尋產品序號" value="<%= DevNo %>" />
     <% if (locals.SuperUser == 1) { %>
     <input type="text" name="SearchDevName" placeholder="搜尋機台名稱" value="<%= DevName %>" />
@@ -192,18 +194,7 @@
                     onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.ExpireDate asc');" />
                 <% } %>
             </th>
-            <th>狀態
-                <% if(order == "a.UpdateDate asc") { %>
-                <input type="button" name="order" value="▼"
-                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.UpdateDate desc');" />
-                <% } else if (order == "a.UpdateDate desc"){ %>
-                <input type="button" name="order" value="▲"
-                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.UpdateDate asc');" />
-                <% } else { %>
-                <input type="button" name="order" value="▽"
-                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.UpdateDate desc');" />
-                <% } %>
-            </th>
+            <th>狀態</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
