@@ -62,6 +62,7 @@
             <th>投幣累計值</th>
             <th>出獎累計值</th>
             <th>錯誤碼</th>
+            <th>裝置更新日期</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
@@ -89,6 +90,18 @@
             <td>
                 <% if( data[i].H63 !=0) { %>
                 <%= data[i].H63  %>
+                <% } else { %>
+                <% } %>
+            </td>
+            <td>
+                <% var date = new Date(data[i].DevTime*1000); %>
+                <% if( data[i].DevTime != null) { %>
+                <%= date.getFullYear() + "-" 
+                    + (date.getMonth() + 1) + "-" 
+                    + date.getDate() + " " 
+                    + date.getHours() + ":" 
+                    + date.getMinutes() + ":" 
+                    + date.getSeconds()  %>
                 <% } else { %>
                 <% } %>
             </td>
