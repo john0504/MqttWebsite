@@ -218,7 +218,7 @@ client.on('message', function (topic, msg) {
                 view[i] = msg[i];
             }
             var dataView = new DataView(arrayBuffer);
-            // var Timestamp = dataView.getUint32(0);
+            var Timestamp = dataView.getUint32(0);
             // console.log("Timestamp:" + Timestamp);
             var obj = {};
             for (i = 4; i < msg.length; i += 3) {
@@ -245,6 +245,7 @@ client.on('message', function (topic, msg) {
                 H6E: obj.H6E,
                 H6F: obj.H6F,
                 DateCode: Date.now() / 1000,
+                DevTime: Timestamp,
             };
             // console.log(JSON.stringify(insertsql));
             mysqlQuery("INSERT INTO MessageTbl SET ?", insertsql, function (err, result) {

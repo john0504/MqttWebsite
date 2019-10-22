@@ -233,7 +233,7 @@
                 <input type="button" name="chart" value="圖表" class="btn" onclick="Chart('<%= data[i].DevNo  %>');" />
                 <% if (locals.SuperUser != 0) { %>
                 <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].DevNo  %>');" />
-                <input type="button" name="delete" value="刪除" class="btn"
+                <input type="button" name="delete" value="解綁" class="btn"
                     onclick="Delete('<%= data[i].DevNo %>','<%= data[i].AccountNo %>');" />
                 <% } %>
             </td>
