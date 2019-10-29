@@ -365,6 +365,11 @@ router.post('/payment', function (req, res, next) {
                                                                 console.log(err);
                                                             }
                                                             res.status(200).send({});
+                                                            var topic = `WAWA/${token}/U`;
+                                                            var paylod = JSON.stringify({ action: "list" });
+
+                                                            var mqttClient = req.mqttClient;
+                                                            mqttClient.publish(topic, paylod, { qos: 1, retain: false });
                                                             return;
                                                         });
                                                 });
