@@ -19,6 +19,15 @@
             }
             window.location.href = "/serial/search?SearchAllow=" + SearchAllow;
         }
+        function SearchGroup() {
+            var SearchAllowGroup = document.getElementsByName('SearchAllowGroup')[0].value;
+
+            if (SearchAllowGroup.length == 0) {
+                window.location.href = "/serial";
+                return true;
+            }
+            window.location.href = "/serial/searchGroup?SearchAllowGroup=" + SearchAllowGroup;
+        }
         function Edit(DevNo) {
             window.location.href = "/serial/serialEdit?DevNo=" + DevNo;
         }
@@ -81,6 +90,7 @@
             <th>編號</th>
             <th>序號</th>
             <th>使用期限</th>
+            <th>Group</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
@@ -96,6 +106,9 @@
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() %>
             </td>
+            <td>
+                <%= data[i].GroupNo  %>
+            </td>
             <td>                               
                 <input type="button" name="delete" value="刪除" class="btn" onclick="Delete('<%= data[i].DevNo  %>');" />                
             </td>
@@ -105,11 +118,15 @@
     <h1>白名單 - 列表</h1>
     <input type="text" name="SearchAllow" placeholder="搜尋序號" value="<%= SearchAllow %>" />
     <input type="button" name="search" value="搜尋" class="btn" onclick="Search();" />
+    <br/>
+    <input type="number" name="SearchAllowGroup" placeholder="搜尋Gruop" value="<%= SearchAllowGroup %>" />
+    <input type="button" name="search" value="搜尋" class="btn" onclick="SearchGroup();" />
     <table class="table">
         <tr>
             <th>編號</th>
             <th>序號</th>
             <th>使用期限</th>
+            <th>Group</th>
         </tr>
         <% for ( var j = 0 ; j < allow.length ; j++){ %>
         <tr>
@@ -124,6 +141,9 @@
                 <%= date.getFullYear() + "-" 
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() %>
+            </td>
+            <td>
+                <%=allow[j].GroupNo  %>
             </td>
             <td>                               
                 <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= allow[j].DevNo  %>');" />                          

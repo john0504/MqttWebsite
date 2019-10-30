@@ -30,15 +30,19 @@
 
 <body>
     <form name="editform" action="serialEdit" method="post" accept-charset="utf-8" onSubmit="return Check();">
-        <h1>白名單  - 修改</h1>
+        <h1>白名單 - 修改</h1>
         <div class="row">
             <label>序號：</label>
             <input type="text" name="DevNo" placeholder="DevNo" value="<%=data[0].DevNo %>" readonly />
-        </div>        
+        </div>
         <div class="row">
             <label>使用期限：</label>
-            <input type="number" name="ExpireDate" placeholder="請輸入如:20210101" value="<%=data[0].ExpireStr %>"/>
-        </div>       
+            <input type="number" name="ExpireDate" placeholder="請輸入如:20210101" value="<%=data[0].ExpireStr %>" />
+        </div>
+        <div class="row">
+            <label>Group：</label>
+            <input type="number" name="GroupNo" placeholder="請輸入數字可留空" value="<%=data[0].GroupNo %>" />
+        </div>
         <div class="row">
             <input class="btn" type='submit' value='提交'>
             <input class="btn" type='reset' value='重置'>

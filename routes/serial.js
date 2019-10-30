@@ -20,6 +20,7 @@ router.get('/', function (req, res, next) {
     }
     var mysqlQuery = req.mysqlQuery;
     var SearchAllow = "";
+    var SearchAllowGroup = "";
 
     if (req.session.SuperUser == 1) {
         mysqlQuery('SELECT * FROM TempTbl ', function (err, serials) {
@@ -33,7 +34,7 @@ router.get('/', function (req, res, next) {
                 }
                 // use serial.ejs
                 var allow = allows;
-                res.render('serial', { title: 'Serial Information', data: data, allow: allow, SearchAllow: SearchAllow });
+                res.render('serial', { title: 'Serial Information', data: data, allow: allow, SearchAllow: SearchAllow, SearchAllowGroup: SearchAllowGroup });
             });
         });
     } else {
@@ -55,6 +56,7 @@ router.post('/serialAdd', function (req, res, next) {
         return;
     }
     var DevNo = req.body.DevNo;
+    var GroupNo = req.body.GroupNo;
     var DevNoArr = DevNo.toString().split(',');
     var dateStr = req.body.ExpireDate;
     var year = dateStr.substring(0, 4);
@@ -71,8 +73,11 @@ router.post('/serialAdd', function (req, res, next) {
         if (devNo.trim().length == 12) {
             var sql = {
                 DevNo: devNo.trim(),
-                ExpireDate: ExpireDate
+                ExpireDate: ExpireDate,
             };
+            if (GroupNo) {
+                sql.GroupNo = GroupNo;
+            }
             mysqlQuery('INSERT IGNORE INTO TempTbl SET ?', sql, function (err, rows) {
                 if (err) {
                     console.log(err);
@@ -96,6 +101,7 @@ router.get('/search', function (req, res, next) {
         return;
     }
     var SearchAllow = req.query.SearchAllow;
+    var SearchAllowGroup = "";
     var mysqlQuery = req.mysqlQuery;
 
     if (req.session.SuperUser != 0) {
@@ -110,7 +116,35 @@ router.get('/search', function (req, res, next) {
                 }
                 var data = serials;
                 // use serial.ejs
-                res.render('serial', { title: 'Serial Information', data: data, allow: allow, SearchAllow: SearchAllow });
+                res.render('serial', { title: 'Serial Information', data: data, allow: allow, SearchAllow: SearchAllow, SearchAllowGroup: SearchAllowGroup });
+            });
+        });
+    } else {
+        return;
+    }
+});
+
+router.get('/searchGroup', function (req, res, next) {
+    if (!checkSession(req, res)) {
+        return;
+    }
+    var SearchAllow = "";
+    var SearchAllowGroup = req.query.SearchAllowGroup;
+    var mysqlQuery = req.mysqlQuery;
+
+    if (req.session.SuperUser != 0) {
+        mysqlQuery('SELECT * FROM AllowTbl WHERE GroupNo = ?', `${SearchAllowGroup}`, function (err, allows) {
+            if (err) {
+                console.log(err);
+            }
+            var allow = allows;
+            mysqlQuery('SELECT * FROM TempTbl ', function (err, serials) {
+                if (err) {
+                    console.log(err);
+                }
+                var data = serials;
+                // use serial.ejs
+                res.render('serial', { title: 'Serial Information', data: data, allow: allow, SearchAllow: SearchAllow, SearchAllowGroup: SearchAllowGroup });
             });
         });
     } else {
@@ -157,10 +191,9 @@ router.post('/serialEdit', function (req, res, next) {
     }
     var mysqlQuery = req.mysqlQuery;
     var DevNo = req.body.DevNo;
+    var GroupNo = req.body.GroupNo;
 
-    var sql = {
-        DevNo: req.body.DevNo
-    };
+    var sql = { };
     var dateStr = req.body.ExpireDate;
     var year = dateStr.substring(0, 4);
     var month = dateStr.substring(4, 6);
@@ -169,6 +202,11 @@ router.post('/serialEdit', function (req, res, next) {
     var ExpireDate = date.getTime() / 1000;
     if (ExpireDate) {
         sql.ExpireDate = ExpireDate;
+    }
+    if (GroupNo) {
+        sql.GroupNo = GroupNo;
+    } else {
+        sql.GroupNo = null;
     }
 
     mysqlQuery('UPDATE AllowTbl SET ? WHERE DevNo = ?', [sql, DevNo], function (err, allows) {
@@ -191,7 +229,7 @@ router.get('/move', function (req, res, next) {
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('INSERT IGNORE INTO AllowTbl(DevNo,ExpireDate) SELECT DevNo,ExpireDate FROM TempTbl', function (err, rows) {
+    mysqlQuery('INSERT IGNORE INTO AllowTbl(DevNo,ExpireDate,GroupNo) SELECT DevNo,ExpireDate,GroupNo FROM TempTbl', function (err, rows) {
         if (err) {
             console.log(err);
         }

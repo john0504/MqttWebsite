@@ -136,7 +136,7 @@ client.on('message', function (topic, msg) {
                                 DevAlias: obj.DevAlias,
                                 VerNum: obj.VerNum,
                                 SaaModel: obj.SaaModel,
-                                GroupNo: obj.GroupNo ? obj.GroupNo : null,
+                                GroupNo: allow[0].GroupNo,
                                 S01: obj.S01,
                                 S02: obj.S02,
                                 ExpireDate: allow[0].ExpireDate,
@@ -149,7 +149,7 @@ client.on('message', function (topic, msg) {
                                 DevAlias: obj.DevAlias,
                                 VerNum: obj.VerNum,
                                 SaaModel: obj.SaaModel,
-                                GroupNo: obj.GroupNo ? obj.GroupNo : null,
+                                GroupNo: allow[0].GroupNo,
                                 S01: obj.S01,
                                 S02: obj.S02,
                                 UpdateDate: Date.now() / 1000
@@ -171,7 +171,7 @@ client.on('message', function (topic, msg) {
                                 DevName: obj.DevName,
                                 VerNum: obj.VerNum,
                                 SaaModel: obj.SaaModel,
-                                GroupNo: obj.GroupNo ? obj.GroupNo : null,
+                                GroupNo: allow[0].GroupNo,
                                 S01: obj.S01,
                                 S02: obj.S02,
                                 UpdateDate: Date.now() / 1000

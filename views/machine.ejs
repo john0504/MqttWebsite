@@ -180,6 +180,17 @@
                     onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.DevNo asc');" />
                 <% } %>
             </th>
+            <th>Group
+                <% if(order == "a.GroupNo asc") { %>
+                <input type="button" name="order" value="▼"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.GroupNo desc');" />
+                <% } else if (order == "a.GroupNo desc"){ %>
+                <input type="button" name="order" value="▲"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.GroupNo asc');" />
+                <% } else { %>
+                <input type="button" name="order" value="▽"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.GroupNo asc');" />
+                <% } %></th>
             <th>WiFi版本</th>
             <th>SAA版本</th>
             <th>使用期限
@@ -209,6 +220,9 @@
             </td>
             <td>
                 <%= data[i].DevNo  %>
+            </td>
+            <td>
+                <%= data[i].GroupNo  %>
             </td>
             <td>
                 <%= data[i].VerNum  %>
