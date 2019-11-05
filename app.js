@@ -333,7 +333,7 @@ client.on('message', function (topic, msg) {
                     var H62 = 0;
                     var DateCode = 0;
                     msgs.forEach(msg => {
-                        if (H62 > msg.H62 && timelist.length < 3) {
+                        if (H62 > msg.H62 && timelist.length < 5) {
                             timelist.push(DateCode);
                         }
                         H62 = msg.H62;
