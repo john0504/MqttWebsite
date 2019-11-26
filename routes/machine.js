@@ -224,27 +224,28 @@ router.get('/machineChart', function (req, res, next) {
         return;
     }
     var DevNo = req.query.DevNo;
+    var DevName = req.query.DevName;
     var mysqlQuery = req.mysqlQuery;
     var index = parseInt(req.query.index) ? parseInt(req.query.index) : 0;
 
-    var cahrtdate = new Date(Date.now());
-    cahrtdate.setHours(0, 0, 0, 0);
-    var datecodeEnd = parseInt(cahrtdate.getTime() / 1000);
+    var chartdate = new Date(Date.now());
+    chartdate.setHours(0, 0, 0, 0);
+    var datecodeEnd = parseInt(chartdate.getTime() / 1000);
     if (index != 0) {
-        var month = cahrtdate.getMonth() + index + 1;
+        var month = chartdate.getMonth() + index + 1;
         var pastYear = parseInt(month / 12);
-        cahrtdate.setFullYear(cahrtdate.getFullYear() + pastYear, month % 12, 1);
-        datecodeEnd = parseInt(cahrtdate.getTime() / 1000) - 1;
+        chartdate.setFullYear(chartdate.getFullYear() + pastYear, month % 12, 1);
+        datecodeEnd = parseInt(chartdate.getTime() / 1000) - 1;
     }
-    cahrtdate.setDate(1);
-    var datecodeStart = parseInt(cahrtdate.getTime() / 1000);
+    chartdate.setDate(1);
+    var datecodeStart = parseInt(chartdate.getTime() / 1000);
     if (index != 0) {
-        cahrtdate = new Date(Date.now());
-        var month = cahrtdate.getMonth() + index;
+        chartdate = new Date(Date.now());
+        var month = chartdate.getMonth() + index;
         var pastYear = parseInt(month / 12);
-        cahrtdate.setFullYear(cahrtdate.getFullYear() + pastYear, month % 12, 1);
-        cahrtdate.setHours(0, 0, 0, 0);
-        datecodeStart = parseInt(cahrtdate.getTime() / 1000);
+        chartdate.setFullYear(chartdate.getFullYear() + pastYear, month % 12, 1);
+        chartdate.setHours(0, 0, 0, 0);
+        datecodeStart = parseInt(chartdate.getTime() / 1000);
     }
     mysqlQuery('SELECT * FROM HistoryTbl WHERE DevNo = ? AND DateCode >= ? AND DateCode <  ? order by id desc', [DevNo, datecodeStart, datecodeEnd], function (err, msgs) {
         if (err) {
@@ -301,7 +302,7 @@ router.get('/machineChart', function (req, res, next) {
         }
 
 
-        res.render('machineChart', { title: 'Machine Chart', DevNo: DevNo, index: index, cahrtdate: cahrtdate, labels: labels, moneyDataSet: moneyDataSet, giftDataSet: giftDataSet });
+        res.render('machineChart', { title: 'Machine Chart', DevNo: DevNo, DevName: DevName, index: index, chartdate: chartdate, labels: labels, moneyDataSet: moneyDataSet, giftDataSet: giftDataSet });
     });
 
 });

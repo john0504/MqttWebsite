@@ -51,8 +51,8 @@
             window.location.href = "/machine/machineHistory?DevNo=" + DevNo;
         }
 
-        function Chart(DevNo) {
-            window.location.href = "/machine/machineChart?DevNo=" + DevNo;
+        function Chart(DevNo, DevName) {
+            window.location.href = `/machine/machineChart?DevNo=${DevNo}&DevName=${DevName}`;
         }
 
         function Edit(DevNo) {
@@ -244,7 +244,7 @@
             <td>
                 <input type="button" name="history" value="紀錄" class="btn"
                     onclick="History('<%= data[i].DevNo  %>');" />
-                <input type="button" name="chart" value="圖表" class="btn" onclick="Chart('<%= data[i].DevNo  %>');" />
+                <input type="button" name="chart" value="圖表" class="btn" onclick="Chart('<%= data[i].DevNo  %>', '<%= data[i].DevName  %>');" />
                 <% if (locals.SuperUser != 0) { %>
                 <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].DevNo  %>');" />
                 <input type="button" name="delete" value="解綁" class="btn"
