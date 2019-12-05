@@ -328,22 +328,12 @@ client.on('message', function (topic, msg) {
                 });
             } else if (obj.action == "gifttime") {
                 var DevNo = obj.DevNo;
-                mysqlQuery('SELECT * FROM MessageTbl WHERE DevNo = ? order by id desc limit 1000', DevNo, function (err, msgs) {
-                    var timelist = [];
-                    var H62 = 0;
-                    var DateCode = 0;
-                    msgs.forEach(msg => {
-                        if (H62 > msg.H62 && timelist.length < 5) {
-                            timelist.push(DateCode);
-                        }
-                        H62 = msg.H62;
-                        DateCode = msg.DateCode;
-                    });
+                mysqlQuery('SELECT DevTime FROM MessageTbl WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 5', DevNo, function (err, msgs) {
+                    var timelist =  msgs.DevTime;                   
                     var mytopic = `${PrjName}/${No}/G`
                     var mymsg = { T: timelist };
                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
                 });
-
             } else if (obj.action == "delete") {
                 var AccountNo = parseInt(No, 16);
                 var DevNo = obj.DevNo;
