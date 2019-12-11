@@ -328,7 +328,7 @@ client.on('message', function (topic, msg) {
                 });
             } else if (obj.action == "gifttime") {
                 var DevNo = obj.DevNo;
-                mysqlQuery('SELECT DevTime FROM MessageTbl WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 5', DevNo, function (err, msgs) {
+                mysqlQuery('SELECT DevTime FROM MessageTbl WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 10', DevNo, function (err, msgs) {
                     var timelist = [];
                     msgs.forEach(msg => {
                         timelist.push(msg.DevTime);
