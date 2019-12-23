@@ -338,9 +338,9 @@ client.on('message', function (topic, msg) {
                             timelist.push(msg.DevTime);
                         }
                         if (index > 0) {
-                            moneyList.push(money - (msg.H68 << 16 + msg.H69));
+                            moneyList.push(money - ((msg.H68 << 16) + msg.H69));
                         }
-                        money = msg.H68 << 16 + msg.H69;
+                        money = (msg.H68 << 16) + msg.H69;
                         index++;
                     });
                     var mytopic = `${PrjName}/${No}/G`
