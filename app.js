@@ -328,13 +328,23 @@ client.on('message', function (topic, msg) {
                 });
             } else if (obj.action == "gifttime") {
                 var DevNo = obj.DevNo;
-                mysqlQuery('SELECT DevTime FROM MessageTbl WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 10', DevNo, function (err, msgs) {
+                mysqlQuery('SELECT DevTime, H68, H69 FROM MessageTbl WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 11', DevNo, function (err, msgs) {
                     var timelist = [];
+                    var moneyList = [];
+                    var index = 0;
+                    var money = 0
                     msgs.forEach(msg => {
-                        timelist.push(msg.DevTime);
+                        if (index < msgs.length - 1) {
+                            timelist.push(msg.DevTime);
+                        }
+                        if (index > 0) {
+                            moneyList.push(money - (msg.H68 << 16 + msg.H69));
+                        }
+                        money = msg.H68 << 16 + msg.H69;
+                        index++;
                     });
                     var mytopic = `${PrjName}/${No}/G`
-                    var mymsg = { T: timelist };
+                    var mymsg = { T: timelist, M: moneyList };
                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
                 });
             } else if (obj.action == "delete") {
