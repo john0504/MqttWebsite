@@ -256,7 +256,7 @@ client.on('message', function (topic, msg) {
                     console.log('[SELECT ERROR] - ', err.message);
                     return;
                 }
-                if (msgs[0].H6B != obj.H6B && Date.now() / 1000 < msgs[0].ExpireDate) {
+                if (/*msgs[0].H6B != obj.H6B &&*/ Date.now() / 1000 < msgs[0].ExpireDate) {
                     var token = msgs[0].AccountNo.toString(16);
                     if (token.length == 1) {
                         token = "000" + token;
@@ -274,6 +274,7 @@ client.on('message', function (topic, msg) {
                             title: '出貨通知',
                             body: content,
                             sound: 'Enabled',
+                            image: 'https://firebasestorage.googleapis.com/v0/b/wawa-63463.appspot.com/o/icon.png?alt=media&token=cf3b884b-ad1b-4f79-810c-1bd0e76a8e3d',
                             color: '#12FFF0'
                         }
                     };
@@ -282,8 +283,7 @@ client.on('message', function (topic, msg) {
                             console.log('fcm error: ' + JSON.stringify(err));
                         }
                         if (response) {
-                            console.log('fcm success: ' + JSON.stringify(response));
-                            console.log(`${JSON.stringify(message)}`);
+                            console.log(`FCM PUSH(${token}):${JSON.stringify(content)}`);
                         }
                     });
                 }
