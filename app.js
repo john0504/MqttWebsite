@@ -287,24 +287,24 @@ client.on('message', function (topic, msg) {
                         }
                     });
                 }
-            });
-            // console.log(JSON.stringify(insertsql));
-            mysqlQuery("INSERT INTO MessageTbl SET ?", insertsql, function (err, result) {
-                if (err) {
-                    console.log('[SELECT ERROR] - ', err.message);
-                    return;
-                }
-                var updatesql = {
-                    UpdateDate: Date.now() / 1000
-                };
-                var sqlstring = "UPDATE DeviceTbl SET ? WHERE DevNo = ?";
-                mysqlQuery(sqlstring, [updatesql, No], function (err, result) {
+                // console.log(JSON.stringify(insertsql));
+                mysqlQuery("INSERT INTO MessageTbl SET ?", insertsql, function (err, result) {
                     if (err) {
-                        console.log('[UPDATE ERROR] - ', err.message);
+                        console.log('[SELECT ERROR] - ', err.message);
                         return;
                     }
+                    var updatesql = {
+                        UpdateDate: Date.now() / 1000
+                    };
+                    var sqlstring = "UPDATE DeviceTbl SET ? WHERE DevNo = ?";
+                    mysqlQuery(sqlstring, [updatesql, No], function (err, result) {
+                        if (err) {
+                            console.log('[UPDATE ERROR] - ', err.message);
+                            return;
+                        }
+                    });
+                    // console.log('--------------------------INSERT----------------------------');
                 });
-                // console.log('--------------------------INSERT----------------------------');
             });
         } else if (msgType == "app") {
             // console.log(msg.toString());
