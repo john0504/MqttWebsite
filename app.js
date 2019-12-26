@@ -20,6 +20,10 @@ var ota = require('./routes/ota');
 var payment = require('./routes/payment');
 var serial = require('./routes/serial');
 var firmware = require('./routes/firmware');
+var FCM = require('fcm-push');
+
+var server_key = 'AAAAaDdIUbc:APA91bG3Eu49uQ3tWQmmdxfxdoWQD_uRx2kOI96aOdalWBKX0USJ3EE1xVZaNBdCqIBq549DSQ3k_neHmuoN8L8sYexcEcwWXJlQEUjIexwR2squJbxPI6vTOt2bHa05L151e_aW6_Qv';
+var fcm = new FCM(server_key);
 
 var mailTransport = nodemailer.createTransport(
     {
@@ -247,6 +251,43 @@ client.on('message', function (topic, msg) {
                 DateCode: Date.now() / 1000,
                 DevTime: Timestamp,
             };
+            mysqlQuery("SELECT a.AccountNo, a.DevName, a.ExpireDate, b.H6B FROM MessageTbl as b LEFT JOIN  DeviceTbl as a ON a.DevNo = b.DevNo WHERE a.DevNo = ? ORDER BY b.id desc LIMIT 1", No, function (err, msgs) {
+                if (err) {
+                    console.log('[SELECT ERROR] - ', err.message);
+                    return;
+                }
+                if (msgs[0].H6B != obj.H6B && Date.now() / 1000 < msgs[0].ExpireDate) {
+                    var token = msgs[0].AccountNo.toString(16);
+                    if (token.length == 1) {
+                        token = "000" + token;
+                    } else if (token.length == 2) {
+                        token = "00" + token;
+                    } else if (token.length == 3) {
+                        token = "0" + token;
+                    }
+
+                    var content = '機台 ' + msgs[0].DevName + ' 已出貨！';
+                    var message = {
+                        to: '/topics/' + token,
+                        collapse_key: '001',
+                        notification: {
+                            title: '出貨通知',
+                            body: content,
+                            sound: 'Enabled',
+                            color: '#12FFF0'
+                        }
+                    };
+                    fcm.send(message, function (err, response) {
+                        if (err) {
+                            console.log('fcm error: ' + JSON.stringify(err));
+                        }
+                        if (response) {
+                            console.log('fcm success: ' + JSON.stringify(response));
+                            console.log(`${JSON.stringify(message)}`);
+                        }
+                    });
+                }
+            });
             // console.log(JSON.stringify(insertsql));
             mysqlQuery("INSERT INTO MessageTbl SET ?", insertsql, function (err, result) {
                 if (err) {
