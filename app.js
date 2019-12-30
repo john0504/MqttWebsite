@@ -256,7 +256,7 @@ client.on('message', function (topic, msg) {
                     console.log('[SELECT ERROR] - ', err.message);
                     return;
                 }
-                if (msgs[0].H6B != obj.H6B && Date.now() / 1000 < msgs[0].ExpireDate && msgs[0].AccountNo) {
+                if (msgs.length > 0 && msgs[0].H6B != obj.H6B && Date.now() / 1000 < msgs[0].ExpireDate && msgs[0].AccountNo) {
                     var token = msgs[0].AccountNo.toString(16);
                     if (token.length == 1) {
                         token = "000" + token;
