@@ -165,7 +165,7 @@ client.on('message', function (topic, msg) {
                                     return;
                                 }
                                 if (device.length == 0 || device[0].AccountNo == null) {
-                                    var mytopic = `${PrjName}/${obj.Account}/U`
+                                    var mytopic = `${PrjName}/${obj.Account}/U`;
                                     var mymsg = { action: "list" };
                                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
                                 }
@@ -186,7 +186,7 @@ client.on('message', function (topic, msg) {
                                     console.log('[UPDATE ERROR] - ', err.message);
                                     return;
                                 }
-                                var mytopic = `${PrjName}/${obj.Account}/U`
+                                var mytopic = `${PrjName}/${obj.Account}/U`;
                                 var mymsg = { action: "list" };
                                 client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
                                 // console.log('--------------------------UPDATE----------------------------');
@@ -251,30 +251,33 @@ client.on('message', function (topic, msg) {
                 DateCode: Date.now() / 1000,
                 DevTime: Timestamp,
             };
-            mysqlQuery("SELECT a.AccountNo, a.DevName, a.ExpireDate, b.H6B FROM MessageTbl as b LEFT JOIN  DeviceTbl as a ON a.DevNo = b.DevNo WHERE a.DevNo = ? ORDER BY b.id desc LIMIT 1", No, function (err, msgs) {
+            mysqlQuery("SELECT a.DevName, a.ExpireDate, b.H69, b.H6B FROM MessageTbl as b LEFT JOIN  DeviceTbl as a ON a.DevNo = b.DevNo WHERE a.DevNo = ? ORDER BY b.id desc LIMIT 1", No, function (err, msgs) {
                 if (err) {
                     console.log('[SELECT ERROR] - ', err.message);
                     return;
                 }
-                if (msgs.length > 0 && msgs[0].H6B != obj.H6B && Date.now() / 1000 < msgs[0].ExpireDate && msgs[0].AccountNo) {
-                    var token = msgs[0].AccountNo.toString(16);
-                    if (token.length == 1) {
-                        token = "000" + token;
-                    } else if (token.length == 2) {
-                        token = "00" + token;
-                    } else if (token.length == 3) {
-                        token = "0" + token;
+                if (msgs.length > 0 && (msgs[0].H69 != obj.H69 || msgs[0].H6B != obj.H6B) && Date.now() / 1000 < msgs[0].ExpireDate) {
+                    var topic = '';
+                    var content = '';
+                    var title = '';
+                    if (msgs[0].H6B != obj.H6B) {
+                        topic = `${No}-Gift`;
+                        content = '機台 ' + msgs[0].DevName + ' 已出貨！';
+                        title = '出貨通知';
+                    } else if (msgs[0].H69 != obj.H69) {
+                        topic = `${No}-Money`;
+                        content = '機台 ' + msgs[0].DevName + ' 已被投幣！';
+                        title = '投幣通知';
                     }
-
-                    var content = '機台 ' + msgs[0].DevName + ' 已出貨！';
                     var message = {
-                        to: '/topics/' + token,
+                        to: '/topics/' + topic,
                         collapse_key: '001',
                         notification: {
-                            title: '出貨通知',
+                            title: title,
                             body: content,
                             sound: 'Enabled',
-                            image: 'https://firebasestorage.googleapis.com/v0/b/wawa-63463.appspot.com/o/icon.png?alt=media&token=cf3b884b-ad1b-4f79-810c-1bd0e76a8e3d',
+                            icon = "fcm_push_icon",
+                            // image: 'https://firebasestorage.googleapis.com/v0/b/wawa-63463.appspot.com/o/icon.png?alt=media&token=cf3b884b-ad1b-4f79-810c-1bd0e76a8e3d',
                             color: '#12FFF0'
                         }
                     };
@@ -283,7 +286,7 @@ client.on('message', function (topic, msg) {
                             console.log('fcm error: ' + JSON.stringify(err));
                         }
                         if (response) {
-                            console.log(`FCM PUSH(${token}):${JSON.stringify(content)}`);
+                            console.log(`FCM PUSH(${topic}):${JSON.stringify(content)}`);
                         }
                     });
                 }
@@ -347,7 +350,7 @@ client.on('message', function (topic, msg) {
                                 }
 
                                 if (count == 0) {
-                                    var topic = `${PrjName}/${token}/D`
+                                    var topic = `${PrjName}/${token}/D`;
                                     client.publish(topic, JSON.stringify(message), { qos: 1, retain: false });
                                     return;
                                 }
@@ -360,7 +363,7 @@ client.on('message', function (topic, msg) {
                                     };
                                     message.data.push(device);
                                 }
-                                var topic = `${PrjName}/${token}/D`
+                                var topic = `${PrjName}/${token}/D`;
                                 client.publish(topic, JSON.stringify(message), { qos: 1, retain: false });
                                 return;
                             });
@@ -369,22 +372,26 @@ client.on('message', function (topic, msg) {
                 });
             } else if (obj.action == "gifttime") {
                 var DevNo = obj.DevNo;
-                mysqlQuery('SELECT DevTime, H68, H69 FROM MessageTbl WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 11', DevNo, function (err, msgs) {
+                mysqlQuery('SELECT a.DevTime, a.H68, a.H69, b.ExpireDate FROM MessageTbl as a LEFT JOIN DeviceTbl as b on a.DevNo = b.DevNo WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 11', DevNo, function (err, msgs) {
                     var timelist = [];
                     var moneyList = [];
                     var index = 0;
-                    var money = 0
+                    var money = 0;
                     msgs.forEach(msg => {
-                        if (index < msgs.length - 1) {
-                            timelist.push(msg.DevTime);
+                        if (Date.now() / 1000 < msg.ExpireDate) {
+                            break;
+                        } else {
+                            if (index < msgs.length - 1) {
+                                timelist.push(msg.DevTime);
+                            }
+                            if (index > 0) {
+                                moneyList.push(money - ((msg.H68 << 16) + msg.H69));
+                            }
+                            money = (msg.H68 << 16) + msg.H69;
+                            index++;
                         }
-                        if (index > 0) {
-                            moneyList.push(money - ((msg.H68 << 16) + msg.H69));
-                        }
-                        money = (msg.H68 << 16) + msg.H69;
-                        index++;
                     });
-                    var mytopic = `${PrjName}/${No}/G`
+                    var mytopic = `${PrjName}/${No}/G`;
                     var mymsg = { T: timelist, M: moneyList };
                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
                 });
@@ -404,16 +411,16 @@ client.on('message', function (topic, msg) {
                                     if (err) {
                                         console.log(err);
                                     }
-                                    var mytopic = `WAWA/${No}/U`
+                                    var mytopic = `WAWA/${No}/U`;
                                     var mymsg = { action: "list" };
                                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
 
                                     var DevNo = result[0].DevNo
-                                    var mytopic = `${PrjName}/${DevNo}/D`
+                                    var mytopic = `${PrjName}/${DevNo}/D`;
                                     var mymsg = { Account: "0000", Owner: No };
                                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
 
-                                    var mytopic = `WAWA/${DevNo}/C`
+                                    var mytopic = `WAWA/${DevNo}/C`;
                                     var mymsg = "";
                                     client.publish(mytopic, mymsg, { qos: 1, retain: true });
 

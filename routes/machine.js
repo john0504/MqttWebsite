@@ -393,15 +393,15 @@ router.get('/machineDelete', function (req, res, next) {
             console.log(err);
         }
 
-        var mytopic = `WAWA/${token}/U`
+        var mytopic = `WAWA/${token}/U`;
         var mymsg = { action: "list" };
         client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
 
-        var mytopic = `WAWA/${DevNo}/D`
+        var mytopic = `WAWA/${DevNo}/D`;
         var mymsg = { Account: "0000", Owner: token };
         client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
 
-        var mytopic = `WAWA/${DevNo}/C`
+        var mytopic = `WAWA/${DevNo}/C`;
         var mymsg = "";
         client.publish(mytopic, mymsg, { qos: 1, retain: true });
 
