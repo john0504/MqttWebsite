@@ -276,8 +276,8 @@ client.on('message', function (topic, msg) {
                             title: title,
                             body: content,
                             sound: 'Enabled',
-                            icon: "fcm_push_icon",
-                            // image: 'https://firebasestorage.googleapis.com/v0/b/wawa-63463.appspot.com/o/icon.png?alt=media&token=cf3b884b-ad1b-4f79-810c-1bd0e76a8e3d',
+                            // icon: "fcm_push_icon",
+                            image: 'https://firebasestorage.googleapis.com/v0/b/wawa-63463.appspot.com/o/icon.png?alt=media&token=cf3b884b-ad1b-4f79-810c-1bd0e76a8e3d',
                             color: '#12FFF0'
                         }
                     };
