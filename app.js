@@ -378,7 +378,7 @@ client.on('message', function (topic, msg) {
                     var index = 0;
                     var money = 0;
                     msgs.forEach(msg => {
-                        if (Date.now() / 1000 > msg.ExpireDate) {
+                        if (Date.now() / 1000 < msg.ExpireDate) {
                             if (index < msgs.length - 1) {
                                 timelist.push(msg.DevTime);
                             }
