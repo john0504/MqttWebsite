@@ -90,6 +90,9 @@ var client = mqtt.connect('mqtt://localhost', opt);
 client.on('connect', function () {
     console.log('MQTT server connected.');
     client.subscribe("WAWA/#");
+    var topic = `WAWA2/AppVersion`;
+    var paylod = `2.4.20200114`;
+    client.publish(topic, paylod, { qos: 1, retain: true });
 });
 
 client.on('message', function (topic, msg) {
@@ -251,21 +254,29 @@ client.on('message', function (topic, msg) {
                 DateCode: Date.now() / 1000,
                 DevTime: Timestamp,
             };
-            mysqlQuery("SELECT a.DevName, a.ExpireDate, b.H69, b.H6B FROM MessageTbl as b LEFT JOIN  DeviceTbl as a ON a.DevNo = b.DevNo WHERE a.DevNo = ? ORDER BY b.id desc LIMIT 1", No, function (err, msgs) {
+            mysqlQuery("SELECT a.AccountNo, a.DevName, a.ExpireDate, b.H69, b.H6B FROM MessageTbl as b LEFT JOIN  DeviceTbl as a ON a.DevNo = b.DevNo WHERE a.DevNo = ? ORDER BY b.id desc LIMIT 1", No, function (err, msgs) {
                 if (err) {
                     console.log('[SELECT ERROR] - ', err.message);
                     return;
                 }
-                if (msgs.length > 0 && (msgs[0].H69 != obj.H69 || msgs[0].H6B != obj.H6B) && Date.now() / 1000 < msgs[0].ExpireDate) {
+                if (msgs.length > 0 && msgs[0].AccountNo && (msgs[0].H69 != obj.H69 || msgs[0].H6B != obj.H6B) && Date.now() / 1000 < msgs[0].ExpireDate) {
                     var topic = '';
                     var content = '';
                     var title = '';
+                    var token = msgs[0].AccountNo.toString(16);
+                    if (token.length == 1) {
+                        token = "000" + token;
+                    } else if (token.length == 2) {
+                        token = "00" + token;
+                    } else if (token.length == 3) {
+                        token = "0" + token;
+                    }
                     if (msgs[0].H6B != obj.H6B) {
-                        topic = `${No}-Gift`;
+                        topic = `${token}-${No}-Gift`;
                         content = '機台 ' + msgs[0].DevName + ' 已出貨！';
                         title = '出貨通知';
                     } else if (msgs[0].H69 != obj.H69) {
-                        topic = `${No}-Money`;
+                        topic = `${token}-${No}-Money`;
                         content = '機台 ' + msgs[0].DevName + ' 已被投幣！';
                         title = '投幣通知';
                     }
@@ -286,7 +297,7 @@ client.on('message', function (topic, msg) {
                             console.log('fcm error: ' + JSON.stringify(err));
                         }
                         if (response) {
-                            console.log(`FCM PUSH(${topic}):${JSON.stringify(content)}`);
+                            console.log(`FCM PUSH(${topic})`);
                         }
                     });
                 }
