@@ -193,7 +193,7 @@ router.post('/serialEdit', function (req, res, next) {
     var DevNo = req.body.DevNo;
     var GroupNo = req.body.GroupNo;
 
-    var sql = { };
+    var sql = {};
     var dateStr = req.body.ExpireDate;
     var year = dateStr.substring(0, 4);
     var month = dateStr.substring(4, 6);
@@ -213,7 +213,9 @@ router.post('/serialEdit', function (req, res, next) {
         if (err) {
             console.log(err);
         }
-
+        if (GroupNo) {
+            mysqlQuery('UPDATE DeviceTbl SET GroupNo = ? WHERE DevNo = ?', [GroupNo, DevNo], function (err, res) { });
+        }
         res.locals.Account = req.session.Account;
         res.locals.Name = req.session.Name;
         res.setHeader('Content-Type', 'application/json');
