@@ -213,7 +213,11 @@ router.post('/serialEdit', function (req, res, next) {
         if (err) {
             console.log(err);
         }
-        mysqlQuery('UPDATE DeviceTbl SET GroupNo = ? WHERE DevNo = ?', [sql.GroupNo, DevNo], function (err, res) { });
+        var sql2 = { GroupNo: sql.GroupNo };
+        if (ExpireDate) {
+            sql2.ExpireDate = ExpireDate;
+        }
+        mysqlQuery('UPDATE DeviceTbl SET ? WHERE DevNo = ?', [sql2, DevNo], function (err, res) { });
         res.locals.Account = req.session.Account;
         res.locals.Name = req.session.Name;
         res.setHeader('Content-Type', 'application/json');
