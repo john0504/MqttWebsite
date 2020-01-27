@@ -120,12 +120,12 @@ client.on('message', function (topic, msg) {
             }
             mysqlQuery("SELECT * FROM AllowTbl WHERE DevNo = ?", No, function (err, allow) {
                 const obj = JSON.parse(msg.toString());
-                if (allow.length != 1) {
+                if (allow && allow.length != 1) {
                     var topic = `${PrjName}/${obj.Account}/M`;
                     var paylod = "此裝置未被授權";
                     client.publish(topic, paylod, { qos: 1, retain: false });
                     return;
-                } else {
+                } else if (allow && allow.length == 1) {
                     mysqlQuery("SELECT * FROM DeviceTbl WHERE DevNo = ?", No, function (err, device) {
                         if (err) {
                             console.log('[SELECT ERROR] - ', err.message);
