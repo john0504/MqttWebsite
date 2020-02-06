@@ -54,6 +54,7 @@ DROP TABLE IF EXISTS `AllowTbl`;
 CREATE TABLE `AllowTbl` (
   `DevNo` char(12) NOT NULL,
   `ExpireDate` int(11) DEFAULT NULL,
+  `GroupNo` int(11) DEFAULT NULL,
   PRIMARY KEY (`DevNo`),
   UNIQUE KEY `DevNo` (`DevNo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -82,6 +83,7 @@ CREATE TABLE `DeviceTbl` (
   `PrjName` char(4) CHARACTER SET latin1 DEFAULT NULL,
   `DevAlias` char(128) CHARACTER SET latin1 DEFAULT NULL,
   `VerNum` int(11) DEFAULT NULL,
+  `SaaModel` char(128) CHARACTER SET latin1 DEFAULT NULL,
   `GroupNo` int(11) DEFAULT NULL,
   `S01` char(128) CHARACTER SET latin1 DEFAULT NULL,
   `S02` char(128) CHARACTER SET latin1 DEFAULT NULL,
@@ -129,6 +131,46 @@ LOCK TABLES `FirmwareTbl` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `HistoryTbl`
+--
+
+DROP TABLE IF EXISTS `HistoryTbl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `HistoryTbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `DevNo` char(12) DEFAULT NULL,
+  `H60` int(11) DEFAULT NULL,
+  `H61` int(11) DEFAULT NULL,
+  `H62` int(11) DEFAULT NULL,
+  `H63` int(11) DEFAULT NULL,
+  `H64` int(11) DEFAULT NULL,
+  `H65` int(11) DEFAULT NULL,
+  `H66` int(11) DEFAULT NULL,
+  `H67` int(11) DEFAULT NULL,
+  `H68` int(11) DEFAULT NULL,
+  `H69` int(11) DEFAULT NULL,
+  `H6A` int(11) DEFAULT NULL,
+  `H6B` int(11) DEFAULT NULL,
+  `H6C` int(11) DEFAULT NULL,
+  `H6D` int(11) DEFAULT NULL,
+  `H6E` int(11) DEFAULT NULL,
+  `H6F` int(11) DEFAULT NULL,
+  `DateCode` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `HistoryTbl`
+--
+
+LOCK TABLES `HistoryTbl` WRITE;
+/*!40000 ALTER TABLE `HistoryTbl` DISABLE KEYS */;
+/*!40000 ALTER TABLE `HistoryTbl` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `MessageTbl`
 --
 
@@ -156,7 +198,7 @@ CREATE TABLE `MessageTbl` (
   `H6F` int(11) DEFAULT NULL,
   `DateCode` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1762 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -208,6 +250,7 @@ DROP TABLE IF EXISTS `TempTbl`;
 CREATE TABLE `TempTbl` (
   `DevNo` char(12) NOT NULL,
   `ExpireDate` int(11) DEFAULT NULL,
+  `GroupNo` int(11) DEFAULT NULL,
   PRIMARY KEY (`DevNo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
