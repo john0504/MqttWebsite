@@ -32,7 +32,7 @@
 <body><a href="/machine">回到列表</a>
     <h1>機台 - 圖表</h1>
 
-    <h2><%= chartdate.getFullYear() + "年" + (chartdate.getMonth() + 1) + "月 : " + DevName + "  本月累積總幣量 : " + totalMoney + "  本月累積總出貨數 : " + totalGift %> </h2>
+    <h2><%= chartdate.getFullYear() + "年" + (chartdate.getMonth() + 1) + "月 : " + DevName %>  &nbsp;  &nbsp; &nbsp; &nbsp; <%= "本月累積總幣量 : " + totalMoney  %>  &nbsp;  &nbsp; &nbsp; &nbsp; <%= "本月累積總出貨數 : " + totalGift %> </h2>
     <input type="number" name="year" placeholder="輸入年份" value="<%= chartdate.getFullYear() %>" />
     <input type="number" name="month" placeholder="輸入月份" value="<%= chartdate.getMonth() + 1%>"  />
     <input type="button" name="search" value="前往" class="btn"
