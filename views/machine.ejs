@@ -193,6 +193,18 @@
                 <% } %></th>
             <th>WiFi版本</th>
             <th>SAA版本</th>
+            <th>創建時間
+                <% if(order == "a.CreateDate asc") { %>
+                <input type="button" name="order" value="▼"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate desc');" />
+                <% } else if (order == "a.CreateDate desc"){ %>
+                <input type="button" name="order" value="▲"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate asc');" />
+                <% } else { %>
+                <input type="button" name="order" value="▽"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate asc');" />
+                <% } %>
+            </th>
             <th>使用期限
                 <% if(order == "a.ExpireDate asc") { %>
                 <input type="button" name="order" value="▼"
@@ -203,18 +215,6 @@
                 <% } else { %>
                 <input type="button" name="order" value="▽"
                     onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.ExpireDate asc');" />
-                <% } %>
-            </th>
-            <th>使用期限
-                <% if(order == "a.CreateDate asc") { %>
-                <input type="button" name="order" value="▼"
-                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate desc');" />
-                <% } else if (order == "a.CreateDate desc"){ %>
-                <input type="button" name="order" value="▲"
-                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate asc');" />
-                <% } else { %>
-                <input type="button" name="order" value="▽"
-                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate asc');" />
                 <% } %>
             </th>
             <th>狀態</th>
@@ -243,7 +243,13 @@
                 <%= data[i].SaaModel  %>
             </td>
             <td>
-                <% var date = new Date(data[i].ExpireDate * 1000); %>
+                <% var date = new Date(data[i].CreateDate * 1000); %>
+                <%= date.getFullYear() + "-" 
+                    + (date.getMonth() + 1) + "-" 
+                    + date.getDate() %>
+            </td>
+            <td>
+                <% var date = new Date(data[i].CreateDate * 1000); %>
                 <%= date.getFullYear() + "-" 
                     + (date.getMonth() + 1) + "-" 
                     + date.getDate() %>
