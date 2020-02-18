@@ -205,6 +205,18 @@
                     onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.ExpireDate asc');" />
                 <% } %>
             </th>
+            <th>使用期限
+                <% if(order == "a.CreateDate asc") { %>
+                <input type="button" name="order" value="▼"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate desc');" />
+                <% } else if (order == "a.CreateDate desc"){ %>
+                <input type="button" name="order" value="▲"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate asc');" />
+                <% } else { %>
+                <input type="button" name="order" value="▽"
+                    onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.CreateDate asc');" />
+                <% } %>
+            </th>
             <th>狀態</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>

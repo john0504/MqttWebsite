@@ -255,6 +255,8 @@ router.get('/machineChart', function (req, res, next) {
         var labels = [];
         var moneyDataSet = { data: [], backgroundColor: [], borderColor: [] };
         var giftDataSet = { data: [], backgroundColor: [], borderColor: [] };
+        var totalMoney = 0;
+        var totalGift = 0;
 
         for (var datecode = datecodeStart; datecode < datecodeEnd; datecode += 86400) {
             var dataExist = false;
@@ -268,10 +270,12 @@ router.get('/machineChart', function (req, res, next) {
                         moneyDataSet.data.push((data[i].H68 << 16) + data[i].H69);
                         moneyDataSet.backgroundColor.push('rgba(255, 99, 132, 0.2)');
                         moneyDataSet.borderColor.push('rgba(255, 99, 132, 1)');
+                        totalGift += ((data[i].H68 << 16) + data[i].H69);
 
                         giftDataSet.data.push((data[i].H6A << 16) + data[i].H6B);
                         giftDataSet.backgroundColor.push('rgba(54, 162, 235, 0.2)');
                         giftDataSet.borderColor.push('rgba(54, 162, 235, 1)');
+                        totalGift += ((data[i].H6A << 16) + data[i].H6B);
                     } else {
                         var date = new Date(data[i].DateCode * 1000);
                         labels.push((date.getMonth() + 1) + "-" + date.getDate());
@@ -302,7 +306,9 @@ router.get('/machineChart', function (req, res, next) {
         }
 
 
-        res.render('machineChart', { title: 'Machine Chart', DevNo: DevNo, DevName: DevName, index: index, chartdate: chartdate, labels: labels, moneyDataSet: moneyDataSet, giftDataSet: giftDataSet });
+        res.render('machineChart', { title: 'Machine Chart', DevNo: DevNo, DevName: DevName, 
+            index: index, chartdate: chartdate, labels: labels, moneyDataSet: moneyDataSet, 
+            giftDataSet: giftDataSet, totalMoney: totalMoney, totalGift: totalGift });
     });
 
 });
