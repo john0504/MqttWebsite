@@ -263,6 +263,8 @@ client.on('message', function (topic, msg) {
                     var topic = '';
                     var content = '';
                     var title = '';
+                    var image = '';
+                    var color = '';
                     var token = msgs[0].AccountNo.toString(16);
                     if (token.length == 1) {
                         token = "000" + token;
@@ -275,10 +277,14 @@ client.on('message', function (topic, msg) {
                         topic = `${token}-${No}-Gift`;
                         content = '機台 ' + msgs[0].DevName + ' 已出貨！';
                         title = '出貨通知';
+                        image = 'https://firebasestorage.googleapis.com/v0/b/wawa-63463.appspot.com/o/icon2.png?alt=media&token=94712762-34b8-49df-a422-de9d3380c284';
+                        color = '#12FFF0';
                     } else if (msgs[0].H69 != obj.H69) {
                         topic = `${token}-${No}-Money`;
                         content = '機台 ' + msgs[0].DevName + ' 已被投幣！';
                         title = '投幣通知';
+                        image = 'https://firebasestorage.googleapis.com/v0/b/wawa-63463.appspot.com/o/icon.png?alt=media&token=cf3b884b-ad1b-4f79-810c-1bd0e76a8e3d';
+                        color = '#FFC920';
                     }
                     var message = {
                         to: '/topics/' + topic,
@@ -288,8 +294,8 @@ client.on('message', function (topic, msg) {
                             body: content,
                             sound: 'Enabled',
                             // icon: "fcm_push_icon",
-                            image: 'https://firebasestorage.googleapis.com/v0/b/wawa-63463.appspot.com/o/icon.png?alt=media&token=cf3b884b-ad1b-4f79-810c-1bd0e76a8e3d',
-                            color: '#12FFF0'
+                            image: image,
+                            color: color
                         }
                     };
                     fcm.send(message, function (err, response) {
