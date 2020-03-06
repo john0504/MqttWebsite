@@ -2,6 +2,8 @@ var express = require('express'),
     router = express.Router();
 
 router.get('/az', function (req, res) {
+    req.setTimeout(60 * 1000);
+    res.setTimeout(60 * 1000);
     var mysqlQuery = req.mysqlQuery;
     var DevNo = req.headers["devno"];
     var sha1 = req.headers["sha1"];
@@ -28,6 +30,8 @@ router.get('/az', function (req, res) {
 });
 
 router.get('/azz', function (req, res) {
+    req.setTimeout(60 * 1000);
+    res.setTimeout(60 * 1000);
     var mysqlQuery = req.mysqlQuery;
     var sha1 = req.query["sha1"];
 
