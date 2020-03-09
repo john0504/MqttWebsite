@@ -20,15 +20,12 @@ router.get('/az', function (req, res) {
                     return;
                 }
                 if (firmware && firmware.length > 0) {
-                    var fs = require('fs');
-                    // res.status(200).send(fs.readFileSync(`./${firmware[0].FilePath}`));
-                    res.status(200).send(fs.readFile(`./${firmware[0].FilePath}`, function (err, data) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            console.log(data.length + ' bytes');
-                        }
-                    }));
+                    try {
+                        var fs = require('fs');
+                        res.status(200).send(fs.readFileSync(`./${firmware[0].FilePath}`));
+                    } catch (err) {
+                        console.log(err);
+                    }
                 }
             });
         }
