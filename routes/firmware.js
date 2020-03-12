@@ -172,7 +172,8 @@ router.post('/ota', function (req, res, next) {
         sha1: sha1,
         OTA: OTA,
         VerNum: parseInt(VerNum, 10),
-        url: url
+        url: url,
+        CmdTimeStamp: Date.now() / 1000
     };
     if (CheckStart != 'checked') {
         paylod.RunTime = timestamp;

@@ -432,7 +432,7 @@ client.on('message', function (topic, msg) {
 
                                     var DevNo = result[0].DevNo
                                     var mytopic = `${PrjName}/${DevNo}/D`;
-                                    var mymsg = { Account: "0000", Owner: No };
+                                    var mymsg = { Account: "0000", Owner: No, CmdTimeStamp: Date.now() / 1000 }
                                     client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
 
                                     var mytopic = `WAWA/${DevNo}/C`;

@@ -306,9 +306,11 @@ router.get('/machineChart', function (req, res, next) {
         }
 
 
-        res.render('machineChart', { title: 'Machine Chart', DevNo: DevNo, DevName: DevName, 
-            index: index, chartdate: chartdate, labels: labels, moneyDataSet: moneyDataSet, 
-            giftDataSet: giftDataSet, totalMoney: totalMoney, totalGift: totalGift });
+        res.render('machineChart', {
+            title: 'Machine Chart', DevNo: DevNo, DevName: DevName,
+            index: index, chartdate: chartdate, labels: labels, moneyDataSet: moneyDataSet,
+            giftDataSet: giftDataSet, totalMoney: totalMoney, totalGift: totalGift
+        });
     });
 
 });
@@ -404,7 +406,7 @@ router.get('/machineDelete', function (req, res, next) {
         client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: false });
 
         var mytopic = `WAWA/${DevNo}/D`;
-        var mymsg = { Account: "0000", Owner: token };
+        var mymsg = { Account: "0000", Owner: token, CmdTimeStamp: Date.now() / 1000 };
         client.publish(mytopic, JSON.stringify(mymsg), { qos: 1, retain: true });
 
         var mytopic = `WAWA/${DevNo}/C`;
