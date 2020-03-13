@@ -55,7 +55,7 @@ router.post('/firmwareAdd', function (req, res, next) {
         var sha1 = fields.sha1;
         var url = fields.url;
         var FilePath = files.FilePath.name;
-        var newFile = "./" + FilePath;
+        var newFile = "./public/nfw" + FilePath;
         fs.readFile(files.FilePath.path, function (err, data) {
             fs.writeFile(newFile, data, function (err) {
                 if (err) {
