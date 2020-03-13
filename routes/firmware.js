@@ -55,7 +55,7 @@ router.post('/firmwareAdd', function (req, res, next) {
         var sha1 = fields.sha1;
         var url = fields.url;
         var FilePath = files.FilePath.name;
-        var newFile = "./public/nfw" + FilePath;
+        var newFile = "./public/nfw/" + FilePath;
         fs.readFile(files.FilePath.path, function (err, data) {
             fs.writeFile(newFile, data, function (err) {
                 if (err) {
@@ -72,7 +72,7 @@ router.post('/firmwareAdd', function (req, res, next) {
                     VerNum: VerNum,
                     sha1: sha1,
                     url: url,
-                    FilePath: FilePath
+                    FilePath: "public/nfw/" + FilePath
                 };
                 mysqlQuery('INSERT IGNORE INTO FirmwareTbl SET ?', sql, function (err, rows) {
                     if (err) {
