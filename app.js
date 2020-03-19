@@ -469,7 +469,7 @@ client.on('message', function (topic, msg) {
 console.log("Monthly History Start");
 
 var date = new Date(Date.now());
-date.setMonth(1);
+date.setMonth(2);
         date.setDate(1);
         date.setHours(0, 0, 0, 0);
         var timestamp = parseInt(date.getTime() / 1000);
