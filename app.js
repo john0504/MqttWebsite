@@ -12,6 +12,7 @@ var routes = require('./routes/index');
 var login = require('./routes/login');
 var logout = require('./routes/logout');
 var machine = require('./routes/machine');
+var monthly = require('./routes/monthly');
 var user = require('./routes/user');
 var store = require('./routes/store');
 var reg = require('./routes/reg');
@@ -464,6 +465,44 @@ client.on('message', function (topic, msg) {
 
 //===========================================
 
+
+console.log("Monthly History Start");
+
+var date = new Date(Date.now());
+date.setMonth(1);
+        date.setDate(1);
+        date.setHours(0, 0, 0, 0);
+        var timestamp = parseInt(date.getTime() / 1000);
+        var pastTimestamp = timestamp - 60 * 60 * 24;
+        var pastdate = new Date(pastTimestamp * 1000);
+        pastdate.setDate(1);
+        pastdate.setHours(0, 0, 0, 0);
+        pastTimestamp = parseInt(pastdate.getTime() / 1000);
+        var sqlstring = "SELECT DevNo, SUM(H68) as H68, SUM(H69) as H69, SUM(H6A) as H6A, SUM(H6B) as H6B FROM HistoryTbl WHERE DateCode > ? AND DateCode < ?  Group by DevNo";
+        mysqlQuery(sqlstring, [pastTimestamp, timestamp], function (err, pastHistory) {
+            pastHistory.forEach(history => {
+                var insertSql = {
+                    DevNo: history.DevNo,
+                    money: (history.H68 << 8) + history.H69,
+                    gift: (history.H6A << 8) + history.H6B,
+                    DateCode: pastTimestamp
+                };
+                var sqlstring = "INSERT INTO MonthlyTbl SET ?";
+                mysqlQuery(sqlstring, insertSql, function (err, result) {
+                    if (err) {
+                        console.log('[INSERT ERROR] - ', err.message);
+                        return;
+                    }
+                });
+            });
+            if (err) {
+                console.log('[SELECT ERROR] - ', err.message);
+                return;
+            }
+        });
+
+// ================================
+
 setInterval(function () {
     var date = new Date(Date.now());
     if (date.getHours() == 1) {
@@ -619,6 +658,7 @@ app.use('/reg', reg);
 app.use('/login', login);
 app.use('/logout', logout);
 app.use('/machine', machine);
+app.use('/monthly', monthly);
 app.use('/store', store);
 app.use('/user', user);
 app.use('/api:1', api);

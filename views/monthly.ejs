@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script>
+
+        function Chart(DevNo, DevName, DateCode) {
+            var pastdate = new Date(DateCode * 1000);
+            var date = new Date(Date.now());
+            var getyear = date.getFullYear();
+            var getmonth = date.getMonth();
+            var index = (pastdate.getFullYear() - getyear) * 12 + (pastdate.getMonth() - getmonth);
+            window.location.href = `/machine/machineChart?DevNo=${DevNo}&DevName=${DevName}&index=${index}`;
+        }
+
+        function Next(DevNo, datecode, index) {
+            window.location.href = `/monthly?index=${++index}&DevNo=${DevNo}&datecode=${datecode}`;
+        }
+
+        function Past(DevNo, datecode, index) {
+            window.location.href = `/monthly?index=${index - 1}&DevNo=${DevNo}&datecode=${datecode}`;
+        }
+
+        function Go(DevNo, datecode) {
+            var index = document.getElementsByName('pageindex')[0].value - 1;
+            window.location.href = `/monthly?index=${index}&DevNo=${DevNo}&datecode=${datecode}`;
+        }
+
+        function Search() {
+            var year = document.getElementsByName('year')[0].value;
+            var month = document.getElementsByName('month')[0].value - 1;
+            var date = new Date(Date.now());
+            date.setFullYear(year, month, 1);
+            date.setHours(0, 0, 0);
+            var datecode = parseInt(date.getTime() / 1000);
+            window.location.href = `/monthly?datecode=${datecode}`;
+        }
+
+        function SearchDevNo() {
+            var DevNo = document.getElementsByName('SearchDevNo')[0].value;
+            if (DevNo.length == 0) {
+                window.location.href = "/monthly";
+                return true;
+            }
+            var regex = /^([A-Z0-9])+$/;
+            if (DevNo.length != 0 && !regex.test(DevNo)) {
+                return false;
+            }
+            window.location.href = `/monthly?DevNo=${DevNo}`;
+        }
+    </script>
+</head>
+
+<body>
+    <% if (locals.Name) { %>
+    <table border="0" align="right">
+        <tr>
+            <th>
+                <h3>您好, <%= Name %></h1>
+            </th>
+            <th><a href="/logout">登出</a></th>
+        </tr>
+    </table>
+    <% } %>
+    <img src="/img/logo.png" class="logo-left">
+    <table border="0" align="center">
+        <tr>
+            <% if (locals.SuperUser == 1) { %>
+            <th><a href="/firmware">OTA</a></th>
+            <th><a href="/serial">白名單</a></th>
+            <th><a href="/payment">加值卡</a></th>
+            <% } %>
+            <th><a href="/user">用戶</a></th>
+            <th><a href="/machine">機台</a></th>
+            <th><a href="/monthly">報表</a></th>
+        </tr>
+    </table>
+    <h1>報表</h1>
+    <input type="number" name="year" placeholder="輸入年份" value="<%= monthlydate.getFullYear() %>" />
+    <input type="number" name="month" placeholder="輸入月份" value="<%= monthlydate.getMonth() + 1%>" />
+    <input type="button" name="search" value="前往" class="btn" onclick="Search();" />
+    <br />
+    <input type="text" name="SearchDevNo" placeholder="搜尋產品序號" value="<%= DevNo %>" />
+    <input type="button" name="search" value="搜尋" class="btn" onclick="SearchDevNo();" />
+    <table class="table">
+        <tr>
+            <th>編號</th>
+            <th>機台名稱</th>
+            <th>所有者</th>
+            <th>序號</th>
+            <th>當月總投幣數目</th>
+            <th>當月總出獎數目</th>
+            <th>紀錄時間</th>
+        </tr>
+        <% for ( var i = 0 ; i < data.length ; i++){ %>
+        <tr>
+            <td>
+                <%= linePerPage*index+(i+1) %>
+            </td>
+            <td>
+                <%= data[i].DevName  %>
+            </td>
+            <td>
+                <%= data[i].Account  %>
+            </td>
+            <td>
+                <%= data[i].DevNo  %>
+            </td>
+            <td>
+                <%= data[i].money  %>
+            </td>
+            <td>
+                <%= data[i].gift  %>
+            </td>
+            <td>
+                <% var date = new Date(data[i].DateCode * 1000); %>
+                <%= date.getFullYear() + "-" + (date.getMonth() + 1) %>
+            </td>
+            <td>
+                <input type="button" name="chart" value="圖表" class="btn"
+                    onclick="Chart('<%= data[i].DevNo  %>', '<%= data[i].DevName %>' , '<%= data[i].DateCode %>'  );" />
+            </td>
+        </tr>
+        <% } %>
+    </table>
+    <% if(index > 0) { %>
+    <input type="button" name="past" value="上一頁" class="btn"
+        onclick="Past('<%= DevNo %>', '<%= datecode %>','<%= index %>');" />
+    <% } else { %>
+    <input type="button" name="past" value="上一頁" class="btn" disabled="true" />
+    <% } %>
+    <%= index+1  %>/<%= totalPage  %>
+    <% if(index < totalPage - 1) { %>
+    <input type="button" name="next" value="下一頁" class="btn"
+        onclick="Next('<%= DevNo %>', '<%= datecode %>','<%= index %>');" />
+    <% } else { %>
+    <input type="button" name="next" value="下一頁" class="btn" disabled="true" />
+    <% } %>
+    <br>
+    <input type="number" name="pageindex" placeholder="輸入頁碼" value="<%= index  + 1 %>" />
+    <input type="button" name="search" value="前往" class="btn" onclick="Go('<%= DevNo %>', '<%= datecode %>');" />
+</body>
+
+</html>

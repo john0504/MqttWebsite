@@ -29,9 +29,21 @@
     </script>
 </head>
 
-<body><a href="/machine">回到列表</a>
+<body>
+    <table border="0" align="center">
+            <tr>
+                    <input class="btn" type='button' value='上一頁' onclick="javascript: window.history.back();">
+                <% if (locals.SuperUser == 1) { %>
+                <th><a href="/firmware">OTA</a></th>
+                <th><a href="/serial">白名單</a></th>
+                <th><a href="/payment">加值卡</a></th>
+                <% } %>
+                <th><a href="/user">用戶</a></th>
+                <th><a href="/machine">機台</a></th>
+                <th><a href="/monthly">報表</a></th>
+            </tr>
+        </table>
     <h1>機台 - 圖表</h1>
-
     <h2><%= chartdate.getFullYear() + "年" + (chartdate.getMonth() + 1) + "月 : " + DevName %>  &nbsp;  &nbsp; &nbsp; &nbsp; <%= "本月累積總幣量 : " + totalMoney  %>  &nbsp;  &nbsp; &nbsp; &nbsp; <%= "本月累積總出貨數 : " + totalGift %> </h2>
     <input type="number" name="year" placeholder="輸入年份" value="<%= chartdate.getFullYear() %>" />
     <input type="number" name="month" placeholder="輸入月份" value="<%= chartdate.getMonth() + 1%>"  />
