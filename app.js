@@ -540,6 +540,7 @@ setInterval(function () {
         });
     } else if (date.getDate() == 1 && date.getHours() == 2) {
         console.log("Monthly History Start");
+        date.setDate(1);
         date.setHours(0, 0, 0, 0);
         var timestamp = parseInt(date.getTime() / 1000);
         var pastTimestamp = timestamp - 60 * 60 * 24;
@@ -547,13 +548,13 @@ setInterval(function () {
         pastdate.setDate(1);
         pastdate.setHours(0, 0, 0, 0);
         pastTimestamp = parseInt(pastdate.getTime() / 1000);
-        var sqlstring = "SELECT DevNo, SUM(H68), SUM(H69), SUM(H6A), SUM(H6B) FROM HistoryTbl WHERE DateCode > ? AND DateCode < ?";
-        mysqlQuery(sqlstring, pastTimestamp, timestamp, function (err, pastHistory) {
+        var sqlstring = "SELECT DevNo, SUM(H68) as H68, SUM(H69) as H69, SUM(H6A) as H6A, SUM(H6B) as H6B FROM HistoryTbl WHERE DateCode > ? AND DateCode < ?  Group by DevNo";
+        mysqlQuery(sqlstring, [pastTimestamp, timestamp], function (err, pastHistory) {
             pastHistory.forEach(history => {
                 var insertSql = {
                     DevNo: history.DevNo,
-                    money: history.H68 << 8 + history.H69,
-                    gift: history.H6A << 8 + history.H6B,
+                    money: (history.H68 << 8) + history.H69,
+                    gift: (history.H6A << 8) + history.H6B,
                     DateCode: pastTimestamp
                 };
                 var sqlstring = "INSERT INTO MonthlyTbl SET ?";
