@@ -538,7 +538,38 @@ setInterval(function () {
                 });
             });
         });
-    } else if (date.getDate() == 1 && date.getHours() == 3) {
+    } else if (date.getDate() == 1 && date.getHours() == 2) {
+        console.log("Monthly History Start");
+        date.setHours(0, 0, 0, 0);
+        var timestamp = parseInt(date.getTime() / 1000);
+        var pastTimestamp = timestamp - 60 * 60 * 24;
+        var pastdate = new Date(pastTimestamp * 1000);
+        pastdate.setDate(1);
+        pastdate.setHours(0, 0, 0, 0);
+        pastTimestamp = parseInt(pastdate.getTime() / 1000);
+        var sqlstring = "SELECT DevNo, SUM(H68), SUM(H69), SUM(H6A), SUM(H6B) FROM HistoryTbl WHERE DateCode > ? AND DateCode < ?";
+        mysqlQuery(sqlstring, pastTimestamp, timestamp, function (err, pastHistory) {
+            pastHistory.forEach(history => {
+                var insertSql = {
+                    DevNo: history.DevNo,
+                    money: history.H68 << 8 + history.H69,
+                    gift: history.H6A << 8 + history.H6B,
+                    DateCode: pastTimestamp
+                };
+                var sqlstring = "INSERT INTO MonthlyTbl SET ?";
+                mysqlQuery(sqlstring, insertSql, function (err, result) {
+                    if (err) {
+                        console.log('[INSERT ERROR] - ', err.message);
+                        return;
+                    }
+                });
+            });
+            if (err) {
+                console.log('[SELECT ERROR] - ', err.message);
+                return;
+            }
+        });
+    } else if (date.getDate() == 1 && date.getHours() == 5) {
         console.log("Monthly MessageTbl Clear Start");
         date.setHours(0, 0, 0, 0);
         var timestamp = parseInt(date.getTime() / 1000);
