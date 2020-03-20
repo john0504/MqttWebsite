@@ -475,7 +475,7 @@ client.on('message', function (topic, msg) {
         pastdate.setDate(1);
         pastdate.setHours(0, 0, 0, 0);
         pastTimestamp = parseInt(pastdate.getTime() / 1000);
-        var sqlstring = "SELECT DevNo, SUM(H68) as H68, SUM(H69) as H69, SUM(H6A) as H6A, SUM(H6B) as H6B FROM HistoryTbl WHERE DateCode >= ? AND DateCode < ? AND H68 = 0 AND H69 <= 1000 AND H6A = 0 AND H6B <= 1000 Group by DevNo";
+        var sqlstring = "SELECT DevNo, SUM(H68) as H68, SUM(H69) as H69, SUM(H6A) as H6A, SUM(H6B) as H6B FROM HistoryTbl WHERE DateCode >= ? AND DateCode < ? AND H68 <= 1 AND H69 <= 1000 AND H6A <= 1 AND H6B <= 1000 Group by DevNo";
         mysqlQuery(sqlstring, [pastTimestamp, timestamp], function (err, pastHistory) {
             pastHistory.forEach(history => {
                 var insertSql = {
@@ -582,7 +582,7 @@ setInterval(function () {
         pastdate.setDate(1);
         pastdate.setHours(0, 0, 0, 0);
         pastTimestamp = parseInt(pastdate.getTime() / 1000);
-        var sqlstring = "SELECT DevNo, SUM(H68) as H68, SUM(H69) as H69, SUM(H6A) as H6A, SUM(H6B) as H6B FROM HistoryTbl WHERE DateCode >= ? AND DateCode < ? AND H69 <= 1000 AND H6B <= 1000 Group by DevNo";
+        var sqlstring = "SELECT DevNo, SUM(H68) as H68, SUM(H69) as H69, SUM(H6A) as H6A, SUM(H6B) as H6B FROM HistoryTbl WHERE DateCode >= ? AND DateCode < ? AND H68 <= 1 AND H69 <= 1000 AND H6A <= 1 AND H6B <= 1000 Group by DevNo";
         mysqlQuery(sqlstring, [pastTimestamp, timestamp], function (err, pastHistory) {
             pastHistory.forEach(history => {
                 var insertSql = {
