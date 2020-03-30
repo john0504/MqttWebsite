@@ -390,7 +390,7 @@ client.on('message', function (topic, msg) {
                 });
             } else if (obj.action == "gifttime") {
                 var DevNo = obj.DevNo;
-                mysqlQuery('SELECT a.DevTime, a.H68, a.H69, b.ExpireDate FROM MessageTbl as a LEFT JOIN DeviceTbl as b on a.DevNo = b.DevNo WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 11', DevNo, function (err, msgs) {
+                mysqlQuery('SELECT a.DevTime, a.H68, a.H69, b.ExpireDate FROM MessageTbl as a LEFT JOIN DeviceTbl as b on a.DevNo = b.DevNo WHERE id in (SELECT min(id) FROM MessageTbl WHERE DevNo = ? GROUP BY H6B ORDER BY min(id) desc) ORDER BY id desc LIMIT 31', DevNo, function (err, msgs) {
                     var timelist = [];
                     var moneyList = [];
                     var index = 0;
