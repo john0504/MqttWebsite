@@ -185,6 +185,10 @@ router.post('/userEdit', function (req, res, next) {
         sql.Enable = req.body.Enable;
     }
 
+    if (req.body.SuperUser) {
+        sql.SuperUser = req.body.SuperUser;
+    }
+
     mysqlQuery('UPDATE AccountTbl SET ? WHERE AccountNo = ?', [sql, AccountNo], function (err, accounts) {
         if (err) {
             console.log(err);
