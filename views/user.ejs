@@ -99,6 +99,7 @@
             <th>名稱</th>
             <th>建立日期</th>
             <th>狀態</th>
+            <th>後台權限</th>
         </tr>
         <% for ( var i = 0 ; i < data.length ; i++){ %>
         <tr>
@@ -125,6 +126,13 @@
                 啟用
                 <% } else { %>
                 禁用
+                <% } %>
+            </td>
+            <td>
+                <% if(data[i].SuperUser > 0) { %>
+                啟用
+                <% } else { %>
+                
                 <% } %>
             </td>
             <td>
