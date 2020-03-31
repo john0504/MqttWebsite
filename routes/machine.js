@@ -32,13 +32,13 @@ router.get('/', function (req, res, next) {
     var totalPage = 0;
     var mysqlQuery = req.mysqlQuery;
     var sql = 'SELECT count(*) as count from DeviceTbl'
-    if (req.session.SuperUser == 0) {
+    if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
         sql += (` WHERE AccountNo = ${req.session.AccountNo}`);
     }
     mysqlQuery(sql, function (err, dev) {
         sql = 'SELECT count(*) as count from DeviceTbl'
         sql += (` WHERE UpdateDate >= ${timenow}`);
-        if (req.session.SuperUser == 0) {
+        if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
             sql += (` AND AccountNo = ${req.session.AccountNo}`);
         }
         mysqlQuery(sql, function (err, dev2) {
@@ -47,7 +47,7 @@ router.get('/', function (req, res, next) {
             totalPage = Math.ceil(total / linePerPage);
             sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
 
-            if (req.session.SuperUser == 0) {
+            if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
                 sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
             }
             // sql += (` order by a.DevName asc`);
@@ -93,7 +93,7 @@ router.get('/search', function (req, res, next) {
 
     var sql = 'SELECT count(*) as count from DeviceTbl'
     sql += (` WHERE UpdateDate >= ${timenow}`);
-    if (req.session.SuperUser == 0) {
+    if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
         sql += (` AND AccountNo = ${req.session.AccountNo}`);
     }
     mysqlQuery(sql, function (err, dev2) {
@@ -120,7 +120,7 @@ router.get('/search', function (req, res, next) {
                 sql += (` AND b.Account LIKE '%${Account}%'`);
             }
         }
-        if (req.session.SuperUser == 0) {
+        if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
             if (!haswhere) {
                 sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
                 haswhere = true;
@@ -153,7 +153,7 @@ router.get('/search', function (req, res, next) {
                     sql += (` AND b.Account LIKE '%${Account}%'`);
                 }
             }
-            if (req.session.SuperUser == 0) {
+            if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
                 if (!haswhere) {
                     sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
                     haswhere = true;

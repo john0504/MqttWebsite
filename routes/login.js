@@ -60,6 +60,10 @@ router.post('/', function (req, res, next) {
             res.locals.error = '使用者被拒絕存取';
             res.render('login', { title: res.locals.error });
             return;
+        } else if (result[0].SuperUser == 0) {
+            res.locals.error = '使用者權限不足';
+            res.render('login', { title: res.locals.error });
+            return;
         } else {
             //設定session
             req.session.Name = result[0].Name;

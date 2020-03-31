@@ -69,7 +69,7 @@ router.get('/search', function (req, res, next) {
     var SearchAccount = req.query.SearchAccount;
     var mysqlQuery = req.mysqlQuery;
 
-    if (req.session.SuperUser != 0) {
+    if (req.session.SuperUser == 1 || req.session.SuperUser == 2) {
         var sql = `SELECT count(*) as count from AccountTbl WHERE Account LIKE '%${SearchAccount}%'`;
         mysqlQuery(sql, function (err, acc) {
             var total = acc[0].count;

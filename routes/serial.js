@@ -104,7 +104,7 @@ router.get('/search', function (req, res, next) {
     var SearchAllowGroup = "";
     var mysqlQuery = req.mysqlQuery;
 
-    if (req.session.SuperUser != 0) {
+    if (req.session.SuperUser == 1 || req.session.SuperUser == 2) {
         mysqlQuery('SELECT * FROM AllowTbl WHERE DevNo LIKE ?', `%${SearchAllow}%`, function (err, allows) {
             if (err) {
                 console.log(err);
@@ -132,7 +132,7 @@ router.get('/searchGroup', function (req, res, next) {
     var SearchAllowGroup = req.query.SearchAllowGroup;
     var mysqlQuery = req.mysqlQuery;
 
-    if (req.session.SuperUser != 0) {
+    if (req.session.SuperUser == 1 || req.session.SuperUser == 2) {
         mysqlQuery('SELECT * FROM AllowTbl WHERE GroupNo = ?', `${SearchAllowGroup}`, function (err, allows) {
             if (err) {
                 console.log(err);

@@ -73,7 +73,7 @@
         </tr>
     </table>
     <h1>用戶 - 列表</h1>
-    <% if (locals.SuperUser != 0) { %>
+    <% if (locals.SuperUser == 1 || locals.SuperUser == 2) { %>
     <div class="control">
         <input class="btn" type='submit' value='新增' onclick="javascript: location.href='/user/add'">
     </div>
