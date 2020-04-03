@@ -92,7 +92,7 @@ client.on('connect', function () {
     console.log('MQTT server connected.');
     client.subscribe("WAWA/#");
     var topic = `WAWA2/AppVersion`;
-    var paylod = `2.4.20200306`;
+    var paylod = `2.4.20200326`;
     client.publish(topic, paylod, { qos: 1, retain: true });
 });
 
