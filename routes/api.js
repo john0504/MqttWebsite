@@ -2,7 +2,7 @@ var express = require('express'),
     router = express.Router();
 var crypto = require('crypto');
 
-var uid = "42689212";
+var uid = "0952752498";
 var pwd = "";
 
 router.put('/session', function (req, res) {
