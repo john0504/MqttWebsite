@@ -238,6 +238,7 @@
             <td>
                 <%= data[i].DevNo  %>
             </td>
+            <% if (locals.SuperUser < 4) { %>
             <td>
                 <%= data[i].GroupNo  %>
             </td>
@@ -247,6 +248,7 @@
             <td>
                 <%= data[i].SaaModel  %>
             </td>
+            <% } %>
             <td>
                 <% var date = new Date(data[i].CreateDate * 1000); %>
                 <%= date.getFullYear() + "-" 
