@@ -37,9 +37,7 @@ router.get('/', function (req, res, next) {
     } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
         sql += (` WHERE GroupNo = 68`);
     }
-    console.log(`debug============1`);
     mysqlQuery(sql, function (err, dev) {
-        console.log(`debug============2`);
         sql = 'SELECT count(*) as count from DeviceTbl'
         sql += (` WHERE UpdateDate >= ${timenow}`);
         if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
@@ -48,7 +46,6 @@ router.get('/', function (req, res, next) {
             sql += (` WHERE GroupNo = 68`);
         }
         mysqlQuery(sql, function (err, dev2) {
-            console.log(`debug============3`);
             totalOnline = dev2[0].count;
             var total = dev[0].count;
             totalPage = Math.ceil(total / linePerPage);
@@ -61,9 +58,8 @@ router.get('/', function (req, res, next) {
             }
             // sql += (` order by a.DevName asc`);
             sql += (` limit ${index * linePerPage},${linePerPage}`);
-
+            console.log(`debug============ ${sql}`);
             mysqlQuery(sql, function (err, devices) {
-                console.log(`debug============4`);
                 if (err) {
                     console.log(err);
                 }
