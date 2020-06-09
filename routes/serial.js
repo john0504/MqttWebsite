@@ -78,7 +78,7 @@ router.post('/serialAdd', function (req, res, next) {
             if (GroupNo) {
                 sql.GroupNo = GroupNo;
             }
-            mysqlQuery('INSERT REPLACE INTO TempTbl SET ?', sql, function (err, rows) {
+            mysqlQuery('REPLACE INTO TempTbl SET ?', sql, function (err, rows) {
                 if (err) {
                     console.log(err);
                 }
@@ -233,7 +233,7 @@ router.get('/move', function (req, res, next) {
 
     var mysqlQuery = req.mysqlQuery;
 
-    mysqlQuery('INSERT REPLACE INTO AllowTbl(DevNo,ExpireDate,GroupNo) SELECT DevNo,ExpireDate,GroupNo FROM TempTbl', function (err, rows) {
+    mysqlQuery('REPLACE INTO AllowTbl(DevNo,ExpireDate,GroupNo) SELECT DevNo,ExpireDate,GroupNo FROM TempTbl', function (err, rows) {
         if (err) {
             console.log(err);
         }
