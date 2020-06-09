@@ -32,14 +32,18 @@ router.get('/', function (req, res, next) {
     var totalPage = 0;
     var mysqlQuery = req.mysqlQuery;
     var sql = 'SELECT count(*) as count from DeviceTbl'
-    if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
+    if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
         sql += (` WHERE AccountNo = ${req.session.AccountNo}`);
+    } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
+        sql += (` WHERE GroupNo = 68`);
     }
     mysqlQuery(sql, function (err, dev) {
         sql = 'SELECT count(*) as count from DeviceTbl'
         sql += (` WHERE UpdateDate >= ${timenow}`);
-        if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
+        if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
             sql += (` AND AccountNo = ${req.session.AccountNo}`);
+        } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
+            sql += (` WHERE GroupNo = 68`);
         }
         mysqlQuery(sql, function (err, dev2) {
             totalOnline = dev2[0].count;
@@ -47,8 +51,10 @@ router.get('/', function (req, res, next) {
             totalPage = Math.ceil(total / linePerPage);
             sql = 'SELECT a.*,b.Account FROM DeviceTbl a left join AccountTbl b on a.AccountNo = b.AccountNo';
 
-            if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
+            if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
                 sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
+            } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
+                sql += (` WHERE a.GroupNo = 68`);
             }
             // sql += (` order by a.DevName asc`);
             sql += (` limit ${index * linePerPage},${linePerPage}`);
@@ -93,8 +99,10 @@ router.get('/search', function (req, res, next) {
 
     var sql = 'SELECT count(*) as count from DeviceTbl'
     sql += (` WHERE UpdateDate >= ${timenow}`);
-    if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
+    if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
         sql += (` AND AccountNo = ${req.session.AccountNo}`);
+    } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
+        sql += (` WHERE GroupNo = 68`);
     }
     mysqlQuery(sql, function (err, dev2) {
         totalOnline = dev2[0].count;
@@ -120,12 +128,19 @@ router.get('/search', function (req, res, next) {
                 sql += (` AND b.Account LIKE '%${Account}%'`);
             }
         }
-        if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
+        if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
             if (!haswhere) {
                 sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
                 haswhere = true;
             } else {
                 sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
+            }
+        } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
+            if (!haswhere) {
+                sql += (` WHERE a.GroupNo = 68`);
+                haswhere = true;
+            } else {
+                sql += (` AND a.GroupNo = 68`);
             }
         }
         mysqlQuery(sql, function (err, dev) {
@@ -153,12 +168,19 @@ router.get('/search', function (req, res, next) {
                     sql += (` AND b.Account LIKE '%${Account}%'`);
                 }
             }
-            if (req.session.SuperUser != 1 && req.session.SuperUser != 2) {
+            if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
                 if (!haswhere) {
                     sql += (` WHERE a.AccountNo = ${req.session.AccountNo}`);
                     haswhere = true;
                 } else {
                     sql += (` AND a.AccountNo = ${req.session.AccountNo}`);
+                }
+            } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
+                if (!haswhere) {
+                    sql += (` WHERE a.GroupNo = 68`);
+                    haswhere = true;
+                } else {
+                    sql += (` AND a.GroupNo = 68`);
                 }
             }
             if (order && order != "") {

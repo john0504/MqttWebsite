@@ -95,19 +95,21 @@
         </tr>
     </table>
     <% } %>
+    <% if (locals.SuperUser < 4) { %>
     <img src="/img/logo.png" class="logo-left">
     <table border="0" align="center">
         <tr>
-            <% if (locals.SuperUser == 1) { %>
-            <th><a href="/firmware">OTA</a></th>
-            <th><a href="/serial">白名單</a></th>
-            <th><a href="/payment">加值卡</a></th>
-            <% } %>
-            <th><a href="/user">用戶</a></th>
-            <th><a href="/machine">機台</a></th>
-            <th><a href="/monthly">報表</a></th>
+                <% if (locals.SuperUser == 1) { %>
+                <th><a href="/firmware">OTA</a></th>
+                <th><a href="/serial">白名單</a></th>
+                <th><a href="/payment">加值卡</a></th>
+                <% } %>
+                <th><a href="/user">用戶</a></th>
+                <th><a href="/machine">機台</a></th>
+                <th><a href="/monthly">報表</a></th>
         </tr>
     </table>
+    <% } %>
     <!-- <% if (data[index]) { %>
     <h3>
         <%= data[index].name %>
@@ -181,6 +183,7 @@
                     onclick="Order('<%= index %>','<%= DevNo %>','<%= DevName %>','<%= Account %>','a.DevNo asc');" />
                 <% } %>
             </th>
+            <% if (locals.SuperUser < 4) { %>
             <th>Group
                 <% if(order == "a.GroupNo asc") { %>
                 <input type="button" name="order" value="▼"
@@ -194,6 +197,7 @@
                 <% } %></th>
             <th>WiFi版本</th>
             <th>SAA版本</th>
+            <% } %>
             <th>創建時間
                 <% if(order == "a.CreateDate asc") { %>
                 <input type="button" name="order" value="▼"
@@ -261,11 +265,15 @@
                 <% } %>
             </td>
             <td>
+                <% if (locals.SuperUser < 4) { %>
                 <input type="button" name="history" value="紀錄" class="btn"
                     onclick="History('<%= data[i].DevNo  %>');" />
                 <input type="button" name="chart" value="圖表" class="btn" onclick="Chart('<%= data[i].DevNo  %>', '<%= data[i].DevName  %>');" />
-                <% if (locals.SuperUser == 1 || locals.SuperUser == 2) { %>
+                <% } %>
+                <% if (locals.SuperUser == 1 || locals.SuperUser == 2 || locals.SuperUser == 5) { %>
                 <input type="button" name="edit" value="修改" class="btn" onclick="Edit('<%= data[i].DevNo  %>');" />
+                <% } %>
+                <% if (locals.SuperUser == 1 || locals.SuperUser == 2 || locals.SuperUser == 4 || locals.SuperUser == 5) { %>
                 <input type="button" name="delete" value="解綁" class="btn"
                     onclick="Delete('<%= data[i].DevNo %>','<%= data[i].AccountNo %>');" />
                 <% } %>
