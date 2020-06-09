@@ -43,9 +43,8 @@ router.get('/', function (req, res, next) {
         if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
             sql += (` AND AccountNo = ${req.session.AccountNo}`);
         } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
-            sql += (` WHERE GroupNo = 68`);
+            sql += (` AND GroupNo = 68`);
         }
-        console.log(`debug============ ${sql}`);
         mysqlQuery(sql, function (err, dev2) {
             totalOnline = dev2[0].count;
             var total = dev[0].count;
@@ -102,7 +101,7 @@ router.get('/search', function (req, res, next) {
     if (req.session.SuperUser != 1 && req.session.SuperUser != 2 && req.session.SuperUser != 4 && req.session.SuperUser != 5) {
         sql += (` AND AccountNo = ${req.session.AccountNo}`);
     } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
-        sql += (` WHERE GroupNo = 68`);
+        sql += (` AND GroupNo = 68`);
     }
     mysqlQuery(sql, function (err, dev2) {
         totalOnline = dev2[0].count;
