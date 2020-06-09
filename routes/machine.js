@@ -45,6 +45,7 @@ router.get('/', function (req, res, next) {
         } else if (req.session.SuperUser == 4 || req.session.SuperUser == 5) {
             sql += (` WHERE GroupNo = 68`);
         }
+        console.log(`debug============ ${sql}`);
         mysqlQuery(sql, function (err, dev2) {
             totalOnline = dev2[0].count;
             var total = dev[0].count;
@@ -58,8 +59,6 @@ router.get('/', function (req, res, next) {
             }
             // sql += (` order by a.DevName asc`);
             sql += (` limit ${index * linePerPage},${linePerPage}`);
-            console.log(`debug============ ${sql}`);
-            /*
             mysqlQuery(sql, function (err, devices) {
                 if (err) {
                     console.log(err);
@@ -76,7 +75,7 @@ router.get('/', function (req, res, next) {
                     DevName: DevName, Account: Account, totalPage: totalPage,
                     linePerPage: linePerPage, order: order, totalOnline: totalOnline
                 });
-            });*/
+            });
         });
     });
 });
