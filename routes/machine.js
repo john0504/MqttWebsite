@@ -59,6 +59,7 @@ router.get('/', function (req, res, next) {
             // sql += (` order by a.DevName asc`);
             sql += (` limit ${index * linePerPage},${linePerPage}`);
             console.log(`debug============ ${sql}`);
+            /*
             mysqlQuery(sql, function (err, devices) {
                 if (err) {
                     console.log(err);
@@ -75,7 +76,7 @@ router.get('/', function (req, res, next) {
                     DevName: DevName, Account: Account, totalPage: totalPage,
                     linePerPage: linePerPage, order: order, totalOnline: totalOnline
                 });
-            });
+            });*/
         });
     });
 });
